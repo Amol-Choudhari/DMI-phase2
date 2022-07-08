@@ -26,12 +26,16 @@ $("#tbl_consent_letter_docs").change(function(){
 
 $("#edit_tbl_details").click(function(e){
 
-	validate_tbl_details();
+	if(validate_tbl_details()==false){//condition added on 06-07-2022 by Amol
+		e.preventDefault();
+	}
 });
 
 $("#add_tbl_details").click(function(e){
 
-	validate_tbl_details();
+	if(validate_tbl_details()==false){//condition added on 06-07-2022 by Amol
+		e.preventDefault();
+	}
 });
 
 

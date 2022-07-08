@@ -24,7 +24,7 @@
 				if(!ctype_digit($data)){						
 					$app->invalidActivities();
 				}
-				$changeField = $this->find('all',array('valueField'=>array('c_filed_id','payment','sectionid'),'conditions'=>array('field_id IS'=>$data, 'form_type IS'=>$form_type)))->first();
+				$changeField = $this->find('all',array('valueField'=>array('c_filed_id','payment','sectionid'),'conditions'=>array('field_id IS'=>$data, 'form_type IS'=>'common')))->first();
 				$explode = explode(',',$changeField['c_filed_id']);							
 				$changefieldAarray = array_merge($changefieldAarray,$explode);				
 				

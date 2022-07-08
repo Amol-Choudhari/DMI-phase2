@@ -98,13 +98,13 @@ if ($current_menu == 'menu_register') {
 						  <i class="far fa-clock nav-icon"></i>
 						  <p>Suspension</p>
 						</a>
-					  </li>
+					  </li>  -->
 					  <li class="nav-item">
 						<a href="<?php echo $this->request->getAttribute("webroot");?>application/application-type/3" class="nav-link <?php echo $menu_mod; ?>">
 						  <i class="fa fa-wrench nav-icon"></i>
 						  <p>Modification</p>
 						</a>
-					  </li> -->
+					  </li>
 					  <?php if($split_user_name[1] == 1 && $IsApproved=='yes') { ?>
 
 							<li class="nav-item">

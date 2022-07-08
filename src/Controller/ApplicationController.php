@@ -100,7 +100,7 @@
 			$final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
 			$this->set('final_submit_details',$final_submit_details);
 
-			$changeFieldsList = $this->DmiChangeFieldLists->find('list',array('keyField'=>'field_id','valueField'=>'change_field','conditions'=>array('form_type IS'=>$form_type),'order'=>'field_id'))->toArray();
+			$changeFieldsList = $this->DmiChangeFieldLists->find('list',array('keyField'=>'field_id','valueField'=>'change_field','conditions'=>array('form_type IS'=>'common'),'order'=>'field_id'))->toArray();
 			$this->set('changeFieldsList',$changeFieldsList);
 
 			$selectedValues = $this->DmiChangeSelectedFields->selectedChangeFields();
@@ -227,14 +227,10 @@
 			$this->Customfunctions->showOldCertDetailsPopup($customer_id);
 
 
-			if ($application_type == 3) {
-				$DmiAllDirectorsDetails = TableRegistry::getTableLocator()->get('DmiChangeDirectorsDetails');
-			} else {
-				$DmiAllDirectorsDetails = TableRegistry::getTableLocator()->get('DmiAllDirectorsDetails');
-			}
+			$DmiAllDirectorsDetails = TableRegistry::getTableLocator()->get('DmiAllDirectorsDetails');
 
 			$added_directors_details = $DmiAllDirectorsDetails->allDirectorsDetail($customer_id);
-			$this->set('added_directors_details',$added_directors_details);
+			//$this->set('added_directors_details',$added_directors_details);
 			$office_type = $this->Customfunctions->getApplDistrictOffice($customer_id);
 			$firm_type = $this->Customfunctions->firmType($customer_id);
 			$this->set('firm_type',$firm_type);			
@@ -342,25 +338,148 @@
 
 			$this->set('final_submit_status',$final_submit_status);
 
-
+			//below code commented by Amol on 06-07-2022
 			/* For change module*/
-			$fstatuses = array('pending','replied','approved');
+			/*$fstatuses = array('pending','replied','approved');
 			if ($application_type == 3 && in_array($final_submit_status,$fstatuses) == false) {
 				$changefields = $this->Session->read('changefield');
 			} else {
 				$changefields = array();
-			}
+			}*/
+			$changefields = array();
 			
 			$this->set('changefields',json_encode($changefields));
 
 			$selectedSections = array();
+			$change_details = array();
+			$last_details = array();
 			if ($application_type == 3) {
 				$this->loadModel('DmiChangeSelectedFields');
+				$this->loadModel('DmiChangeApplDetails');
 				$selectedfields = $this->DmiChangeSelectedFields->selectedChangeFields();
-				$selectedSections = $selectedfields[2];
+				//$selectedSections = $selectedfields[2];
+				$selectedValues = $selectedfields[0];
+
+				//get details from change appl table, if application saved once
+				$getChangeDetails = $this->DmiChangeApplDetails->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first(); 
+				if(!empty($getChangeDetails)){
+					$change_details['firm_name'] = $getChangeDetails['firm_name'];
+					$change_details['const_of_firm'] = $getChangeDetails['const_of_firm'];
+					$change_details['mobile_no'] = $getChangeDetails['mobile_no'];
+					$change_details['email_id'] = $getChangeDetails['email_id'];
+					$change_details['phone_no'] = $getChangeDetails['phone_no'];
+					$change_details['premise_street'] = $getChangeDetails['premise_street'];
+					$change_details['premise_city'] = $getChangeDetails['premise_city'];
+					$change_details['premise_state'] = $getChangeDetails['premise_state'];
+					$change_details['premise_pin'] = $getChangeDetails['premise_pin'];
+					$change_details['comm_category'] = $getChangeDetails['comm_category'];
+					$change_details['commodity'] = $getChangeDetails['commodity'];
+					$change_details['lab_type'] = $getChangeDetails['lab_type'];
+					$change_details['lab_name'] = $getChangeDetails['lab_name'];
+					$change_details['lab_consent_docs'] = $getChangeDetails['lab_consent_docs'];
+					$change_details['lab_equipped_docs'] = $getChangeDetails['lab_equipped_docs'];
+					$change_details['chemist_details_docs'] = $getChangeDetails['chemist_details_docs'];
+				}else{
+					$change_details['firm_name'] = '';
+					$change_details['const_of_firm'] = '';
+					$change_details['mobile_no'] = '';
+					$change_details['email_id'] = '';
+					$change_details['phone_no'] = '';
+					$change_details['premise_street'] = '';
+					$change_details['premise_city'] = '';
+					$change_details['premise_state'] = '';
+					$change_details['premise_pin'] = '';
+					$change_details['comm_category'] = '';
+					$change_details['commodity'] = '';
+					$change_details['lab_type'] = '';
+					$change_details['lab_name'] = '';
+					$change_details['lab_consent_docs'] = '';
+					$change_details['lab_equipped_docs'] = '';
+					$change_details['chemist_details_docs'] = '';
+				}
+				if (in_array(1,$selectedValues)) {
+					$last_details['firm_name'] = $firm_details['firm_name'];
+				}
+				if (in_array(2,$selectedValues)) {
+					$last_details['mobile_no'] = base64_decode($firm_details['mobile_no']);
+					$last_details['email_id'] = base64_decode($firm_details['email']);
+					$last_details['phone_no'] = base64_decode($firm_details['fax_no']);
+				}
+				if (in_array(3,$selectedValues)) {
+
+					//check if change tbl table is not empty, else fetch and store last data to it
+					$this->loadModel('DmiChangeAllTblsDetails');
+					$checkChangeTbl = $this->DmiChangeAllTblsDetails->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$customer_id)))->first();
+					
+					//for first time only
+					if(empty($checkChangeTbl)){
+						//fetch last details
+						$this->loadModel('DmiAllTblsDetails');
+						$getLastTbls = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS NULL'),'order'=>'id asc'))->toArray();
+						$dataArr = array();
+						foreach($getLastTbls as $each){
+							$dataArr[] = array(
+								'customer_id'=>$customer_id,
+								'tbl_name'=>$each['tbl_name'],
+								'tbl_registered'=>$each['tbl_registered'],
+								'tbl_registered_no'=>$each['tbl_registered_no'],
+								'tbl_registration_docs'=>$each['tbl_registration_docs'],
+								'created'=>$this->Customfunctions->changeDateFormat($each['created']),
+								'modified'=>$this->Customfunctions->changeDateFormat($each['modified'])
+							);
+						}
+						//save last details in change tbl table
+						$ChangeTblsEntity = $this->DmiChangeAllTblsDetails->newEntities($dataArr);
+						foreach($ChangeTblsEntity as $each){
+							$this->DmiChangeAllTblsDetails->save($each);
+						}
+					}
+					$added_tbls_details = $this->DmiChangeAllTblsDetails->tblsDetails();
+					$this->set('added_tbls_details',$added_tbls_details);
+
+				}
+				if(in_array(4,$selectedValues)){
+					
+					//check if change Details table is not empty, else fetch and store last data to it
+					$this->loadModel('DmiChangeDirectorsDetails');
+					$checkChangeDirector = $this->DmiChangeDirectorsDetails->find('all',array('fields'=>'id','conditions'=>array('customer_id IS'=>$customer_id)))->first();
+					
+					//for first time only
+					if(empty($checkChangeDirector)){
+						//fetch last details
+						$this->loadModel('DmiAllDirectorsDetails');
+						$getLastDirector = $this->DmiAllDirectorsDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS NULL'),'order'=>'id asc'))->toArray();
+						$dataArr = array();
+						foreach($getLastDirector as $each){
+							$dataArr[] = array(
+								'customer_id'=>$customer_id,
+								'user_email_id'=>$each['user_email_id'],
+								'd_name'=>$each['d_name'],
+								'd_address'=>$each['d_address'],
+								'created'=>$this->Customfunctions->changeDateFormat($each['created']),
+								'modified'=>$this->Customfunctions->changeDateFormat($each['modified'])
+							);
+						}
+						//save last details in change tbl table
+						$ChangeDirectorEntity = $this->DmiChangeDirectorsDetails->newEntities($dataArr);
+						foreach($ChangeDirectorEntity as $each){
+							$this->DmiChangeDirectorsDetails->save($each);
+						}
+					}
+					$added_directors_details = $this->DmiChangeDirectorsDetails->allDirectorsDetail($customer_id);			
+					$this->set('added_directors_details',$added_directors_details);
+				}
+				if(in_array(6,$selectedValues)){
+
+				}
+
 			}
 			
-			$this->set('selectedSections',$selectedSections);
+			$this->set('added_directors_details',$added_directors_details);
+			//$this->set('selectedSections',$selectedSections);
+			$this->set('selectedValues',$selectedValues);
+			$this->set('last_details',$last_details);
+			$this->set('change_details',$change_details);
 
 
 			// Check current forms is saved or not
@@ -533,8 +652,14 @@
 
 			} elseif (null !== $this->request->getData('add_tbl_details')) {
 
-				$this->loadModel('DmiAllTblsDetails');
-				$save_details_result = $this->DmiAllTblsDetails->saveTblDetails($customer_id,$this->request->getData());
+				//this condition and code added on 06-07-2022 by Amol
+				if ($application_type == 3) {
+					$this->loadModel('DmiChangeAllTblsDetails');
+					$save_details_result = $this->DmiChangeAllTblsDetails->saveTblDetails($customer_id,$this->request->getData());
+				}else{
+					$this->loadModel('DmiAllTblsDetails');
+					$save_details_result = $this->DmiAllTblsDetails->saveTblDetails($customer_id,$this->request->getData());
+				}
 				
 				if ($save_details_result == 1) {
 					$this->Session->delete('edit_tbl_id');
@@ -936,8 +1061,18 @@
 		// DELETE TBL ID
 		public function deleteTblId($id) {
 			$record_id = $id;
-			$this->loadModel('DmiAllTblsDetails');
-			$tbl_delete_result = $this->DmiAllTblsDetails->deleteTblDetails($record_id);// call to custome function from model
+
+			$application_type = $this->Session->read('application_type');
+
+			//this condition and code added on 06-07-2022 by Amol
+			if($application_type==3){
+				$this->loadModel('DmiChangeAllTblsDetails');
+				$tbl_delete_result = $this->DmiChangeAllTblsDetails->deleteTblDetails($record_id);
+			}else{
+				$this->loadModel('DmiAllTblsDetails');
+				$tbl_delete_result = $this->DmiAllTblsDetails->deleteTblDetails($record_id);// call to custome function from model
+			}
+			
 			if ($tbl_delete_result == 1)
 			{
 				$this->redirect('/application/application-for-certificate');

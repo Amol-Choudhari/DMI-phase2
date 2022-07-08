@@ -2836,19 +2836,19 @@
 			$application_type = $this->Session->read('application_type');
 			$sections = array();
 
-			if ($application_type == 3 ) {
+			/*if ($application_type == 3 ) {
 
 				$DmiChangeSelectedFields = TableRegistry::getTableLocator()->get('DmiChangeSelectedFields');
 				$selectedfields = $DmiChangeSelectedFields->selectedChangeFields();
 				$sections = $selectedfields[2];
 
-			} else {
+			} else {*/
 
 				foreach ($allSectionDetails as $section) {
 
 					$sections[] =  $section['section_id'];
 				}
-			}
+			/*}*/
 
 			sort($sections);
 
