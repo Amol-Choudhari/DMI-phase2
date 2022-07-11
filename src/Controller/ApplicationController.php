@@ -471,6 +471,11 @@
 				}
 				if(in_array(6,$selectedValues)){
 
+					//check if change Details table is not empty, else fetch and store last data to it
+					$this->loadModel('DmiCustomerLaboratoryDetails');
+					$fetchCaLablastDetails = $this->DmiCustomerLaboratoryDetails->find('all',array('fields'=>array('laboratory_name','laboratory_type','consent_letter_docs','chemist_detail_docs','lab_equipped_docs'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+					$this->set('fetchCaLablastDetails',$fetchCaLablastDetails);
+
 				}
 
 			}
