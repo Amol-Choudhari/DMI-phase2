@@ -473,9 +473,16 @@
 
 					//check if change Details table is not empty, else fetch and store last data to it
 					$this->loadModel('DmiCustomerLaboratoryDetails');
+					$laboratory_types = $this->Mastertablecontent->allLaboratoryType();
+					$this->set('laboratory_types',$laboratory_types);
 					$fetchCaLablastDetails = $this->DmiCustomerLaboratoryDetails->find('all',array('fields'=>array('laboratory_name','laboratory_type','consent_letter_docs','chemist_detail_docs','lab_equipped_docs'),'conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
 					$this->set('fetchCaLablastDetails',$fetchCaLablastDetails);
 
+				}
+				if(in_array(7,$selectedValues)){
+					$this->loadModel('MCommodityCategory');
+					$cat_list = $this->MCommodityCategory->find('list',array('valueField'=>'category_name','conditions'=>array('display'=>'Y')))->toArray();
+					$this->set('cat_list',$cat_list);
 				}
 
 			}

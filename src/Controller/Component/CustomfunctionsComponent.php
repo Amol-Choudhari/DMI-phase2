@@ -2836,6 +2836,7 @@
 			$application_type = $this->Session->read('application_type');
 			$sections = array();
 
+			//commented to manage updated changed flow.
 			/*if ($application_type == 3 ) {
 
 				$DmiChangeSelectedFields = TableRegistry::getTableLocator()->get('DmiChangeSelectedFields');
