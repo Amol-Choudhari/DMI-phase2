@@ -13,7 +13,7 @@
 			<div id="directors_each_row">
 				<?php
 					$i=1;
-					foreach ($added_directors_details as $each_director) { ?>
+					foreach ($section_form_details[4] as $each_director) { ?>
 						<tr>
 							<td><?php echo $i; ?></td>
 							<td><?php echo $each_director['d_name']; ?></td>

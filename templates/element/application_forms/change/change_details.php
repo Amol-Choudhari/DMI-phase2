@@ -17,7 +17,7 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Firm Name <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('firm_name', array('type'=>'text', 'id'=>'firm_name', 'escape'=>false, 'value'=>$change_details['firm_name'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('firm_name', array('type'=>'text', 'id'=>'firm_name', 'escape'=>false, 'value'=>$section_form_details[0]['firm_name'], 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 						</div>
@@ -27,7 +27,7 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Firm Name <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('firm_name_last', array('type'=>'text','escape'=>false, 'value'=>$last_details['firm_name'], 'class'=>'form-control input-field', 'label'=>false, 'disabled'=>true)); ?>
+									<?php echo $this->Form->control('firm_name_last', array('type'=>'text','escape'=>false, 'value'=>$section_form_details[1]['firm_name'], 'class'=>'form-control input-field', 'label'=>false, 'disabled'=>true)); ?>
 								</div>
 							</div>
 						</div>
@@ -42,19 +42,19 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Mobile No. <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('mobile_no', array('type'=>'text', 'id'=>'mobile_no', 'escape'=>false, 'value'=>$change_details['mobile_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('mobile_no', array('type'=>'text', 'id'=>'mobile_no', 'escape'=>false, 'value'=>$section_form_details[0]['mobile_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Email Id <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('email_id', array('type'=>'text', 'id'=>'email_id', 'escape'=>false, 'value'=>$change_details['email_id'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('email_id', array('type'=>'text', 'id'=>'email_id', 'escape'=>false, 'value'=>$section_form_details[0]['email_id'], 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Phone No. <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('phone_no', array('type'=>'text', 'id'=>'phone_no', 'escape'=>false, 'value'=>$change_details['phone_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('phone_no', array('type'=>'text', 'id'=>'phone_no', 'escape'=>false, 'value'=>$section_form_details[0]['phone_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 						</div>
@@ -64,19 +64,19 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Mobile No. <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('mobile_no_last', array('type'=>'text','escape'=>false, 'value'=>$last_details['mobile_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('mobile_no_last', array('type'=>'text','escape'=>false, 'value'=>base64_decode($section_form_details[1]['mobile_no']), 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Email Id <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('email_id_last', array('type'=>'text','escape'=>false, 'value'=>$last_details['email_id'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('email_id_last', array('type'=>'text','escape'=>false, 'value'=>base64_decode($section_form_details[1]['email']), 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Phone No. <span class="cRed">*</span></label>
 								<div class="col-sm-9">
-									<?php echo $this->Form->control('phone_no_last', array('type'=>'text','escape'=>false, 'value'=>$last_details['phone_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<?php echo $this->Form->control('phone_no_last', array('type'=>'text','escape'=>false, 'value'=>base64_decode($section_form_details[1]['fax_no']), 'class'=>'form-control input-field', 'label'=>false)); ?>
 								</div>
 							</div>
 						</div>
@@ -92,28 +92,28 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Address <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('premise_street', array('type'=>'textarea', 'id'=>'premise_street', 'escape'=>false, 'value'=>$change_details['premise_street'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter street address')); ?>
+										<?php echo $this->Form->control('premise_street', array('type'=>'textarea', 'id'=>'street_address', 'escape'=>false, 'value'=>$section_form_details[0]['premise_street'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter street address')); ?>
 									<span id="error_street_address" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">State/Region <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('premise_state', array('type'=>'select', 'id'=>'premise_state', 'options'=>$state_list,  'value'=>$change_details['premise_state'],  'empty'=>'Select', 'label'=>false,'class'=>'form-control')); ?>
+										<?php echo $this->Form->control('premise_state', array('type'=>'select', 'id'=>'state', 'options'=>$state_list,  'value'=>$section_form_details[0]['premise_state'],  'empty'=>'Select', 'label'=>false,'class'=>'form-control')); ?>
 									<span id="error_state" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">District <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('premise_city', array('type'=>'select', 'id'=>'premise_city', 'options'=>$section_form_details[2], 'value'=>$change_details['premise_city'], 'label'=>false, 'class'=>'form-control')); ?>
+										<?php echo $this->Form->control('premise_city', array('type'=>'select', 'id'=>'district', 'options'=>$section_form_details[0]['dist_list'], 'value'=>$section_form_details[0]['premise_city'], 'label'=>false, 'class'=>'form-control')); ?>
 									<span id="error_district" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Pin Code <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('premise_pin', array('type'=>'text', 'id'=>'premise_pin', 'escape'=>false, 'value'=>$change_details['premise_pin'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter postal/zip code')); ?>
+										<?php echo $this->Form->control('premise_pin', array('type'=>'text', 'id'=>'postal_code', 'escape'=>false, 'value'=>$section_form_details[0]['premise_pin'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter postal/zip code')); ?>
 									<span id="error_postal_code" class="error invalid-feedback"></span>
 								</div>
 							</div>
@@ -124,28 +124,28 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Address <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('street_address_last', array('type'=>'textarea', 'escape'=>false, 'value'=>$change_details['premise_street'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter street address')); ?>
+										<?php echo $this->Form->control('street_address_last', array('type'=>'textarea', 'escape'=>false, 'value'=>$section_form_details[2]['street_address'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter street address')); ?>
 								
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">State/Region <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('state_last', array('type'=>'select','options'=>$state_list,  'value'=>$change_details['premise_state'],  'empty'=>'Select', 'label'=>false,'class'=>'form-control')); ?>
+										<?php echo $this->Form->control('state_last', array('type'=>'select','options'=>$state_list,  'value'=>$section_form_details[2]['state'],  'empty'=>'Select', 'label'=>false,'class'=>'form-control')); ?>
 									
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">District <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('district_last', array('type'=>'select','options'=>$section_form_details[2], 'value'=>$change_details['premise_city'], 'label'=>false, 'class'=>'form-control')); ?>
+										<?php echo $this->Form->control('district_last', array('type'=>'select','options'=>$distict_list, 'value'=>$section_form_details[2]['district'], 'label'=>false, 'class'=>'form-control')); ?>
 									
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Pin Code <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
-										<?php echo $this->Form->control('postal_code_last', array('type'=>'text','escape'=>false, 'value'=>$change_details['premise_pin'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter postal/zip code')); ?>
+										<?php echo $this->Form->control('postal_code_last', array('type'=>'text','escape'=>false, 'value'=>$section_form_details[2]['postal_code'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter postal/zip code')); ?>
 									<span id="error_postal_code" class="error invalid-feedback"></span>
 								</div>
 							</div>
@@ -178,25 +178,25 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-4 col-form-label">Laboratory Name <span class="cRed">*</span></label>
 								<div class="custom-file col-sm-8">
-									<?php echo $this->form->control('lab_name', array('type'=>'text', 'id'=>'lab_name', 'escape'=>false, 'value'=>$change_details['lab_name'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter laboratory name')); ?>
+									<?php echo $this->form->control('lab_name', array('type'=>'text', 'id'=>'lab_name', 'escape'=>false, 'value'=>$section_form_details[0]['lab_name'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter laboratory name')); ?>
 									<span id="error_laboratory_name" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-4 col-form-label">Laboratory Type <span class="cRed">*</span></label>
 								<div class="custom-file col-sm-8">
-									<?php echo $this->form->control('lab_type', array('type'=>'select', 'id'=>'lab_type', 'options'=>$laboratory_types, 'value'=>$change_details['lab_type'], 'label'=>false, 'class'=>'form-control')); ?>
+									<?php echo $this->form->control('lab_type', array('type'=>'select', 'id'=>'lab_type', 'options'=>$section_form_details[5][0], 'value'=>$section_form_details[0]['lab_type'], 'label'=>false, 'class'=>'form-control')); ?>
 									<span id="error_laboratory_type" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							
-							<div class="row" id="show_chemist_details">
+							<div id="show_chemist_details">
 								<div class="d-inline-block">
 									<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Upload Details of Approved Chemists</p>
 									<div class="form-group row">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Attach File: <span class="cRed">*</span></label>
-											<?php if(!empty($change_details['chemist_details_docs'])){?>
-												<a id="chemist_detail_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$change_details['chemist_details_docs']); ?>">Preview</a>
+											<?php if(!empty($section_form_details[0]['chemist_details_docs'])){?>
+												<a id="chemist_detail_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['chemist_details_docs']); ?>">Preview</a>
 											<?php } ?>
 										
 										<div class="custom-file col-sm-9">
@@ -213,8 +213,8 @@
 									<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Upload Details of Instruments, Details of Glass Apparatus, Details of Chemicals</p>
 									<div class="form-group row">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Attach File: <span class="cRed">*</span></label>
-											<?php if(!empty($change_details['lab_equipped_docs'])){?>
-												<a id="lab_equipped_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$change_details['lab_equipped_docs']); ?>">Preview</a>
+											<?php if(!empty($section_form_details[0]['lab_equipped_docs'])){?>
+												<a id="lab_equipped_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['lab_equipped_docs']); ?>">Preview</a>
 											<?php } ?>
 										
 										<div class="custom-file col-sm-9">
@@ -232,8 +232,8 @@
 								<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Consent letter of the laboratory may be enclosed, Not required in case of own laboratory.</p>
 										<div class="form-group row">
 										<label for="inputEmail3" class="col-sm-2 col-form-label">Attach File: <span class="cRed">*</span></label>
-											<?php if(!empty($change_details['lab_consent_docs'])){?>
-												<a id="consent_letter_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$change_details['lab_consent_docs']); ?>">Preview</a>
+											<?php if(!empty($section_form_details[0]['lab_consent_docs'])){?>
+												<a id="consent_letter_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['lab_consent_docs']); ?>">Preview</a>
 											<?php } ?>
 										
 										<div class="custom-file col-sm-4">
@@ -253,41 +253,41 @@
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-4 col-form-label">Laboratory Name <span class="cRed">*</span></label>
 								<div class="custom-file col-sm-8">
-									<?php echo $this->form->control('laboratory_name', array('type'=>'text','escape'=>false, 'value'=>$fetchCaLablastDetails['laboratory_name'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter laboratory name')); ?>
+									<?php echo $this->form->control('laboratory_name', array('type'=>'text','escape'=>false, 'value'=>$section_form_details[5][1]['laboratory_name'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter laboratory name')); ?>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-4 col-form-label">Laboratory Type <span class="cRed">*</span></label>
 								<div class="custom-file col-sm-8">
-									<?php echo $this->form->control('laboratory_type', array('type'=>'select','options'=>$laboratory_types, 'value'=>$fetchCaLablastDetails['laboratory_type'], 'label'=>false, 'class'=>'form-control')); ?>
+									<?php echo $this->form->control('laboratory_type', array('type'=>'select','options'=>$section_form_details[5][0], 'value'=>$section_form_details[5][1]['laboratory_type'], 'label'=>false, 'class'=>'form-control')); ?>
 								
 								</div>
 							</div>
 
-							<?php if(!empty($fetchCaLablastDetails['chemist_detail_docs'])){?>
+							<?php if(!empty($section_form_details[5][1]['chemist_detail_docs'])){?>
 								<div class="d-inline-block">
 									<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Upload Details of Approved Chemists</p>
 									<div class="form-group row">
-									Attached File : <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$fetchCaLablastDetails['chemist_detail_docs']); ?>">Preview</a>
+									Attached File : <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[5][1]['chemist_detail_docs']); ?>">Preview</a>
 									</div>
 									<p class="lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
 								</div>
 							<?php } ?>
 
-							<?php if(!empty($fetchCaLablastDetails['lab_equipped_docs'])){?>
+							<?php if(!empty($section_form_details[5][1]['lab_equipped_docs'])){?>
 								<div class="d-inline-block">
 									<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Upload Details of Instruments, Details of Glass Apparatus, Details of Chemicals</p>
 									<div class="form-group row">
-									Attached File : <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$fetchCaLablastDetails['lab_equipped_docs']); ?>">Preview</a>	
+									Attached File : <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[5][1]['lab_equipped_docs']); ?>">Preview</a>	
 									</div>
 									<p class="lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
 								</div>
 							<?php } ?>
 
-							<?php if(!empty($fetchCaLablastDetails['consent_letter_docs'])){?>
+							<?php if(!empty($section_form_details[5][1]['consent_letter_docs'])){?>
 								<p class="bg-info pl-2 p-1 rounded text-sm"><i class="fa fa-info-circle"></i> Consent letter of the laboratory may be enclosed, Not required in case of own laboratory.</p>
 									<div class="form-group row">
-										Attached File : <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$fetchCaLablastDetails['consent_letter_docs']); ?>">Preview</a>	
+										Attached File : <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[5][1]['consent_letter_docs']); ?>">Preview</a>	
 									</div>
 								<p class="lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
 							<?php } ?>

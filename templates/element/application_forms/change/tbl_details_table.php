@@ -11,7 +11,7 @@
             <div id="machinery_each_row">
                 <?php
                 $i=1;
-                foreach($added_tbls_details[0] as $each_tbl){  ?>
+                foreach($section_form_details[3][0] as $each_tbl){  ?>
                 <tr>
                     <td><?php echo $i; ?></td>
                     <td><?php echo $each_tbl['tbl_name']; ?></td>
@@ -31,10 +31,10 @@
             <?php  if($this->request->getSession()->read('edit_tbl_id') != null){?>
                 <tr>
                     <td></td>
-                    <td><?php  echo $this->Form->control('tbl_name', array('type'=>'text', 'id'=>'tbl_name', 'value'=>$added_tbls_details[0][1]['tbl_name'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
+                    <td><?php  echo $this->Form->control('tbl_name', array('type'=>'text', 'id'=>'tbl_name', 'value'=>$section_form_details[3][0][1]['tbl_name'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
                     <td>
                         <?php
-                        $tbl_registered_radio = $added_tbls_details[0][1]['tbl_registered'];
+                        $tbl_registered_radio = $section_form_details[3][0][1]['tbl_registered'];
                         if($tbl_registered_radio == 'yes'){
                             $tbl_registered_radio_yes = 'checked';
                             $tbl_registered_radio_no = '';
@@ -57,14 +57,14 @@
                         </label>
                         </div>
                     </td>
-                    <td><?php  echo $this->Form->control('tbl_registered_no', array('type'=>'text', 'id'=>'tbl_registered_no', 'value'=>$added_tbls_details[0][1]['tbl_registered_no'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
+                    <td><?php  echo $this->Form->control('tbl_registered_no', array('type'=>'text', 'id'=>'tbl_registered_no', 'value'=>$section_form_details[3][0][1]['tbl_registered_no'], 'escape'=>false, 'class'=>'form-control input-field', 'label'=>false)); ?></td>
                     <td>
                         <div class="custom-file">
                             <input type="file" name="tbl_registration_docs" class="custom-file-input", multiple='multiple'>
                             <label class="custom-file-label" for="customFile">Choose file</label>
                         </div>
-                        <?php if($added_tbls_details[0][1]['tbl_registration_docs'] != null){?>
-                        <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$added_tbls_details[0][1]['tbl_registration_docs']); ?>">Preview</a>
+                        <?php if($section_form_details[3][0][1]['tbl_registration_docs'] != null){?>
+                        <a target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[3][0][1]['tbl_registration_docs']); ?>">Preview</a>
                         <?php } ?>
                     </td>
                     <td><?php  echo $this->form->submit('save', array('name'=>'add_tbl_details', 'class'=>'table_record_add_btn btn btn-info btn-sm', 'id'=>'edit_tbl_details','label'=>false)); ?></td>

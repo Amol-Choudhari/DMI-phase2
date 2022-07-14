@@ -12,7 +12,7 @@
 			<div class="form-group row">
 				<label for="inputEmail3" class="col-sm-3 col-form-label">Category <span class="cRed">*</span></label>
 				<div class="col-sm-9">
-					<?php echo $this->Form->control('comm_category', array('type'=>'select', 'id'=>'category', 'empty'=>'Select Category', 'options'=>$cat_list,'label'=>false, 'class'=>'form-control')); ?>
+					<?php echo $this->Form->control('comm_category', array('type'=>'select', 'id'=>'category', 'empty'=>'Select Category', 'options'=>$section_form_details[6],'label'=>false, 'class'=>'form-control')); ?>
 				</div>
 			</div>
 			
