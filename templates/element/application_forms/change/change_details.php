@@ -18,6 +18,7 @@
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Firm Name <span class="cRed">*</span></label>
 								<div class="col-sm-9">
 									<?php echo $this->Form->control('firm_name', array('type'=>'text', 'id'=>'firm_name', 'escape'=>false, 'value'=>$section_form_details[0]['firm_name'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<span id="error_firm_name" class="error invalid-feedback"></span>
 								</div>
 							</div>
 						</div>
@@ -43,18 +44,21 @@
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Mobile No. <span class="cRed">*</span></label>
 								<div class="col-sm-9">
 									<?php echo $this->Form->control('mobile_no', array('type'=>'text', 'id'=>'mobile_no', 'escape'=>false, 'value'=>$section_form_details[0]['mobile_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<span id="error_mobile_no" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Email Id <span class="cRed">*</span></label>
 								<div class="col-sm-9">
 									<?php echo $this->Form->control('email_id', array('type'=>'text', 'id'=>'email_id', 'escape'=>false, 'value'=>$section_form_details[0]['email_id'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<span id="error_email_id" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Phone No. <span class="cRed">*</span></label>
 								<div class="col-sm-9">
 									<?php echo $this->Form->control('phone_no', array('type'=>'text', 'id'=>'phone_no', 'escape'=>false, 'value'=>$section_form_details[0]['phone_no'], 'class'=>'form-control input-field', 'label'=>false)); ?>
+									<span id="error_phone_no" class="error invalid-feedback"></span>
 								</div>
 							</div>
 						</div>
@@ -93,28 +97,28 @@
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Address <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
 										<?php echo $this->Form->control('premise_street', array('type'=>'textarea', 'id'=>'street_address', 'escape'=>false, 'value'=>$section_form_details[0]['premise_street'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter street address')); ?>
-									<span id="error_street_address" class="error invalid-feedback"></span>
+										<span id="error_premise_street" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">State/Region <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
 										<?php echo $this->Form->control('premise_state', array('type'=>'select', 'id'=>'state', 'options'=>$state_list,  'value'=>$section_form_details[0]['premise_state'],  'empty'=>'Select', 'label'=>false,'class'=>'form-control')); ?>
-									<span id="error_state" class="error invalid-feedback"></span>
+										<span id="error_premise_state" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">District <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
 										<?php echo $this->Form->control('premise_city', array('type'=>'select', 'id'=>'district', 'options'=>$section_form_details[0]['dist_list'], 'value'=>$section_form_details[0]['premise_city'], 'label'=>false, 'class'=>'form-control')); ?>
-									<span id="error_district" class="error invalid-feedback"></span>
+										<span id="error_premise_city" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-3 col-form-label">Pin Code <span class="cRed">*</span></label>
 									<div class="custom-file col-sm-9">
 										<?php echo $this->Form->control('premise_pin', array('type'=>'text', 'id'=>'postal_code', 'escape'=>false, 'value'=>$section_form_details[0]['premise_pin'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter postal/zip code')); ?>
-									<span id="error_postal_code" class="error invalid-feedback"></span>
+										<span id="error_premise_pin" class="error invalid-feedback"></span>
 								</div>
 							</div>
 						</div>
@@ -179,14 +183,14 @@
 								<label for="inputEmail3" class="col-sm-4 col-form-label">Laboratory Name <span class="cRed">*</span></label>
 								<div class="custom-file col-sm-8">
 									<?php echo $this->form->control('lab_name', array('type'=>'text', 'id'=>'lab_name', 'escape'=>false, 'value'=>$section_form_details[0]['lab_name'], 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter laboratory name')); ?>
-									<span id="error_laboratory_name" class="error invalid-feedback"></span>
+									<span id="error_lab_name" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="inputEmail3" class="col-sm-4 col-form-label">Laboratory Type <span class="cRed">*</span></label>
 								<div class="custom-file col-sm-8">
 									<?php echo $this->form->control('lab_type', array('type'=>'select', 'id'=>'lab_type', 'options'=>$section_form_details[5][0], 'value'=>$section_form_details[0]['lab_type'], 'label'=>false, 'class'=>'form-control')); ?>
-									<span id="error_laboratory_type" class="error invalid-feedback"></span>
+									<span id="error_lab_type" class="error invalid-feedback"></span>
 								</div>
 							</div>
 							
@@ -201,9 +205,9 @@
 										
 										<div class="custom-file col-sm-9">
 											<input type="file" name="chemist_details_docs" class="form-control" id="chemist_details_docs", multiple='multiple'>
-											<span id="error_chemist_detail_docs" class="error invalid-feedback"></span>
-											<span id="error_type_chemist_detail_docs" class="error invalid-feedback"></span>
-											<span id="error_size_chemist_detail_docs" class="error invalid-feedback"></span>
+											<span id="error_chemist_details_docs" class="error invalid-feedback"></span>
+											<span id="error_type_chemists_detail_docs" class="error invalid-feedback"></span>
+											<span id="error_size_chemists_detail_docs" class="error invalid-feedback"></span>
 										</div>
 									</div>
 									<p class="lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>
@@ -238,9 +242,9 @@
 										
 										<div class="custom-file col-sm-4">
 											<input type="file" name="lab_consent_docs" class="form-control" id="lab_consent_docs", multiple='multiple'>
-											<span id="error_consent_letter_docs" class="error invalid-feedback"></span>
-											<span id="error_type_consent_letter_docs" class="error invalid-feedback"></span>
-											<span id="error_size_consent_letter_docs" class="error invalid-feedback"></span>
+											<span id="error_lab_consent_docss" class="error invalid-feedback"></span>
+											<span id="error_type_lab_consent_docs" class="error invalid-feedback"></span>
+											<span id="error_size_lab_consent_docs" class="error invalid-feedback"></span>
 										</div>
 									</div>
 								<p class="lab_form_note float-right"><i class="fa fa-info-circle"></i> File type: PDF, jpg &amp; max size upto 2 MB</p>

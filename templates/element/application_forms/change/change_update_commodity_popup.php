@@ -13,6 +13,7 @@
 				<label for="inputEmail3" class="col-sm-3 col-form-label">Category <span class="cRed">*</span></label>
 				<div class="col-sm-9">
 					<?php echo $this->Form->control('comm_category', array('type'=>'select', 'id'=>'category', 'empty'=>'Select Category', 'options'=>$section_form_details[6],'label'=>false, 'class'=>'form-control')); ?>
+					<span id="error_comm_category" class="error invalid-feedback"></span>
 				</div>
 			</div>
 			
@@ -21,6 +22,7 @@
 				<label for="inputEmail3" class="col-sm-3 col-form-label">Commodities <span class="cRed">*</span></label>
 				<div class="col-sm-9">
 					<?php echo $this->Form->control('commodity', array('type'=>'select', 'empty'=>'Select Commodity', 'id'=>'commodity','options'=>array(), 'label'=>false, 'class'=>'form-control')); ?>
+					<span id="error_commodity" class="error invalid-feedback"></span>
 				</div>
 			</div>
 
@@ -28,6 +30,7 @@
 				<label for="inputEmail3" class="col-sm-3 col-form-label">Selected Commodities </label>
 				<div class="col-sm-9">
 					<?php echo $this->Form->control('selected_commodity', array('type'=>'select', 'id'=>'selected_commodity', 'empty'=>'--Selected--', 'multiple'=>true, 'label'=>false, 'class'=>'form-control mH260')); ?>
+					<span id="error_selected_commodity" class="error invalid-feedback"></span>
 				</div>
 			</div>
 			<p class="commodity-note-txt"><i class="fa fa-info-circle"></i> To remove from list click on the item</p>
@@ -62,6 +65,7 @@
 			<label for="inputEmail3" class="col-sm-3 col-form-label">Packing Types <span class="cRed">*</span></label>
 				<div class="col-sm-9">
 					<?php echo $this->Form->control('packing_types', array('type'=>'select', 'id'=>'packing_types', 'empty'=>'Select', 'options'=>$packing_types, 'label'=>false, 'class'=>'form-control')); ?>
+					<span id="error_packing_types" class="error invalid-feedback"></span>
 				</div>
 			</div>
 
@@ -69,6 +73,7 @@
 				<label for="inputEmail3" class="col-sm-3 col-form-label">Selected Packing Types </label>
 				<div class="col-sm-9">
 					<?php echo $this->Form->control('selected_packing_types', array('type'=>'select', 'id'=>'selected_packing_types', 'options'=>$selected_packing_types,'empty'=>'--Selected--', 'multiple'=>true, 'label'=>false, 'class'=>'form-control')); ?>
+					<span id="error_selected_packing_types" class="error invalid-feedback"></span>
 				</div>
 			</div>
 			<p class="commodity-note-txt"><i class="fa fa-info-circle"></i> To remove from list click on the item</p>
