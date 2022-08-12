@@ -515,6 +515,7 @@ class CustomersController extends AppController {
         $this->loadModel('DmiStates');
         $this->loadModel('MCommodityCategory');
         $this->loadModel('DmiDistricts');
+        
 
         if ($this->getRequest()->getSession()->read('username') == null) {
 
@@ -2918,6 +2919,56 @@ class CustomersController extends AppController {
 	}*/
 
 
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>    
+    // created by shankhpal shende for list of documents list on 09/08/2022
+    public function documentCheckList()
+    {
+        $this->viewBuilder()->setLayout('document_check_list');
+        $this->loadModel('DmiDocCheckLists');
+        
+        $form_type = ['CA Non Bevo','CA Bevo','Printing Press','Laboratory','15 Digit Code','E code'];
+        $this->set('form_type', $form_type);
+        $comm_array = [];
+        $i = 0;
+        foreach($form_type as $eachformtype){ 
+            $get_doc =  $this->DmiDocCheckLists->find('all')->select(['releted_document'])->where(array('form_type'=>$eachformtype))->order('id ASC')->toArray();
+            $doc_array[$i] = $get_doc;
+            $i++;
+        }
+        $this->set('doc_array', $doc_array);
+       
+    }
+
+    public function showCommodities()
+    {
+        $this->viewBuilder()->setLayout('document_check_list');
+        $this->loadModel('MCommodityCategory');
+        $this->loadModel('MCommodity');
+        $conn = ConnectionManager::get('default');
+        
+         
+        
+        $commodity_cat =  $this->MCommodityCategory->find('all')->select(['category_code','category_name'])->where(array('display' => 'Y'))->order('category_code ASC')->toArray();
+        $this->set('commodity_cat', $commodity_cat);
+        
+        $comm_array = [];
+        $i = 0;
+        foreach($commodity_cat as $eachcat){
+             $get_comm =  $this->MCommodity->find('all')->select(['commodity_name'])->where(array('category_code'=>$eachcat['category_code'],'display' => 'Y'))->order('category_code ASC')->toArray();
+             $comm_array[$i] = $get_comm;
+             $i++;
+        }
+        
+        $this->set('comm_array', $comm_array);
+
+
+        // $conn = ConnectionManager::get('default');
+		// $query = $conn->execute("SELECT com.commodity_name AS commodity_name, com.l_commodity_name AS l_commodity_name, cat.category_name AS category_name, com.commodity_code AS commodity_code FROM m_commodity_category AS cat, m_commodity AS com WHERE cat.category_code=com.category_code AND com.display='Y' ORDER BY com.commodity_name ASC");
+		// $query_result = $query->fetchAll('assoc');
+		// $this->set('commodityArray', $query_result);
+
+    }
+	
 }
 
 ?>

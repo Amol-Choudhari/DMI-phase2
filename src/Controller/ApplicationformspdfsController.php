@@ -9,6 +9,7 @@ use App\Network\Request\Request;
 use App\Network\Response\Response;
 use Cake\ORM\TableRegistry;
 use tcpdf;
+use phpqrcode;
 use xmldsign;
 use Cake\Utility\Xml;
 use FR3D;
@@ -544,7 +545,7 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiCustomerPackingDetails');
 		$this->loadModel('DmiCrushingRefiningPeriods');
 		
-		
+
 		//added on 27-03-2018, to set default value
 		$show_esigned_by = $this->Session->read('with_esign');
 		$this->set('show_esigned_by',$show_esigned_by);		
@@ -593,7 +594,7 @@ class ApplicationformspdfsController extends AppController{
 			$sub_commodity_data[$i] =  $fetch_commodity_id;			
 			$i=$i+1;
 		}
-
+		
 		$unique_commodity_id = array_unique($commodity_id);		
 		$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
 		$this->set('commodity_name_list',$commodity_name_list);		
@@ -658,7 +659,7 @@ class ApplicationformspdfsController extends AppController{
 			$i=$i+1;
 		}
 		$this->set('tank_shape_value',$tank_shape_value);		
-						
+				
 		// data from laboratory profile form	
 		$fetch_laboratory_last_id = $this->DmiCustomerLaboratoryDetails->find('list',array('valueField'=>'id','conditions'=>array('customer_id IS'=>$customer_id)))->toArray();				
 		$fetch_laboratory_detail_data = $this->DmiCustomerLaboratoryDetails->find('all',array('conditions'=>array('id'=>max($fetch_laboratory_last_id))))->first();
@@ -721,9 +722,18 @@ class ApplicationformspdfsController extends AppController{
 			
 		}
 		
+       //added by shankhpal shende on 12/08/2022 for implimenting QR code
+		$fetch_district_name = $this->DmiDistricts->find('all',array('fields'=>'district_name','conditions'=>array('id IS'=>$premises_data['district'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
+		$premises_district_name = $fetch_district_name['district_name'];
+		
+		$result_for_qr = $this->Customfunctions->getQrCode($premises_district_name);
+
 		$this->generateApplicationPdf('/Applicationformspdfs/caFormsPdf');	
 		
-		// $this->redirect(array('controller'=>'customers','action'=>'secondary_home'));	
+		// $this->redirect(array('controller'=>'customers','action'=>'secondary_home'));
+		
+
+		
 		
 	}
 	
@@ -2379,6 +2389,8 @@ class ApplicationformspdfsController extends AppController{
 			if(ob_get_length() > 0) {
 				ob_end_clean();
 			}
+			// $image = K_PATH_IMAGES.'/qrcode/1050726638.pngqr.png';
+			// $pdf->Image($image, '', '', 40, 40, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
 
 			//Close and output PDF document
 			$pdf->my_output($file_path, $mode);
@@ -2727,6 +2739,8 @@ class ApplicationformspdfsController extends AppController{
 		$this->redirect(array('controller'=>'hoinspections','action'=>'grantCertificatesList'));
 
 	}
+
+	
 	
 	
 }	

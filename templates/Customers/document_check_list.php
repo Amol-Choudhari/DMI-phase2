@@ -1,0 +1,1 @@
+<?php echo $this->element('home-page-elements/document_check_list'); ?>               

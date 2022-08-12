@@ -3404,7 +3404,31 @@
 			return $short_code;
 		}
 		
+
+		//Get QR Code
+		// Author : Shankhpal Shende
+		// Description : This will return QR code
+		// Date : 12/08/2022
 		
+		public function getQrCode($result)
+		{
+		   
+			// include(ROOT.'/vendor/phpqrcode/qrlib.php'); 
+			require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
+			echo "ok";die;
+			$qrimgname = rand();
+			
+			$folder = ROOT."/vendor/tcpdf/examples/images/qrcode/".$qrimgname.".png";
+			
+			$file_name = "qr.png";
+			
+			$file_name=$folder.$file_name;
+			
+			QRcode::png($result,$file_name);
+	
+			echo"<img src='/qrcode/".$qrimgname.".pngqr.png'>";
+ 
+		}
 		
 		
 	}
