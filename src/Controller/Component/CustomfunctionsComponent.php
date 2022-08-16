@@ -6,7 +6,7 @@
 	use Cake\ORM\Table;
 	use Cake\ORM\TableRegistry;
 	use Cake\Datasource\EntityInterface;
-
+    use QRcode;
 	class CustomfunctionsComponent extends Component {
 
 		public $components= array('Session','Randomfunctions');
@@ -3410,24 +3410,51 @@
 		// Description : This will return QR code
 		// Date : 12/08/2022
 		
-		public function getQrCode($result)
+		public function getQrCode($result,$name)
 		{
-		   
+			
+			
+		
 			// include(ROOT.'/vendor/phpqrcode/qrlib.php'); 
 			require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
-			echo "ok";die;
+		
 			$qrimgname = rand();
 			
-			$folder = ROOT."/vendor/tcpdf/examples/images/qrcode/".$qrimgname.".png";
+            $server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
 			
-			$file_name = "qr.png";
-			
-			$file_name=$folder.$file_name;
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
+           
+			$file_name = $file_path;
 			
 			QRcode::png($result,$file_name);
+			
+			$customer_id = $this->Session->read('customer_id');
+			$date = date('Y-m-d H:i:s');
+			$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
+			
+			$resultdata = $DmiCertQrCodes->find('all',array('conditions'=>array('customer_id'=>$customer_id,'qr_code_path'=>$file_path)))->toArray();
 	
-			echo"<img src='/qrcode/".$qrimgname.".pngqr.png'>";
- 
+            if(count($resultdata) == ''){
+			$DmiCertificateQrAdd = $DmiCertQrCodes->newEntity(
+				                                    ['customer_id'=>$customer_id,
+													'qr_code_path'=>$server_imagpath,
+													'created'=>$date,
+													'modified'=>$date
+												    ]);
+             
+			$DmiCertQrCodes->save($DmiCertificateQrAdd);
+			}
+			else
+			{
+			  
+			  $DmiCertQrCodes->updateAll(array('customer_id'=>"$customer_id",'qr_code_path'=>"$server_imagpath"),array('customer_id'=>$customer_id));
+				
+			}
+
+			$qrimage = $DmiCertQrCodes->find('all',array('field'=>'qr_code_path','conditions'=>array('customer_id'=>$customer_id)))->first();
+            
+			return $qrimage;
+			
 		}
 		
 		

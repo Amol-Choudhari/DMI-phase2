@@ -722,12 +722,9 @@ class ApplicationformspdfsController extends AppController{
 			
 		}
 		
-       //added by shankhpal shende on 12/08/2022 for implimenting QR code
-		$fetch_district_name = $this->DmiDistricts->find('all',array('fields'=>'district_name','conditions'=>array('id IS'=>$premises_data['district'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();
-		$premises_district_name = $fetch_district_name['district_name'];
-		
+		//$this->set('customer_id',$customer_id);
 		$result_for_qr = $this->Customfunctions->getQrCode($premises_district_name);
-
+       
 		$this->generateApplicationPdf('/Applicationformspdfs/caFormsPdf');	
 		
 		// $this->redirect(array('controller'=>'customers','action'=>'secondary_home'));
@@ -1728,9 +1725,19 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('user_full_name',$user_full_name);																						   
 				$this->set('certificate_valid_upto',$certificate_valid_upto);
 			}
+          
+		  //added by shankhpal shende on 16/08/2022 for implimenting QR code
+		  $customer_id = $this->Session->read('customer_id');
+		  $name = "Shankhpal";
+		  $lname = "shende";
+		  //$this->set('customer_id',$customer_id);
+		  $result_for_qr = $this->Customfunctions->getQrCode($customer_id,$name,$lname);
+		  //pr($result_for_qr['qr_code_path']);exit();
+		
+		  $this->set('result_for_qr',$result_for_qr);
 
-			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantCaCertificatePdf'); 
-			//$this->create_grant_certificate_pdf();				
+		  $this->generateGrantCerticatePdf('/Applicationformspdfs/grantCaCertificatePdf'); 
+				
 		}
 			
 		$this->redirect(array('controller'=>'hoinspections','action'=>'grantCertificatesList'));
