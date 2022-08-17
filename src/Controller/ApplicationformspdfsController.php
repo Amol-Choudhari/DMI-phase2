@@ -1727,15 +1727,11 @@ class ApplicationformspdfsController extends AppController{
 			}
           
 		  //added by shankhpal shende on 16/08/2022 for implimenting QR code
-		  $customer_id = $this->Session->read('customer_id');
-		  $name = "Shankhpal";
-		  $lname = "shende";
-		  //$this->set('customer_id',$customer_id);
-		  $result_for_qr = $this->Customfunctions->getQrCode($customer_id,$name,$lname);
-		  //pr($result_for_qr['qr_code_path']);exit();
-		
-		  $this->set('result_for_qr',$result_for_qr);
+		  $data = [$customer_id,$pdf_date,$certificate_valid_upto];
+		  $result_for_qr = $this->Customfunctions->getQrCode($data);
 
+		  $this->set('result_for_qr',$result_for_qr);
+          //end for QR code
 		  $this->generateGrantCerticatePdf('/Applicationformspdfs/grantCaCertificatePdf'); 
 				
 		}
@@ -1949,7 +1945,13 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('user_full_name',$user_full_name);																						   
 				$this->set('certificate_valid_upto',$certificate_valid_upto);
 			}
-
+           
+			//added by shankhpal shende on 17/08/2022 for implimenting QR code
+			$data = [$customer_id,$pdf_date,$certificate_valid_upto];
+			$result_for_qr = $this->Customfunctions->getQrCode($data);
+  
+			$this->set('result_for_qr',$result_for_qr);
+			//end for QR code
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantPrintingCertificatePdf'); 
 			//$this->create_grant_certificate_pdf();				
 		}
@@ -2172,7 +2174,13 @@ class ApplicationformspdfsController extends AppController{
 				$this->set('user_full_name',$user_full_name);																						   
 				$this->set('certificate_valid_upto',$certificate_valid_upto);
 			}
+            //added by shankhpal shende on 17/08/2022 for implimenting QR code for grantLaboratoryCertificatePdf
 
+			$data = [$customer_id,$pdf_date,$certificate_valid_upto];
+			$result_for_qr = $this->Customfunctions->getQrCode($data);
+  
+			$this->set('result_for_qr',$result_for_qr);
+			//end for QR code
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantLaboratoryCertificatePdf'); 
 			//$this->create_grant_certificate_pdf();				
 		}
@@ -2551,7 +2559,12 @@ class ApplicationformspdfsController extends AppController{
 			$commodity_names .= $each['commodity_name'].', ';
 		}		
 		$this->set('commodity_names',$commodity_names);
+        //added by shankhpal shende on 17/08/2022 for implimenting QR code
+		$data = [$customer_id,$pdf_date,$certificate_valid_upto];
+		$result_for_qr = $this->Customfunctions->getQrCode($data);
 
+		$this->set('result_for_qr',$result_for_qr);
+        //end for QR code
 		$this->generateGrantCerticatePdf('/Applicationformspdfs/grant15DigitCertificate'); 
 
 		$this->redirect(array('controller'=>'hoinspections','action'=>'grantCertificatesList'));
@@ -2740,6 +2753,13 @@ class ApplicationformspdfsController extends AppController{
 			$eCode = $newEcode;
 		}
 		$this->set('eCode',$eCode);
+		
+		//added by shankhpal shende on 16/08/2022 for implimenting QR code
+		$data = [$customer_id,$pdf_date,$certificate_valid_upto];
+		$result_for_qr = $this->Customfunctions->getQrCode($data);
+
+		$this->set('result_for_qr',$result_for_qr);
+		//end for QR code
 		
 		$this->generateGrantCerticatePdf('/Applicationformspdfs/grantECodeCertificate'); 
 

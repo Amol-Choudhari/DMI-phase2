@@ -3410,31 +3410,33 @@
 		// Description : This will return QR code
 		// Date : 12/08/2022
 		
-		public function getQrCode($result,$name)
+		public function getQrCode($result)
 		{
-			
-			
-		
-			// include(ROOT.'/vendor/phpqrcode/qrlib.php'); 
-			require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
-		
-			$qrimgname = rand();
-			
-            $server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
-			
-			$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
-           
-			$file_name = $file_path;
-			
-			QRcode::png($result,$file_name);
+		    
 			
 			$customer_id = $this->Session->read('customer_id');
-			$date = date('Y-m-d H:i:s');
 			$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
 			
-			$resultdata = $DmiCertQrCodes->find('all',array('conditions'=>array('customer_id'=>$customer_id,'qr_code_path'=>$file_path)))->toArray();
-	
-            if(count($resultdata) == ''){
+			$resultdata = $DmiCertQrCodes->find('all',array('conditions'=>array('customer_id'=>$customer_id)))->toArray();
+	       
+            if(count($resultdata) == 0){
+
+				require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
+		
+				$data = "MECARD:N:".'Certificate No:'.$result[0].";EMAIL:".'      Date:'.$result[1]." valid from this date:".$result[2][0].";";
+				$qrimgname = rand();
+				
+				$server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
+				
+				$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
+			   
+				$file_name = $file_path;
+				
+				QRcode::png($data,$file_name);
+				
+				
+				$date = date('Y-m-d H:i:s');	
+				
 			$DmiCertificateQrAdd = $DmiCertQrCodes->newEntity(
 				                                    ['customer_id'=>$customer_id,
 													'qr_code_path'=>$server_imagpath,
@@ -3443,12 +3445,6 @@
 												    ]);
              
 			$DmiCertQrCodes->save($DmiCertificateQrAdd);
-			}
-			else
-			{
-			  
-			  $DmiCertQrCodes->updateAll(array('customer_id'=>"$customer_id",'qr_code_path'=>"$server_imagpath"),array('customer_id'=>$customer_id));
-				
 			}
 
 			$qrimage = $DmiCertQrCodes->find('all',array('field'=>'qr_code_path','conditions'=>array('customer_id'=>$customer_id)))->first();
