@@ -76,6 +76,7 @@ class ReplicaController extends AppController {
 			
 			//first check if this packer have any chemist incharge or not, elae show alert
 			$this->loadModel('DmiChemistAllotments');
+			$this->loadModel('CommGrade');
 			$check_che_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('customer_id IS'=>$customer_id,'status'=>1,'incharge'=>'yes')))->first();
 			if (empty($check_che_incharge)) {
 				
@@ -98,9 +99,21 @@ class ReplicaController extends AppController {
 				$this->set('lab_list',$lab_list);
 			
 				//get packer wise commodity list
-				$commodity_ids = explode(',',$firm_details['sub_commodity']);		
+				$commodity_ids = explode(',',$firm_details['sub_commodity']);	
+				//pr($commodity_ids);die;	
 				$commodity_list = $this->MCommodity->find('list',array('keyField'=>'commodity_code','valueField'=>'commodity_name','conditions'=>array('commodity_code IN'=>$commodity_ids)))->toArray();
-				$grade_list = $this->MGradeDesc->find('list',array('keyField'=>'grade_code','valueField'=>'grade_desc','conditions'=>array('display'=>'Y'),'order'=>'grade_code asc'))->toArray();
+	//****************************************************************************************************/			
+			    // Added by shankhpal Shende on 22/08/2022 for [On loading Set Grade for selected commodity]
+	            // $grade_list = $this->MGradeDesc->find('list',array('keyField'=>'grade_code','valueField'=>'grade_desc','conditions'=>array('display'=>'Y'),'order'=>'grade_code asc'))->toArray();
+	            
+				$get_grade = $this->CommGrade->find('all',array('fields'=>'grade_code','conditions'=>array('commodity_code IN'=>$commodity_ids),'group'=>'grade_code'))->toArray();
+	           
+				foreach($get_grade as $val)
+				{
+					$get_grade_desc = $this->MGradeDesc->find('all',array('fields'=>array('grade_code','grade_desc'),'conditions'=>array('grade_code IN'=>$val['grade_code']),'group'=>'grade_code'))->first();
+					$desc[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
+				}			
+      //**************************************************************************************************/
 				$tbl_list = $this->DmiAllTblsDetails->find('list',array('keyField'=>'id','valueField'=>'tbl_name','conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS Null'),'order'=>'id asc'))->toArray();
 				$packaging_material_list = $this->DmiPackingTypes->find('list',array('keyField'=>'id','valueField'=>'packing_type','conditions'=>array('delete_status IS Null'),'order'=>'id asc'))->toArray();
 				$printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
@@ -217,15 +230,15 @@ class ReplicaController extends AppController {
 					);
 				}
 	//*************************************************************************** */		
-	            // Grade list Commented by shankhpal Shende on 22/08/2022	
+	            // Grade list Changes by shankhpal Shende on 22/08/2022	
 				//grade list array
-				// foreach ($grade_list as $key => $value) {
+				foreach ($desc as $key => $value) {
 
-				// 	$grade_list1[] = array(
-				// 		'vall' => $key,
-				// 		'label' => $value
-				// 	);
-				// }
+					$grade_list1[] = array(
+						'vall' => $key,
+						'label' => $value
+					);
+				}
 	//*************************************************************************** */				
 				//TBL list array
 				foreach ($tbl_list as $key => $value) {
@@ -735,20 +748,19 @@ class ReplicaController extends AppController {
 		
 
 		$get_grade = $this->CommGrade->find('all',array('fields'=>'grade_code','conditions'=>array('commodity_code IS'=>$commodity_id),'group'=>'grade_code'))->toArray();
-	    $i =0;
+	    
 		foreach($get_grade as $val)
 		{
 			
-			$get_grade_desc = $this->MGradeDesc->find('all',array('fields'=>'grade_desc','conditions'=>array('grade_code IN'=>$val['grade_code']),'group'=>'grade_code'))->first();
-	        $desc[$i] = $get_grade_desc['grade_desc'];
-			$i++;
-	       
-		 
+			$get_grade_desc = $this->MGradeDesc->find('all',array('fields'=>array('grade_code','grade_desc'),'conditions'=>array('grade_code IN'=>$val['grade_code']),'group'=>'grade_code'))->first();
+	        $desc[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
+		
 		}
 		if (!empty($desc)) {
-           
+          
 			$result = array('Grade'=>$desc);
-			pr($result);
+		
+			
 			echo '~'.json_encode($result).'~';
 		
 		} else {

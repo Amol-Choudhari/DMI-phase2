@@ -94,21 +94,21 @@ $(document).ready(function(){
                 
 				if(response == 'No Grade'){
 					alert("No Grade available for selected commodity");
-					$('.grade').html('');
+					$("#ta-grade-"+id_No).val('');
+					$("#ta-grade-"+id_No).html('');
+					
 					return false;
 
 				}else{
 
 					response = JSON.parse(response);//response is JSOn encoded to parse JSON
-                  
-					$("#ta-label_charge-"+id_No).val(response['Grade']);
-
+                   
 					var grade_list = response['Grade'];
                    
 					var grade_option = "<option value=''>--Select--</option>";
 					
 					$.each(grade_list, function(index, value){
-
+						
 						grade_option += "<option value='"+index+"'>"+value+"</option>";
 						
 					});
