@@ -70,11 +70,12 @@ class EsignController extends AppController {
 		$pdf_file_name = $this->Session->read('pdf_file_name');	
 
 		//if response from ESP for esign request
-		if($this->request->is('post')){
+		// if($this->request->is('post'))
+		// {
 			
 			//to get FORM base method response POST and convert into associative array
 			////updated on 31-05-2021 for Form Based Esign method by Amol
-		/*	$eSignResponse = simplexml_load_string($this->request->data['eSignResponse']);
+		 /*	$eSignResponse = simplexml_load_string($this->request->data['eSignResponse']);
 			$getRespInJson = json_encode($eSignResponse);
 			$getRespAssoArray = json_decode($getRespInJson,TRUE);
 			
@@ -84,7 +85,7 @@ class EsignController extends AppController {
 			$this->DmiTempEsignStatuses->saveTempEsignRecord($customer_id,$pdf_file_name,$current_level,$flow_type);																			  
 			//calling to set response signature on existing pdf.
 			$esign_status = $this->sign_the_doc($getRespAssoArray,$pdf_file_name);
-		*/
+		 */
 			$esign_status = 1;
 			if ($esign_status == 1) {
 
@@ -130,7 +131,7 @@ class EsignController extends AppController {
 				$this->redirect('https://10.153.72.52/DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
-		}
+		// }
 		
 	}
 	

@@ -216,16 +216,17 @@ class ReplicaController extends AppController {
 						'label' => $value
 					);
 				}
-				
+	//*************************************************************************** */		
+	            // Grade list Commented by shankhpal Shende on 22/08/2022	
 				//grade list array
-				foreach ($grade_list as $key => $value) {
+				// foreach ($grade_list as $key => $value) {
 
-					$grade_list1[] = array(
-						'vall' => $key,
-						'label' => $value
-					);
-				}
-				
+				// 	$grade_list1[] = array(
+				// 		'vall' => $key,
+				// 		'label' => $value
+				// 	);
+				// }
+	//*************************************************************************** */				
 				//TBL list array
 				foreach ($tbl_list as $key => $value) {
 
@@ -721,6 +722,43 @@ class ReplicaController extends AppController {
 	}
 
 
+	//to get grade as per commodity for replica serial number, when unit selected in row
+	// added by shankhpal shende on 22/08/2022	
+	public function getCommodityWiseGrade() {
+		
+		$this->autoRender = false;
+		
+		$commodity_id = $_POST['commodity_id'];
+		
+		$this->loadModel('CommGrade');
+		$this->loadModel('MGradeDesc');
+		
+
+		$get_grade = $this->CommGrade->find('all',array('fields'=>'grade_code','conditions'=>array('commodity_code IS'=>$commodity_id),'group'=>'grade_code'))->toArray();
+	    $i =0;
+		foreach($get_grade as $val)
+		{
+			
+			$get_grade_desc = $this->MGradeDesc->find('all',array('fields'=>'grade_desc','conditions'=>array('grade_code IN'=>$val['grade_code']),'group'=>'grade_code'))->first();
+	        $desc[$i] = $get_grade_desc['grade_desc'];
+			$i++;
+	       
+		 
+		}
+		if (!empty($desc)) {
+           
+			$result = array('Grade'=>$desc);
+			pr($result);
+			echo '~'.json_encode($result).'~';
+		
+		} else {
+			echo '~No Grade~';
+		}
+		exit;
+					
+	}
+
+
 	//to get gross quantity and total charges when enter no. of packets		
 	public function getGrossQuantityAndTotalCharge() {
 			
@@ -1106,6 +1144,13 @@ class ReplicaController extends AppController {
 		//to eb used this session after successful esigned, to updated transaction table
 		$this->Session->write('overall_total_chrg',$overall_charges);
 		
+		//added by shankhpal shende on 19/08/2022 for implimenting QR code for replica EsignedChemist
+		$data = [$chemist_name,$firm_details];
+		$result_for_qr = $this->Customfunctions->getQrCodeEsignedChemist($data);
+		
+		$this->set('result_for_qr',$result_for_qr);
+		//end for QR code
+
 		$this->generateReplicaAllotmentPdf();
 		
 	}

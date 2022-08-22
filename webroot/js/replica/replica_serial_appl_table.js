@@ -9,6 +9,7 @@ $(document).ready(function(){
     var tblId = $(this).closest('table').attr('id');
     var tblIdArr = tblId.split('_');
     var tblIdNum = tblIdArr[1];
+
     addMoreRow(tblIdNum);
 	});
 
@@ -41,6 +42,7 @@ $(document).ready(function(){
 		$.ajax({
 			type: "POST",
 			url: "../replica/get_commodity_wise_charge",
+			async: false,
 			data: {commodity_id:commodity_id},
 			beforeSend: function (xhr) { // Add this line
 					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
@@ -72,6 +74,47 @@ $(document).ready(function(){
 
 					$("#ta-packet_size_unit-"+id_No).html(unit_option);
 					$("#ta-total_quantity-"+id_No).val(response['min_qty']);
+				}
+
+			}
+		});
+//***************************************************************************************** */
+      // This ajax used for gre grade for selected commodity 
+	  // Added by shankhpal shende on 22/08/2022
+		$.ajax({
+			type: "POST",
+			url: "../replica/get_commodity_wise_grade",
+			data: {commodity_id:commodity_id},
+			beforeSend: function (xhr) { // Add this line
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			},
+			success: function(response){
+                
+				var response = response.match(/~([^']+)~/)[1];//getting data bitween ~..~ from response
+                
+				if(response == 'No Grade'){
+					alert("No Grade available for selected commodity");
+					$('.grade').html('');
+					return false;
+
+				}else{
+
+					response = JSON.parse(response);//response is JSOn encoded to parse JSON
+                  
+					$("#ta-label_charge-"+id_No).val(response['Grade']);
+
+					var grade_list = response['Grade'];
+                   
+					var grade_option = "<option value=''>--Select--</option>";
+					
+					$.each(grade_list, function(index, value){
+
+						grade_option += "<option value='"+index+"'>"+value+"</option>";
+						
+					});
+
+					$("#ta-grade-"+id_No).html(grade_option);
+				
 				}
 
 			}
