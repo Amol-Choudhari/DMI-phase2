@@ -3425,7 +3425,7 @@
 				require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
 				$data = "MECARD:N:".'Certificate No:'.$result[0].";EMAIL:".'Grant Date:'.$result[1]." Valid up to date:".$result[2][0].";";
-				$qrimgname = rand();
+				$qrimgname = $result[0];
 				
 				$server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
 				
@@ -3472,7 +3472,7 @@
 		
 				$data = "MECARD:N:".'Esigned By:'.$result[0].'(Chemist In-charge)'.";EMAIL:".$result[1]['firm_name']." ;";
 				
-				$qrimgname = rand();
+				$qrimgname = $result[0];
 				
 				$server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
 				

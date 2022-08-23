@@ -111,7 +111,7 @@ class ReplicaController extends AppController {
 				foreach($get_grade as $val)
 				{
 					$get_grade_desc = $this->MGradeDesc->find('all',array('fields'=>array('grade_code','grade_desc'),'conditions'=>array('grade_code IN'=>$val['grade_code']),'group'=>'grade_code'))->first();
-					$desc[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
+					$grade_list[$get_grade_desc['grade_code']] = $get_grade_desc['grade_desc'];
 				}			
       //**************************************************************************************************/
 				$tbl_list = $this->DmiAllTblsDetails->find('list',array('keyField'=>'id','valueField'=>'tbl_name','conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS Null'),'order'=>'id asc'))->toArray();
@@ -232,7 +232,7 @@ class ReplicaController extends AppController {
 	//*************************************************************************** */		
 	            // Grade list Changes by shankhpal Shende on 22/08/2022	
 				//grade list array
-				foreach ($desc as $key => $value) {
+				foreach ($grade_list as $key => $value) {
 
 					$grade_list1[] = array(
 						'vall' => $key,

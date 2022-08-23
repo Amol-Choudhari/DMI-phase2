@@ -93,9 +93,10 @@ $(document).ready(function(){
 				var response = response.match(/~([^']+)~/)[1];//getting data bitween ~..~ from response
                 
 				if(response == 'No Grade'){
-					alert("No Grade available for selected commodity");
+					$.alert("No Grade available for selected Commodity");
+					var grade_option = "<option value=''>--Select--</option>";
 					$("#ta-grade-"+id_No).val('');
-					$("#ta-grade-"+id_No).html('');
+					$("#ta-grade-"+id_No).html(grade_option);
 					
 					return false;
 
