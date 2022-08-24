@@ -113,6 +113,14 @@ if ($current_menu == 'menu_register') {
 								<p class="nav-icon-p">Apply for Replica</p>
 								</a>
 							</li>
+					    <!-- Added by shankhpal shende on 24/08/2022		 -->
+							<li class="nav-item">
+								<a href="<?php echo $this->request->getAttribute("webroot");?>customers/attache_pp_lab" class="nav-link">
+								<i class="nav-icon fas fa-award"></i>
+								<p class="nav-icon-p">Attach PP/LAB</p>
+								</a>
+							</li>
+							<!-- end -->
 							<li class="nav-item">
 								<a href="<?php echo $this->request->getAttribute("webroot");?>advancepayment/transactions" class="nav-link">
 								<i class="nav-icon fas fa-rupee-sign"></i>
@@ -137,6 +145,7 @@ if ($current_menu == 'menu_register') {
 								<p class="nav-icon-p">E-Code Approval</p>
 								</a>
 							</li>
+							
 
 						<?php } ?>
 					</ul>

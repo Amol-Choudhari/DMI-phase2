@@ -2968,6 +2968,37 @@ class CustomersController extends AppController {
 		// $this->set('commodityArray', $query_result);
 
     }
+
+    // This function added by Shankhpal shende 
+    // on date 24/08/2022
+    // for Attach PP/LAB
+
+    public function attachePpLab()
+    {
+        $this->loadModel('DmiFirms');
+        $this->loadModel('DmiReplicaAllotmentDetails');
+
+        $this->viewBuilder()->setLayout('secondary_customer');
+        $customer_id = $this->Session->read('username');
+        //list of authorized laboratory
+		$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'));
+        $this->set('lab_list',$lab_list);
+
+        $printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+        $this->set('printers_list',$printers_list);
+        //fetch last reocrds from table, if empty set default value
+				$dataArray = $this->DmiReplicaAllotmentDetails->getSectionData($customer_id);
+				
+				//to show selected lab in list
+				if (!empty($dataArray)) {
+					
+					$selected_lab = $dataArray[0]['grading_lab'];			
+				} else {
+					$selected_lab = '';
+				}
+				$this->set('selected_lab',$selected_lab);
+       
+    }
 	
 }
 

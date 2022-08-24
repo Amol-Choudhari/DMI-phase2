@@ -1039,6 +1039,7 @@ class ReplicaController extends AppController {
 		$ca_unique_no = $this->Session->read('ca_unique_no');
 		$firm_details = $this->DmiFirms->find('all',array('conditions'=>array('id IS'=>$ca_unique_no)))->first();
 		$firm_details = $firm_details;
+		
 		$this->set('firm_details',$firm_details);
 		
 		//get district and state name
@@ -1068,7 +1069,9 @@ class ReplicaController extends AppController {
 			
 			//get selected commodity
 			$commodity_details = $this->MCommodity->find('all',array('fields'=>'commodity_name','conditions'=>array('commodity_code IS'=>$eachrow['commodity'])))->first();
-			$commodity_name = $commodity_details['commodity_name'];				
+			
+			$commodity_name = $commodity_details['commodity_name'];		
+					
 			$tableRowData[$i]['commodity_name'] = $commodity_name;
 			
 			//get selected grade
@@ -1157,8 +1160,8 @@ class ReplicaController extends AppController {
 		$this->Session->write('overall_total_chrg',$overall_charges);
 		
 		//added by shankhpal shende on 19/08/2022 for implimenting QR code for replica EsignedChemist
-		$data = [$chemist_name,$firm_details];
-		$result_for_qr = $this->Customfunctions->getQrCodeEsignedChemist($data);
+	
+		$result_for_qr = $this->Customfunctions->getQrCodeEsignedChemist($tableRowData,$chemist_name,$firm_details);
 		
 		$this->set('result_for_qr',$result_for_qr);
 		//end for QR code

@@ -147,7 +147,7 @@
 		
 		// APPLICATION TYPE
 		public function applicationType($id) {
-
+             
 			$this->Session->delete('section_id');
 			$this->Session->delete('paymentforchange');
 			$this->Session->write('application_type',$id);

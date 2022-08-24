@@ -3425,7 +3425,7 @@
 				require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
 				$data = "MECARD:N:".'Certificate No:'.$result[0].";EMAIL:".'Grant Date:'.$result[1]." Valid up to date:".$result[2][0].";";
-				$qrimgname = $result[0];
+				$qrimgname = rand();
 				
 				$server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
 				
@@ -3459,20 +3459,42 @@
 		// Description : This will return QR code for Esigned of Chemist
 		// Date : 19/08/2022
 
-		public function getQrCodeEsignedChemist($result)
-		{
+		public function getQrCodeEsignedChemist($tableRowData,$chemist_name,$firm_details)
+		{ 
 
+			//pr($firm_details['customer_id']);die;
+		
+			if(!empty($tableRowData)){
+                
+				$i=0;
+				$data1 = '';
+				$data2 = '';
+				$data3 = '';
+				foreach($tableRowData as $each){ 
+				    $data1 .=  $each['commodity_name'].",";
+					$data2 .= $each['tbl_name'].",";
+					$data3 .= $each['printer_name'].",";
+					//.$each['tbl_name'].$each['printer_name'];
+					
+					} 
+					//die;
+				}
+          
 			$customer_id = $this->Session->read('username');
 			$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
 			$resultdata = $DmiCertQrCodes->find('all',array('conditions'=>array('customer_id'=>$customer_id)))->toArray();
 			
-			if(count($resultdata) == 0){
+			// if(count($resultdata) == 0){
                 
 				require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
-				$data = "MECARD:N:".'Esigned By:'.$result[0].'(Chemist In-charge)'.";EMAIL:".$result[1]['firm_name']." ;";
+				//$data = "MECARD:N:".'Esigned By:'.$result[0].'(Chemist In-charge)'.";EMAIL:".$result[1]['firm_name']."|"."Commodity:".$commdity_names.";";
 				
-				$qrimgname = $result[0];
+				//$data = "Commodity:".$each['commodity_name'].";";
+				//$qrdata = $data1.$data2;
+				$data = "CA Id :".$firm_details['customer_id']."##"."Chemist Name :".$chemist_name."##"."commodity_name :".$data1."##"."TBL Name: ".$data2."##"."Printer Name: ".$data3;
+      
+				$qrimgname = rand();
 				
 				$server_imagpath = '/writereaddata/DMI/certificates/QRCodes/'.$qrimgname.".png";
 				
@@ -3494,8 +3516,9 @@
              
 			    $DmiCertQrCodes->save($DmiCertificateQrAdd);
 				
-			}
-			$qrimage = $DmiCertQrCodes->find('all',array('field'=>'qr_code_path','conditions'=>array('customer_id'=>$customer_id)))->first();
+			// }
+			$qrimage = $DmiCertQrCodes->find('all',array('field'=>'qr_code_path','conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+			
             
 			return $qrimage;
 

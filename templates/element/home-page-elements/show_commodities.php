@@ -61,6 +61,7 @@
     <tbody>
     <?php  
        $i= 0;
+       $sum = 0;
 				$sr_no = 1;
 					foreach($commodity_cat as $each){
             if(!empty($each['category_name'])){
@@ -69,9 +70,18 @@
               <td><?php echo $sr_no; ?></td>
 							<td><?php echo $each['category_name']; ?></td>
 							<td><?php echo count($comm_array[$i]); ?></td>
+               <?php $sum += count($comm_array[$i]) ?>
 						</tr>
+            
             <?php } ?>
+            
          <?php $sr_no++;$i++;}  ?>
+        
+          <tr>
+              <td></td>
+              <td><strong>Total No. of Commodities : </strong></td>
+              <td><?php echo "<strong>$sum</strong>"; ?></td></td>
+          </tr>
     </tbody>
   </table>
 </div>
