@@ -2975,28 +2975,108 @@ class CustomersController extends AppController {
 
     public function attachePpLab()
     {
+       
         $this->loadModel('DmiFirms');
         $this->loadModel('DmiReplicaAllotmentDetails');
+        $this->loadModel('DmiCaPpLabMapings');
+        //Set the blank variables for the Displaying messages
+        $message = '';
+        $message_theme = '';
+        $redirect_to = '';
 
         $this->viewBuilder()->setLayout('secondary_customer');
         $customer_id = $this->Session->read('username');
+       
         //list of authorized laboratory
-		$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'));
-        $this->set('lab_list',$lab_list);
-
+		$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+        $this->set('lab_list',$lab_list);         
+      
         $printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+        //pr($printers_list);die;
         $this->set('printers_list',$printers_list);
+
+        $attached_list =  $this->DmiCaPpLabMapings->find('all')->select(['customer_id','pp_id','lab_id','map_type'])->toArray();
+       //pr($attached_list);die;
+        $result = [];
+        $i = 0;
+        foreach($attached_list as $eachlist){
+           
+             $result[$i]['type'] = $eachlist['map_type'];
+             if(!empty($eachlist['pp_id'])){
+                $result[$i]['p_name'] = $printers_list[$eachlist['pp_id']];
+             }
+             if(!empty($eachlist['lab_id'])){
+                $result[$i]['l_name'] = $lab_list[$eachlist['lab_id']];
+             }
+            
+             $i++;
+        }
+        $this->set('result',$result);
         //fetch last reocrds from table, if empty set default value
 				$dataArray = $this->DmiReplicaAllotmentDetails->getSectionData($customer_id);
-				
+				// pr($dataArray);die;
 				//to show selected lab in list
 				if (!empty($dataArray)) {
 					
-					$selected_lab = $dataArray[0]['grading_lab'];			
+					$selected_lab = $dataArray[0]['grading_lab'];
+                    $selected_PP = $dataArray[0]['authorized_printer'];
+                 
 				} else {
 					$selected_lab = '';
 				}
 				$this->set('selected_lab',$selected_lab);
+                $this->set('selected_PP',$selected_PP);
+                $this->set('dataArray',$dataArray);
+              
+                //to save post data
+            
+				if (null!==($this->request->getData('save'))) {
+                   
+                    $postData = $this->request->getData();
+                  
+                    $customer_id = $this->Session->read('username');
+                    
+                   
+
+                    $pp_id = $this->request->getData('pp_id');
+                    $lab_id = $this->request->getData('lab_id');
+                    $maptype = $this->request->getData('maptype');
+                    
+                        if (!empty($maptype)) {
+                            
+                            $DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
+
+                                'customer_id'=>$customer_id,
+                                'pp_id'=>$pp_id,
+                                'lab_id'=>$lab_id,
+                                'map_type'=> $maptype,
+                                'created'=>date('Y-m-d H:i:s'),
+                                'modified'=>date('Y-m-d H:i:s'),
+                                
+                    
+                            ));
+                                //Save the data entity
+                                if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings)) {
+                                    
+                                    $message = 'added successfully';
+                                    $message_theme = 'success';
+                                    $redirect_to = 'attache_pp_lab';
+                                }
+                        }
+                       
+                    
+                }
+              
+                // set variables to show popup messages from view file
+               
+                $this->set('message',$message);
+                $this->set('message_theme',$message_theme);
+                $this->set('redirect_to',$redirect_to);
+
+                if ($message != null) {
+                    $this->render('/element/message_boxes');
+                }
+               
        
     }
 	

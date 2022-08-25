@@ -449,7 +449,7 @@ class ReplicaController extends AppController {
 				
 				//to save post data
 				if (null!==($this->request->getData('save'))) {
-
+                   
 					//set delete flag for last records with allotment status Null, to show only current added/updated records
 					//the alloted records will be status 1, which will not touch, and to be keeped for logs
 					$date = date('Y-m-d H:i:s');
