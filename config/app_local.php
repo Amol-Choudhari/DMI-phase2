@@ -47,7 +47,12 @@ return [
             'username' => 'postgres',
             'password' => '123',
 
+<<<<<<< HEAD
             'database' => 'dmi',
+=======
+            //'database' => 'testmigration1',
+			'database' => 'newphaseIIdb',
+>>>>>>> 292e8c6 (UAT points updates till 26-08-2022 by Amol)
             /*
              * If not using the default 'public' schema with the PostgreSQL driver
              * set it here.

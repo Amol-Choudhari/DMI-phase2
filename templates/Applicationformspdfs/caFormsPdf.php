@@ -307,11 +307,11 @@
 					</tr>
 					
 					
-					
-					<tr>
+				<!--commented on 11-08-2022, as suggested after UAT phase II-->
+				<!--	<tr>
 						<td style="padding:10px; vertical-align:top;">5. Period for which the applicant has been in the business:</td>
-						<td style="padding:10px; vertical-align:top;"><?php if(!empty($business_years_value)){ echo $business_years_value; }else{ echo 'NA'; }  ?></td>
-					</tr>
+						<td style="padding:10px; vertical-align:top;"><?php //if(!empty($business_years_value)){ echo $business_years_value; }else{ echo 'NA'; }  ?></td>
+					</tr>-->
 	
 					<!-- Hide the "Have Registration/License" Radio option (Done By Pravin 02-02-2018) -->					
 					<!--<tr>
@@ -322,12 +322,12 @@
 					<?php if($firm_data['have_reg_no'] == 'yes'){?>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">6(a). Registration/ License No. issued under the FSSAI Act, 2006 in case of food commodities:</td>
+						<td style="padding:10px; vertical-align:top;">5(a). Registration/ License No. issued under the FSSAI Act, 2006 in case of food commodities:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($firm_data['fssai_reg_no'])){ echo $firm_data['fssai_reg_no']; }else{ echo 'NA'; }  ?></td>
 					</tr>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">6(b). FSSAI Relevant Document:</td>
+						<td style="padding:10px; vertical-align:top;">5(b). FSSAI Relevant Document:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($firm_data['fssai_reg_docs'])){ $split_file_path = explode("/",$firm_data['fssai_reg_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php echo $firm_data['fssai_reg_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -337,7 +337,7 @@
 					
 
 					<tr>
-						<td style="padding:10px; vertical-align:top;">7. Details of the machinery/ packing machines/ storage tanks/ Cold Storage etc.  available in the plant/ premises with their capacity.</td>
+						<td style="padding:10px; vertical-align:top;">6. Details of the machinery/ packing machines/ storage tanks/ Cold Storage etc.  available in the plant/ premises with their capacity.</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($machinery_data['have_details'])){ echo ucfirst($machinery_data['have_details']); }else{ echo 'NA'; } ?>
 						</td>
 					</tr>
@@ -345,7 +345,7 @@
 					<?php if($machinery_data['have_details'] == 'yes'){?>
 
 					<tr>
-					<td style="padding:10px; vertical-align:top;">7(a). All Machinery Details:</td>
+					<td style="padding:10px; vertical-align:top;">6(a). All Machinery Details:</td>
 					<td style="padding:10px; vertical-align:top;">
 						<table width="100%" border="1">
 							<tr>
@@ -374,7 +374,7 @@
 					
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">7(b). Machinery Details Docs:</td>
+						<td style="padding:10px; vertical-align:top;">6(b). Machinery Details Docs:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($machinery_data['detail_docs'])){ $split_file_path = explode("/",$machinery_data['detail_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php echo $machinery_data['detail_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -386,7 +386,7 @@
 					
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">8. Is the manufacturing unit owned by the applicant?</td>
+						<td style="padding:10px; vertical-align:top;">7. Is the manufacturing unit owned by the applicant?</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($machinery_data['owned_by_applicant'])){ echo ucfirst($machinery_data['owned_by_applicant']); }else{ echo 'NA'; } ?>
 						</td>
 					</tr>
@@ -394,13 +394,13 @@
 					<?php if($machinery_data['owned_by_applicant'] == 'no'){?>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">8(a). Name & Address of Approved Unit</td>
+						<td style="padding:10px; vertical-align:top;">7(a). Name & Address of Approved Unit</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($machinery_data['unit_name_address'])){ echo $machinery_data['unit_name_address']; }else{ echo 'NA'; } ?>
 						</td>
 					</tr>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">8(b). Manufacturing Unit Document:</td>
+						<td style="padding:10px; vertical-align:top;">7(b). Manufacturing Unit Document:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($machinery_data['unit_related_docs'])){ $split_file_path = explode("/",$machinery_data['unit_related_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php echo $machinery_data['unit_related_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -413,19 +413,19 @@
 					
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">9. Whether it is proposed to re-pack the Graded product for large container to smaller packages.?</td>
+						<td style="padding:10px; vertical-align:top;">8. Whether it is proposed to re-pack the Graded product for large container to smaller packages.?</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($packing_data['proposed_to_repack'])){ echo ucfirst($packing_data['proposed_to_repack']); }else{ echo 'NA'; } ?>
 						</td>
 					</tr>
 					
 					<?php if($packing_data['proposed_to_repack'] == 'yes'){?>
 					<tr>
-						<td style="padding:10px; vertical-align:top;">9(a). Address of the re-packing premises:</td>
+						<td style="padding:10px; vertical-align:top;">8(a). Address of the re-packing premises:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($packing_data['proposed_place'])){ echo $packing_data['proposed_place']; }else{ echo 'NA'; } ?></td>
 					</tr>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">9(b). Re-Packing Related Document:</td>
+						<td style="padding:10px; vertical-align:top;">8(b). Re-Packing Related Document:</td>
 						<td style="padding:10px; vertical-align:top;"><?php  if(!empty($packing_data['repacking_docs'])){ $split_file_path = explode("/",$packing_data['repacking_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php  echo $packing_data['repacking_docs']; ?>"><?php  echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -436,14 +436,14 @@
 									
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">10. Any other information relevant to Grading of commodity?</td>
+						<td style="padding:10px; vertical-align:top;">9. Any other information relevant to Grading of commodity?</td>
 						<td style="padding:10px; vertical-align:top;"><?php  if(!empty($packing_data['have_grading_other_info'])){ echo ucfirst($packing_data['have_grading_other_info']); }else{ echo 'NA'; } ?>
 						</td>
 					</tr>
 					
 					<?php if($packing_data['have_grading_other_info'] == 'yes'){?>
 					<tr>
-						<td style="padding:10px; vertical-align:top;">10(a). Grading Other Information:</td>
+						<td style="padding:10px; vertical-align:top;">9(a). Grading Other Information:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($packing_data['grading_other_info'])){ echo $packing_data['grading_other_info']; }else{ echo 'NA'; } ?></td>
 					</tr>
 					<?php } ?>
@@ -454,7 +454,7 @@
 					
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">11. Specify type of the Laboratory through which grading and marking is proposed to be undertaken i.e. Own laboratory/ State Grading Laboratory/ Commercial Laboratory (Consent letter of the laboratory may be enclosed, not required in case of own laboratory.)</td>
+						<td style="padding:10px; vertical-align:top;">10. Specify type of the Laboratory through which grading and marking is proposed to be undertaken i.e. Own laboratory/ State Grading Laboratory/ Commercial Laboratory (Consent letter of the laboratory may be enclosed, not required in case of own laboratory.)</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($laboratory_type_name)){ echo $laboratory_type_name; }else{ echo 'NA'; } ?>
 						</td>
 					</tr>
@@ -463,14 +463,14 @@
 					
 					<!-- Add By Pravin 22-07-2017 -->
 					<tr>
-						<td style="padding:10px; vertical-align:top;">11(a). Chemist Details:</td>
+						<td style="padding:10px; vertical-align:top;">10(a). Chemist Details:</td>
 						<td style="padding:10px; vertical-align:top;"><?php  if(!empty($laboratory_data['chemist_detail_docs'])){ $split_file_path = explode("/",$laboratory_data['chemist_detail_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php  echo $laboratory_data['chemist_detail_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
 					</tr>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">11(b). List of equipments, Glasswares & chemicals duly signed & stamp by the applicant:</td>
+						<td style="padding:10px; vertical-align:top;">10(b). List of equipments, Glasswares & chemicals duly signed & stamp by the applicant:</td>
 						<td style="padding:10px; vertical-align:top;"><?php  if(!empty($laboratory_data['lab_equipped_docs'])){ $split_file_path = explode("/",$laboratory_data['lab_equipped_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php  echo $laboratory_data['lab_equipped_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -480,7 +480,7 @@
 					<?php }else{ ?>
 
 					<tr>
-						<td style="padding:10px; vertical-align:top;">11(a). Consent letter Document:</td>
+						<td style="padding:10px; vertical-align:top;">10(a). Consent letter Document:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($laboratory_data['consent_letter_docs'])){ $split_file_path = explode("/",$laboratory_data['consent_letter_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php echo $laboratory_data['consent_letter_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -490,7 +490,7 @@
 					
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">12. Name and address of the approved laboratory.</td>
+						<td style="padding:10px; vertical-align:top;">11. Name and address of the approved laboratory.</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($laboratory_data['street_address'])){ echo $laboratory_data['street_address'].', '; }else{ echo 'NA'; } 
 																			if(!empty($laboratory_district_name)){	echo $laboratory_district_name.', '; }else{ echo 'NA'; }
 																			if(!empty($laboratory_state_name)){	echo $laboratory_state_name.', '; }else{ echo 'NA'; }
@@ -508,7 +508,7 @@
 					
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">13. Name(s) of the Trade Brand Label (TBL)  proposed to be applied on the graded packages.</td>
+						<td style="padding:10px; vertical-align:top;">12. Name(s) of the Trade Brand Label (TBL)  proposed to be applied on the graded packages.</td>
 					
 					
 						<td style="padding:10px; vertical-align:top;">
@@ -543,7 +543,7 @@
 					</tr>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">14. Whether the proposed TBLs belongs to the applicant ?</td>
+						<td style="padding:10px; vertical-align:top;">13. Whether the proposed TBLs belongs to the applicant ?</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($tbl_data['tbl_belongs_to_applicant'])){ echo ucfirst($tbl_data['tbl_belongs_to_applicant']); }else{ echo 'NA'; }  ?>
 						</td>
 					</tr>
@@ -551,7 +551,7 @@
 					<?php if($tbl_data['tbl_belongs_to_applicant'] == 'yes'){?>
 					
 					<tr>
-						<td style="padding:10px; vertical-align:top;">14(a). TBLs(Form-A2) Document:</td>
+						<td style="padding:10px; vertical-align:top;">13(a). TBLs(Form-A2) Document:</td>
 						<td style="padding:10px; vertical-align:top;"><?php if(!empty($tbl_data['tbl_belongs_docs'])){ $split_file_path = explode("/",$tbl_data['tbl_belongs_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php echo $tbl_data['tbl_belongs_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
@@ -559,13 +559,13 @@
 					<?php }else{ ?>
 					
 						<tr>
-							<td style="padding:10px; vertical-align:top;">14(a). Name of the firm to which the proposed TBL belongs.</td>
+							<td style="padding:10px; vertical-align:top;">13(a). Name of the firm to which the proposed TBL belongs.</td>
 							<td style="padding:10px; vertical-align:top;"><?php if(!empty($tbl_data['tbl_proposed_firm'])){ echo $tbl_data['tbl_proposed_firm']; }else{ echo 'NA'; } ?>
 							</td>
 						</tr>
 					
 						<tr>
-							<td style="padding:10px; vertical-align:top;">14(b). TBLs Consent Letter:</td>
+							<td style="padding:10px; vertical-align:top;">13(b). TBLs Consent Letter:</td>
 							<td style="padding:10px; vertical-align:top;"><?php if(!empty($tbl_data['tbl_consent_letter_docs'])){ $split_file_path = explode("/",$tbl_data['tbl_consent_letter_docs']);
 																	$file_name = $split_file_path[count($split_file_path) - 1];?>
 																<a href="<?php echo $tbl_data['tbl_consent_letter_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>

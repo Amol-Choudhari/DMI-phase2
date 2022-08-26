@@ -687,9 +687,10 @@ class ApplicationformspdfsController extends AppController{
 			$this->set('premises_state_name',$premises_state_name);				
 									
 			// Takeing business year value from ca_business_year table by pravin 11-08-2017
-			$business_years = $this->DmiCaBusinessYears->find('list',array('keyField'=>'id','valueField'=>'business_years'))->toArray();	
+			//commented on 11-08-2022, as suggested after UAT phase II
+		/*	$business_years = $this->DmiCaBusinessYears->find('list',array('keyField'=>'id','valueField'=>'business_years'))->toArray();	
 			$business_years_value = $business_years[$firm_data['business_years']];
-			$this->Set('business_years_value',$business_years_value);				
+			$this->Set('business_years_value',$business_years_value);	*/			
 			
 			//to fetch laboratory type name
 			$fetch_laboratory_type = $this->DmiLaboratoryTypes->find('all',array('fields'=>'laboratory_type','conditions'=>array('id IS'=>$laboratory_data['laboratory_type'], 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->first();

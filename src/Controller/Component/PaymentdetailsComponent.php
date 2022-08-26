@@ -205,7 +205,8 @@
 				}else{
 					$pao_to_whom_payment = null;
 				}
-				
+				//change reverted so code commented
+				//$paoId = $pao_id['pao_id'];//on 12-08-2022 by Amol and used below
 				
 				$list_applicant_payment_id = $DmiApplicantPaymentDetails->find('list', array('fields'=>'id','conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition)))->toArray();
 						
@@ -238,13 +239,30 @@
 					$this->Controller->set('reason_list_comment',$reason_list_comment);
 					$this->Controller->set('reason_comment',$reason_comment);
 					$this->Controller->set('payment_confirmation_status',$payment_confirmation_status);
+
+					//change reverted so code commented
+					//$paoId = $payment_confirmation['pao_id'];//on 12-08-2022 by Amol and used below
 					
 				}else{
 					
 					$payment_confirmation_status = 'payment_not_submit';
 					$this->Controller->set('payment_confirmation_status',$payment_confirmation_status);
 				}
-				
+
+				//check if login user is DMI athority and PAO details not empty
+				//to show DDO name and role with DDO code on payment window (not to applicant)
+				//on 12-08-2022 by Amol
+				//change reverted so code commented
+				/*if (!empty($pao_to_whom_payment) && filter_var(base64_decode($this->Session->read('username')), FILTER_VALIDATE_EMAIL)) {
+
+					$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');//initialize model in component
+					//get user id from PAO table
+					$getUserId = $DmiPaoDetails->find('all',array('fields'=>'pao_user_id','conditions'=>array('id IS'=>$paoId)))->first();
+					//get user details from user table
+					$gtUsrDtls = $DmiUsers->find('all',array('fields'=>array('f_name','l_name','role'),'conditions'=>array('id'=>$getUserId['pao_user_id'])))->first();
+					$pao_to_whom_payment = $pao_to_whom_payment.' ('.$gtUsrDtls['f_name'].' '.$gtUsrDtls['l_name'].' - '.$gtUsrDtls['role'].') ';
+
+				}*/
 				$fetch_pao_referred_back = array();
 				$fetch_pao_referred_back = $DmiApplicantPaymentDetails->find('all', array('conditions'=>array('customer_id IS'=>$customer_id,'payment_confirmation'=>'not_confirmed',$grantDateCondition)))->toArray();
 				$this->Controller->set('fetch_pao_referred_back',$fetch_pao_referred_back);	

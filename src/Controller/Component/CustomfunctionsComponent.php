@@ -3062,8 +3062,8 @@
 
 					$condition = array('customer_id like'=>'%/'.$short_code.'/%','allot_status'=>'1','delete_status IS Null');
 
-					//Get Replica Status
-					$get_list[$i] = $DmiReplicaAllotmentDetails->find('all',array('fields'=>array('customer_id','ca_unique_no','commodity','grading_lab','allot_status','modified','version'),'conditions'=>$condition,'order'=>array('id desc')))->toArray();
+					//Get Replica Status //added 'id' in query field on 25-08-2022
+					$get_list[$i] = $DmiReplicaAllotmentDetails->find('all',array('fields'=>array('id','customer_id','ca_unique_no','commodity','grading_lab','allot_status','modified','version'),'conditions'=>$condition,'order'=>array('id desc')))->toArray();
 
 					$replica_stats = array_merge($replica_stats,$get_list[$i]);
 
@@ -3103,8 +3103,8 @@
 					$condition = array('grading_lab IS'=>$firm_id,'allot_status'=>'1','delete_status IS Null');
 				}
 
-				//Get Replica Status
-				$replica_stats = $DmiReplicaAllotmentDetails->find('all',array('fields'=>array('customer_id','ca_unique_no','commodity','grading_lab','allot_status','modified','version'),'conditions'=>$condition,'order'=>array('id desc')))->toArray();
+				//Get Replica Status //added 'id' in query field on 25-08-2022
+				$replica_stats = $DmiReplicaAllotmentDetails->find('all',array('fields'=>array('id','customer_id','ca_unique_no','commodity','grading_lab','allot_status','modified','version'),'conditions'=>$condition,'order'=>array('id desc')))->toArray();
 
 			}
 

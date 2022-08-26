@@ -877,9 +877,9 @@ public function renewalRequestReEsign(){
 		$pdf_file_name = $this->Session->read('pdf_file_name');	
 
 		//if response from ESP for esign request
-		if($this->request->is('post')){
+		//if($this->request->is('post')){
 
-			$postData = $this->request->getData();
+			//$postData = $this->request->getData();
 			
 			//to get FORM base method response POST and convert into associative array
 			////Form Based Esign method by Amol
@@ -897,7 +897,7 @@ public function renewalRequestReEsign(){
 					
 				//calling final submit process now after signature appended in pdf.
 
-				$main_domain_url = 'https://10.153.72.52/DMI/';
+				$main_domain_url = 'https://10.158.81.41/DMI/';
 				$url_to_redirect =	$main_domain_url.$_SESSION['replica_for'].'/after_replica_allotment_esigned';				
 					
 				//this echo is used to redirect from CDAC to our Agarmark url.
@@ -907,10 +907,10 @@ public function renewalRequestReEsign(){
 			//by Amol to show esign failed message	
 			}else{
 				
-				$this->redirect('https://10.153.72.52/DMI/esign/esign_issue');//for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.41/DMI/esign/esign_issue');//for Form Based Esign method by Amol
 			}
 			
-		}
+		//}
 		
 	}
 	

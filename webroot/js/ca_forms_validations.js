@@ -247,7 +247,7 @@
 			}
 
 			if($('#old_application_docs_value').text() == ""){
-				alert();
+				
 				if(check_file_upload_validation(old_application_docs).result == false){	
 					
 					$("#error_old_application_docs").show().text(check_file_upload_validation(old_application_docs).error_message);
@@ -2378,7 +2378,10 @@
 		{
 			var error_message = 'Please select the option';		
 			
-			if($('input[name="'+field_value+'"]:checked').val() != "yes" && $('input[name="'+field_value+'"]:checked').val() != "no")
+			//added new option NA in radio options as per UAT suggestion
+    		//on 17-08-2022 
+			if($('input[name="'+field_value+'"]:checked').val() != "yes" && $('input[name="'+field_value+'"]:checked').val() != "no" 
+			&& $('input[name="'+field_value+'"]:checked').val() != "n/a")
 			{
 				
 				return {result: false, error_message: error_message};
@@ -2397,6 +2400,12 @@
 						return 'yes';			
 			}else if($('input[name="'+field_value+'"]:checked').val() == "no"){
 						return 'no';
+			
+			//added new option NA in radio options as per UAT suggestion
+    		//on 17-08-2022 
+			}else if($('input[name="'+field_value+'"]:checked').val() == "n/a"){
+				return 'n/a';
+
 			}
 			
 		}

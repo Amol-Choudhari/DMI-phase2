@@ -6,6 +6,10 @@ use Cake\Event\Event;
 use App\Network\Request\Request;
 use App\Network\Response\Response;
 use Cake\Datasource\ConnectionManager;
+use phpDocumentor\Reflection\Types\This;
+use Cake\Collection\Collection;
+use Cake\Database\Expression\QueryExpression;
+use Cake\Core\Configure;
 
 class ReplicaController extends AppController {
 
@@ -1470,6 +1474,95 @@ class ReplicaController extends AppController {
 		
 		echo '~'.$msg.'~';
 		exit;
+	}
+	
+	
+	//below method is used to generate excel sheet for mapping generated replica no with actual number series.
+	//on 25-08-2022 by Amol
+	public function getAllotedReplicaExcel($record_id){
+		
+		$this->viewBuilder()->setLayout('downloadpdf');
+		
+		$this->LoadModel('DmiReplicaAllotmentDetails');
+		$get_rep = $this->DmiReplicaAllotmentDetails->find('all',array('fields'=>array('alloted_rep_from','alloted_rep_to'),'conditions'=>array('id IS'=>$record_id)))->first();
+		
+		$get_first_serial = $this->getReplicaNumberDetails($get_rep['alloted_rep_from']);
+		$first_rep = $get_first_serial['serial_no'];
+		$get_last_serial = $this->getReplicaNumberDetails($get_rep['alloted_rep_to']);
+		$last_rep = $get_last_serial['serial_no'];
+		
+		$resultArr = array();
+		
+		//serial no mapping array for thound, lakh, and crore position place (AAA000)
+		$mapping_arr = array('0'=>'A','1'=>'B','2'=>'C','3'=>'D','4'=>'E','5'=>'F','6'=>'G','7'=>'H','8'=>'I','9'=>'J','10'=>'K',
+							'11'=>'L','12'=>'M','13'=>'N','14'=>'O','15'=>'P','16'=>'Q','17'=>'R','18'=>'S','19'=>'T','20'=>'U','21'=>'V','22'=>'W',
+							'23'=>'X','24'=>'Y','25'=>'Z');
+
+		//to create array with values and send to excel view 
+		$j=0;
+		for ($i=$first_rep; $i<=$last_rep; $i++) {
+			
+			$resultArr[$j]['year'] = $get_first_serial['year'];
+			$resultArr[$j]['month'] = $get_first_serial['month'];
+			
+			$resultArr[$j]['series_no'] = $i;
+			
+			//creating 13 digit code for proper mapping with alphabets
+			//if not then concatinating respective '0's
+			$len = strlen($i);
+			if ($len==1) {
+				$i = '000000000000'.$i;
+			} elseif ($len==2) {
+				$i = '00000000000'.$i;
+			} elseif ($len==3) {
+				$i = '0000000000'.$i;
+			} elseif ($len==4) {
+				$i = '000000000'.$i;
+			} elseif ($len==5) {
+				$i = '00000000'.$i;
+			} elseif ($len==6) {
+				$i = '0000000'.$i;
+			} elseif ($len==7) {
+				$i = '000000'.$i;
+			} elseif ($len==8) {
+				$i = '00000'.$i;
+			} elseif ($len==9) {
+				$i = '0000'.$i;
+			} elseif ($len==10) {
+				$i = '000'.$i;
+			} elseif ($len==11) {
+				$i = '00'.$i;
+			} elseif ($len==12) {
+				$i = '0'.$i;
+			}
+
+			$hund = substr($i, -3)-1;
+			
+			//to manage for hunderdth digits only
+			//as we already concatinating above, but while doing -1 it convert the string to int and 001 to 1.
+			$hundlen = strlen($hund);
+			if ($hundlen==1) {
+				$hund = '00'.$hund;
+			} elseif ($hundlen==2) {
+				$hund = '0'.$hund;
+			}
+			
+			$thNum = $mapping_arr[substr($i,9,1)];//thousand digit
+			$lkNum = $mapping_arr[substr($i,8,1)];//lakh digit
+			$crNum = $mapping_arr[substr($i,7,1)];//crore digit
+			
+			$resultArr[$j]['replica_no'] = $crNum.$lkNum.$thNum.$hund;
+			
+			$j++;
+		}
+		
+		$this->set('resultArr',$resultArr);
+		
+		$this->layout = null;
+		$this->autoLayout = false;
+		Configure::write('debug', '0');
+		$this -> render('/element/download_report_excel_format/to_generate_replica_excel');
+		
 	}
 
 

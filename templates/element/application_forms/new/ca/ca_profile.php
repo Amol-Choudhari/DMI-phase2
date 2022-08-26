@@ -340,13 +340,14 @@
 										</div>
 
 										<?php if ($ca_bevo_applicant == 'no') { ?>
-											<div class="form-group row">
+											<!-- commented on 11-08-2022, suggested by DMI in UAT-->
+											<!--<div class="form-group row">
 												<label for="inputEmail3" class="col-sm-3 col-form-label">Period for which firm has been in business (Years) <span class="cRed">*</span></label>
 												<div class="custom-file col-sm-9">
-												<?php echo $this->Form->control('business_years', array('type'=>'select', 'id'=>'business_years', 'value'=>$section_form_details[0]['business_years'], 'options'=>$all_ca_business_year, 'label'=>false, 'class'=>'form-control')); ?>
+												<?php //echo $this->Form->control('business_years', array('type'=>'select', 'id'=>'business_years', 'value'=>$section_form_details[0]['business_years'], 'options'=>$all_ca_business_year, 'label'=>false, 'class'=>'form-control')); ?>
 												<span id="error_business_years" class="error invalid-feedback"></span>
 												</div>
-											</div>
+											</div>-->
 										<?php } ?>
 									</div>
 									<div class="col-sm-6">
