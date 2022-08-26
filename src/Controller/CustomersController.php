@@ -2975,7 +2975,7 @@ class CustomersController extends AppController {
 
     public function attachePpLab()
     {
-       
+       //load modal 
         $this->loadModel('DmiFirms');
         $this->loadModel('DmiReplicaAllotmentDetails');
         $this->loadModel('DmiCaPpLabMapings');
@@ -2986,33 +2986,39 @@ class CustomersController extends AppController {
 
         $this->viewBuilder()->setLayout('secondary_customer');
         $customer_id = $this->Session->read('username');
-       
+       //pr($customer_id);die;
         //list of authorized laboratory
 		$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
         $this->set('lab_list',$lab_list);         
-      
+        //list of authorized printers
         $printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
-        //pr($printers_list);die;
         $this->set('printers_list',$printers_list);
 
-        $attached_list =  $this->DmiCaPpLabMapings->find('all')->select(['customer_id','pp_id','lab_id','map_type'])->toArray();
-       //pr($attached_list);die;
-        $result = [];
-        $i = 0;
-        foreach($attached_list as $eachlist){
-           
-             $result[$i]['type'] = $eachlist['map_type'];
-             if(!empty($eachlist['pp_id'])){
-                $result[$i]['p_name'] = $printers_list[$eachlist['pp_id']];
-             }
-             if(!empty($eachlist['lab_id'])){
-                $result[$i]['l_name'] = $lab_list[$eachlist['lab_id']];
-             }
-            
-             $i++;
-        }
-        $this->set('result',$result);
-        //fetch last reocrds from table, if empty set default value
+        $attached_list =  $this->DmiCaPpLabMapings->find('all')->select(['customer_id','pp_id','lab_id','map_type'])->where(array('customer_id IS' => $customer_id))->toArray();
+        //pr($attached_list);die;
+        $this->set('attached_list',$attached_list);      
+
+      
+        $resultArr =  $this->DmiCaPpLabMapings->find('list')->where(array('customer_id IS' => $customer_id))->toList();
+        $this->set('resultArr',$resultArr);
+       
+        //this array is used for display printing press and laboratory on view
+                    $result = [];
+                    $i = 0;
+                    foreach($attached_list as $eachlist){
+                    
+                        $result[$i]['type'] = $eachlist['map_type'];
+                        if(!empty($eachlist['pp_id'])){
+                            $result[$i]['p_name'] = $printers_list[$eachlist['pp_id']];
+                        }
+                        if(!empty($eachlist['lab_id'])){
+                            $result[$i]['l_name'] = $lab_list[$eachlist['lab_id']];
+                        }
+                        
+                        $i++;
+                    }
+                $this->set('result',$result);
+                //fetch last reocrds from table, if empty set default value
 				$dataArray = $this->DmiReplicaAllotmentDetails->getSectionData($customer_id);
 				// pr($dataArray);die;
 				//to show selected lab in list
@@ -3029,22 +3035,45 @@ class CustomersController extends AppController {
                 $this->set('dataArray',$dataArray);
               
                 //to save post data
-            
 				if (null!==($this->request->getData('save'))) {
                    
                     $postData = $this->request->getData();
-                  
-                    $customer_id = $this->Session->read('username');
-                    
                    
 
-                    $pp_id = $this->request->getData('pp_id');
-                    $lab_id = $this->request->getData('lab_id');
-                    $maptype = $this->request->getData('maptype');
+                        $customer_id = $this->Session->read('username');
+                
+                        $pp_id = $this->request->getData('pp_id');
+                        $lab_id = $this->request->getData('lab_id');
+                        $maptype = $this->request->getData('maptype');
                     
-                        if (!empty($maptype)) {
-                            
-                            $DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
+                        
+                        $get_record_pp =  $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'pp_id IS' => $pp_id))->first();
+                    
+                        $get_record_lab =  $this->DmiCaPpLabMapings->find('all')->where(array('customer_id IS' => $customer_id,'map_type IN' => $maptype))->first();
+                       
+                        // for validation to insert data if maptype is pp or lab
+                        if(!empty($maptype)) {
+                           
+                                // to check insert data with selected pp_id if pp_id is exists then record not add
+                                if(isset($get_record_pp['pp_id']))
+                                {
+                                    
+                                    $message = 'Printing Press alredy Attached with you';
+                                    $message_theme = 'error';
+                                    $redirect_to = 'attache_pp_lab';
+                                
+                                }
+                                //if lab is already exists then this condition stop adding new lab
+                                elseif(!empty($get_record_lab && $get_record_pp ))
+                                {
+                                    // echo "ok";die;
+                                    $message = 'Laboratory alredy Attached with you';
+                                    $message_theme = 'error';
+                                    $redirect_to = 'attache_pp_lab';
+                                }
+                                else{
+                                
+                                    $DmiCaPpLabMapings = $this->DmiCaPpLabMapings->newEntity(array(
 
                                 'customer_id'=>$customer_id,
                                 'pp_id'=>$pp_id,
@@ -3055,20 +3084,33 @@ class CustomersController extends AppController {
                                 
                     
                             ));
-                                //Save the data entity
-                                if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings)) {
+                                
+                                if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings) && $maptype == 'pp' ) {
                                     
-                                    $message = 'added successfully';
+                                    $message = 'Printing Press Attached successfully';
                                     $message_theme = 'success';
                                     $redirect_to = 'attache_pp_lab';
                                 }
-                        }
-                       
+                                if ($this->DmiCaPpLabMapings->save($DmiCaPpLabMapings) && $maptype == 'lab' ) {
+                                    
+                                    $message = 'Laboratory Attached successfully';
+                                    $message_theme = 'success';
+                                    $redirect_to = 'attache_pp_lab';
+                                }
+                                
+                        
                     
+                    }
                 }
-              
-                // set variables to show popup messages from view file
+                else{
+                    $message = 'Please Select Atleast one Laboratory/Printing Press!';
+                    $message_theme = 'error';
+                    $redirect_to = 'attache_pp_lab';
+                }
                
+        
+                }
+                // set variables to show popup messages from view file
                 $this->set('message',$message);
                 $this->set('message_theme',$message_theme);
                 $this->set('redirect_to',$redirect_to);

@@ -67,25 +67,31 @@ class ReplicaController extends AppController {
 			$this->loadModel('DmiAllTblsDetails');
 			$this->loadModel('DmiPackingTypes');
 			$this->loadModel('DmiReplicaUnitDetails');
+			$this->loadModel('DmiCaPpLabMapings'); // added by shankhpal shende on 26/08/2022
 
 			$message = '';
 			$message_theme = '';
 			$redirect_to = '';
 
+			// added by shankhpal shende on 26/08/2022 for to maping with Printing prss and LAboratory
+			$attached_lab = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'lab_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
 			
+			$attached_pp = $this->DmiCaPpLabMapings->find('list',array('keyField'=>'id','valueField'=>'pp_id','conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id asc'))->toList();
 			
 			//first check if this packer have any chemist incharge or not, elae show alert
 			$this->loadModel('DmiChemistAllotments');
 			$this->loadModel('CommGrade');
 			$check_che_incharge = $this->DmiChemistAllotments->find('all',array('fields'=>'chemist_id','conditions'=>array('customer_id IS'=>$customer_id,'status'=>1,'incharge'=>'yes')))->first();
-			if (empty($check_che_incharge)) {
-				
-				$message = 'Sorry.. You do not have any registered chemist In-charge, Please register your chemist and set as in-charge';
+			
+			//updated by shankhpal shende on 26/08/2022
+			if (empty($check_che_incharge && $attached_pp && $attached_lab)) {
+                
+				$message = 'Sorry.. You do not have any registered chemist In-charge,Printing Press,Laboratory Please register your chemist and set as in-charge and attached Printing press and Laboratory';
 				$message_theme = 'failed';
 				$redirect_to = '../customers/secondary_home';
 				
 			} else {
-
+                   
 				//get packer details
 				$firm_details = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
 
@@ -94,8 +100,9 @@ class ReplicaController extends AppController {
 				
 				$this->set('firm_details',$firm_details);
 				
+				
 				//list of authorized laboratory
-				$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+				$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null','id IN'=>$attached_lab),'order'=>'firm_name asc'))->toArray();
 				$this->set('lab_list',$lab_list);
 			
 				//get packer wise commodity list
@@ -116,9 +123,9 @@ class ReplicaController extends AppController {
       //**************************************************************************************************/
 				$tbl_list = $this->DmiAllTblsDetails->find('list',array('keyField'=>'id','valueField'=>'tbl_name','conditions'=>array('customer_id IS'=>$customer_id,'delete_status IS Null'),'order'=>'id asc'))->toArray();
 				$packaging_material_list = $this->DmiPackingTypes->find('list',array('keyField'=>'id','valueField'=>'packing_type','conditions'=>array('delete_status IS Null'),'order'=>'id asc'))->toArray();
-				$printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
-				
-
+						
+				$printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null','id IN'=>$attached_pp),'order'=>'firm_name asc'))->toArray();
+             
 				//fetch last reocrds from table, if empty set default value
 				$dataArray = $this->DmiReplicaAllotmentDetails->getSectionData($customer_id);
 				

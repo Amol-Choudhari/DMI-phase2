@@ -45,14 +45,12 @@
 									<div class="row">
 										<div class="column">
 											<table class="table table-bordered">
-											<?php 
-											foreach($result as $each){
-												?>
-											<?php if($each['type']=='pp') { ?>
+												
+											<?php  if(!empty($resultArr)) { ?>
 											<tr>
 												<th>Attached Printing Press</th>
 											</tr>
-											<?php } }?>
+											<?php } ?>
 											<?php 
 											  foreach($result as $each){
 												?>
@@ -64,15 +62,15 @@
 											</table>
 										</div>
 										<div class="column">
-											<table>
+											<table class="table table-bordered">
 											<?php 
-											foreach($result as $each){
+											  foreach($result as $each){
 												?>
 											<?php if($each['type']=='lab') { ?>
 											<tr>
 												<th>Attached Laboratory</th>
 											</tr>
-											<?php } }?>
+											<?php } } ?>
 											<?php 
 											  foreach($result as $each){
 												?>
