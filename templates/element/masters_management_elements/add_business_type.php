@@ -1,8 +1,9 @@
 <?php ?>
 
 	<label>Enter Business Type <span class="cRed">*</span></label>
-	<div class="col-md-6">
-		<?php echo $this->Form->control('business_type', array('type'=>'text', 'id'=>'business_type','label'=>false, 'placeholder'=>'Enter Business Type Here','class'=>'form-control','required'=>true)); ?>
+	<div class="col-md-6 inboxwidth">
+		<!-- added class inboxwidth by shankhpal shende on 08/09/2022 -->
+		<?php echo $this->Form->control('business_type', array('type'=>'text', 'id'=>'business_type','label'=>false, 'placeholder'=>'Enter Business Type Here','class'=>'form-control ','required'=>true)); ?>
 		<span id="error_business_type" class="error invalid-feedback"></span>
 	</div>
 

@@ -1,6 +1,7 @@
 <?php ?>
 	<label class="col-md-4">Enter Machine Type <span class="cRed">*</span></label>
-		<div class="col-md-6">
+	<!-- added class inboxwidth by shankhpal shende on 08/09/2022 -->
+		<div class="col-md-6 inboxwidth">
 			<?php echo $this->Form->control('machine_types', array('type'=>'text', 'id'=>'machine_types','label'=>false, 'placeholder'=>'Enter Machine Type Here','class'=>'form-control','required'=>true)); ?>
 			<span id="error_machine_type" class="error invalid-feedback"></span>
 		</div>
@@ -16,7 +17,7 @@
 					<span id="error_application_type" class="error invalid-feedback"></span>
 				</div>
 
-				<div class="col-md-1 offset-3 flaot-right">
+				<div class="col-md-1 offset-3 flaot-right addmt">
 					<?php echo $this->element('masters_management_elements/add_submit_common_btn'); ?>
 				</div>
 			</div>

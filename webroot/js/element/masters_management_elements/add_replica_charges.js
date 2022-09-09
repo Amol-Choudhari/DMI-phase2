@@ -11,7 +11,8 @@ function get_commodity(){
                     xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
             },
             success: function (data) {
-                    $("#commodity").append(data);
+                $("#commodity").find('option').remove();  // added by shankhpal shende on 08/09/2022
+                $("#commodity").append(data);
             }
     });
 }

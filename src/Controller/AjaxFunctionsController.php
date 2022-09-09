@@ -32,7 +32,8 @@
 			$this->autoRender = false;
 			$this->loadModel('MCommodity');
 			$category_id = $_POST['commodity'];
-			$commodities = $this->MCommodity->find('all', array('fields'=>array('commodity_code','commodity_name'), 'conditions'=>array('category_code IS'=>$category_id)))->toArray();
+			// changes by shankhpal shende for display commodities in asc order on 02/09/2022
+			$commodities = $this->MCommodity->find('all', array('fields'=>array('commodity_code','commodity_name'), 'conditions'=>array('category_code IS'=>$category_id),'order'=>array('commodity_name asc')))->toArray();
 			?>
 					<option value=""><?php echo "Select Commodity";?></option>
 			<?php foreach ($commodities as $commodity) { ?>

@@ -9,7 +9,8 @@
 			</div>
 			<div class="col-md-6">
 				<label>Commodity Name <span class="cRed">*</span></label>
-				<?php echo $this->Form->control('sub_commodity', array('type'=>'select', 'empty'=>'Select Commodity', 'id'=>'commodity', 'label'=>false,'class'=>'form-control')); ?>
+				<!-- changes done by shankhpal shende on 08/09/2022 for 'empty'=>'Select Commodity' -->
+				<?php echo $this->Form->control('sub_commodity', array('type'=>'select',  'id'=>'commodity', 'label'=>false,'class'=>'form-control')); ?>
 				<span class="error invalid-feedback" id="error_commodity"></span>
 			</div>
 		</div>
@@ -49,5 +50,6 @@
 		<div class="col-md-1 mt-3">
 			<?php echo $this->element('masters_management_elements/add_submit_common_btn'); ?>
 		</div>
-
+<!-- Added by shankhpal shende fir input validation on 08/09/2022  -->
+<?php echo $this->Html->Script('input_validation'); ?>
 <?php echo $this->Html->script('element/masters_management_elements/add_replica_charges'); ?>

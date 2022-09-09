@@ -3420,7 +3420,7 @@
 			
 			$resultdata = $DmiCertQrCodes->find('all',array('conditions'=>array('customer_id'=>$customer_id)))->toArray();
 	       
-            if(count($resultdata) == 0){
+            // if(count($resultdata) == 0){
 
 				require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
@@ -3446,7 +3446,7 @@
 														]);
              
 			    $DmiCertQrCodes->save($DmiCertificateQrAdd);
-			}
+			// }
 
 			$qrimage = $DmiCertQrCodes->find('all',array('field'=>'qr_code_path','conditions'=>array('customer_id'=>$customer_id)))->first();
             

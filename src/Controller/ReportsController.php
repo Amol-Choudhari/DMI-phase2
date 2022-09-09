@@ -1460,9 +1460,9 @@
 			//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 			asort($application_type_xy);
 			$this->set('application_type_xy',$application_type_xy);
-
-			$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA');
-
+           // changes done by shankhpal shende on 09/09/2022
+			$user_roles_xy = array('RO/SO'=>'RO/SO','MO/SMO'=>'MO/SMO','IO'=>'IO','HO MO/SMO'=>'HO MO/SMO','DY.AMA'=>'DY.AMA','JT.AMA'=>'JT.AMA','AMA'=>'AMA','once_update_permission'=>'once_update_permission');
+         
 			//Change on 9/11/2018, Sorting array by ascending order - By Pravin Bhakare
 			asort($user_roles_xy);
 			$this->set('user_roles_xy',$user_roles_xy);
@@ -2449,7 +2449,7 @@
 					$approved_application_list[$i] = $each['customer_id'];
 					$i=$i+1;
 				}
-
+              
 				$this->approvedApplicationReportResults($approved_application_list,$approved_application_type);
 			}
 		
@@ -2759,6 +2759,7 @@
 					$approved_application_details = array(); //this line added on 18-07-2019
 
 					if ($approved_application_type == 'new' || $approved_application_type =='') {
+						
 						$approved_application_details = $this->DmiGrantCertificatesPdfs->find('all')->where(['customer_id' => $approved_application])->first(); 
 					} elseif ($approved_application_type == 'renewal') {
 						$approved_application_detail = $this->DmiGrantCertificatesPdfs->find('all')->select(['id'])->where(['customer_id IS'=>$approved_application])->combine('id','id')->toArray(); 
@@ -2775,12 +2776,14 @@
 
 						//to check if the application is old or not to print on the excel and for viewing part dont by Akash 07-04-2022
 						if ($approved_application_type == 'renewal') {
-
+                          
 							$approved_application_type_text[$i] = "Renewal";
 
 						} elseif ($approved_application_result['user_email_id'] == 'old_application') {
+							
 							$approved_application_type_text[$i] = "Old";
 						} else {
+							
 							$approved_application_type_text[$i] = "New";
 						} 
 

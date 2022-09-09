@@ -1338,15 +1338,18 @@ class MastertablecontentComponent extends Component {
 							   'min_qty'=>$htmlencoded_quantity,
 							   'replica_code'=>strtoupper($htmlencoded_replica_code));
 
-		}
+		} // added by shankhpal shende on 08/09/2022
+       if(!empty($dataArray))
+	   {
+			$DmiReplicaChargesDetailsEntity = $DmiReplicaChargesDetails->newEntity($dataArray);
 
+			if ($DmiReplicaChargesDetails->save($DmiReplicaChargesDetailsEntity)) {
+
+				return true;
+			}
+	   }
 		//Save The Data
-		$DmiReplicaChargesDetailsEntity = $DmiReplicaChargesDetails->newEntity($dataArray);
-
-		if ($DmiReplicaChargesDetails->save($DmiReplicaChargesDetailsEntity)) {
-
-			return true;
-		}
+		
 	}
 
 

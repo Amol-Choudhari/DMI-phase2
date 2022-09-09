@@ -229,6 +229,15 @@
 				$this->masterAddTitle = 'Add Division Grade';
 				$this->masterEditTitle = 'Edit Division Grade';
 				$this->fieldNameForCheck = 'division_grade';
+				//19 For the Documents List Master
+			} elseif ($masterId=='19') {
+				//for division, added on 09-08-2022 by Akash
+				$this->masterTable = 'DmiDocumentLists';
+				$this->masterListTitle = 'List of All Documents';
+				$this->masterListHeader = 'Documents List';
+				$this->masterAddTitle = 'Add Documents Type';
+				$this->masterEditTitle = 'Edit Documents Type';
+				$this->fieldNameForCheck = 'document_type';						   
 			}
 		
 		}
@@ -1249,13 +1258,28 @@
 					$this->message = 'You have '.$action_var.' Division Grade Successfully.';
 					$this->message_theme = 'success';
 				}
+				// For Documents Type  # Added on the 09-08-2022 by Akash
+			} elseif ($masterId=='19') {
+
+				if ($this->Mastertablecontent->addEditDocumentsMaster($postData,$record_id)) {
+
+					///Added this call to save the user action log on 21-02-2022 by Akash
+					$this->Customfunctions->userActionPerformLog('Documents Master '."($forActionLog)", 'Success');
+					$this->message = 'You have '.$action_var.' Documents Type Successfully.';
+					$this->message_theme = 'success';
+				}
 			}
 
 			if ($this->message == '') {
 
 				///Added this call to save the user action log on 21-02-2022 by Akash
 				$this->Customfunctions->userActionPerformLog('Master '."($forActionLog)", 'Failed');
-				$this->message = 'Record not '.$action_var.', Please Try Again.';
+				if ($masterId=='16') {
+					$this->message = 'Replica Charges for selected commodity is already exist.';
+				}else{
+					$this->message = 'Record not '.$action_var.', Please Try Again.';
+				}
+				
 				$this->message_theme = 'failed';
 			}
 

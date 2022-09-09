@@ -90,7 +90,8 @@ class ReplicaController extends AppController {
 				$message_theme = 'failed';
 				$redirect_to = '../customers/secondary_home';
 				
-			} else {
+			} 
+			else {
                    
 				//get packer details
 				$firm_details = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();

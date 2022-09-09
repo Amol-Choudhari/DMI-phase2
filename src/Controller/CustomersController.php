@@ -2926,15 +2926,16 @@ class CustomersController extends AppController {
         $this->viewBuilder()->setLayout('document_check_list');
         $this->loadModel('DmiDocCheckLists');
         
-        $form_type = ['CA Non Bevo','CA Bevo','Printing Press','Laboratory','15 Digit Code','E code'];
+        $form_type = ['CA Non Bevo','CA Bevo','E code','Laboratory','Printing Press','15 Digit Code'];
         $this->set('form_type', $form_type);
         $comm_array = [];
         $i = 0;
         foreach($form_type as $eachformtype){ 
-            $get_doc =  $this->DmiDocCheckLists->find('all')->select(['releted_document'])->where(array('form_type'=>$eachformtype))->order('id ASC')->toArray();
+            $get_doc =  $this->DmiDocCheckLists->find('all')->select(['releted_document'])->where(array('form_type'=>$eachformtype))->order('releted_document ASC')->toArray();
             $doc_array[$i] = $get_doc;
             $i++;
         }
+        
         $this->set('doc_array', $doc_array);
        
     }
@@ -2948,13 +2949,13 @@ class CustomersController extends AppController {
         
          
         
-        $commodity_cat =  $this->MCommodityCategory->find('all')->select(['category_code','category_name'])->where(array('display' => 'Y'))->order('category_code ASC')->toArray();
+        $commodity_cat =  $this->MCommodityCategory->find('all')->select(['category_code','category_name'])->where(array('display' => 'Y'))->order('category_name ASC')->toArray();
         $this->set('commodity_cat', $commodity_cat);
-        
+       
         $comm_array = [];
         $i = 0;
         foreach($commodity_cat as $eachcat){
-             $get_comm =  $this->MCommodity->find('all')->select(['commodity_name'])->where(array('category_code'=>$eachcat['category_code'],'display' => 'Y'))->order('category_code ASC')->toArray();
+             $get_comm =  $this->MCommodity->find('all')->select(['commodity_name'])->where(array('category_code'=>$eachcat['category_code'],'display' => 'Y'))->order('commodity_name ASC')->toArray();
              $comm_array[$i] = $get_comm;
              $i++;
         }
@@ -2979,6 +2980,7 @@ class CustomersController extends AppController {
         $this->loadModel('DmiFirms');
         $this->loadModel('DmiReplicaAllotmentDetails');
         $this->loadModel('DmiCaPpLabMapings');
+        $this->loadModel('DmiGrantCertificatesPdfs');
         //Set the blank variables for the Displaying messages
         $message = '';
         $message_theme = '';
@@ -2987,11 +2989,22 @@ class CustomersController extends AppController {
         $this->viewBuilder()->setLayout('secondary_customer');
         $customer_id = $this->Session->read('username');
        //pr($customer_id);die;
-        //list of authorized laboratory
-		$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+        //list of authorized laboratory commented by shankhpal shende on 29/08/2022
+		//$lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+
+       //list of authorized laboratory
+        $lab_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','joins'=>array(array('table' => 'dmi_grant_certificates_pdfs','alias' => 'dmigcp','type' => 'INNER','conditions' => array('dmigcp.customer_id = DmiFirms.customer_id'))),
+		'conditions'=>array('Dmifirms.customer_id like'=>'%'.'/3/'.'%','delete_status IS Null'),'order'=>array('Dmifirms.firm_name asc')))->toArray();
+   
         $this->set('lab_list',$lab_list);         
-        //list of authorized printers
-        $printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+        
+        //list of authorized printers commented by shankhpal shende on 29/08/2022
+        //$printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','conditions'=>array('customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>'firm_name asc'))->toArray();
+       
+        
+        $printers_list = $this->DmiFirms->find('list',array('keyField'=>'id','valueField'=>'firm_name','joins'=>array(array('table' => 'dmi_grant_certificates_pdfs','alias' => 'dmigcp','type' => 'INNER','conditions' => array('dmigcp.customer_id = DmiFirms.customer_id'))),
+		'conditions'=>array('Dmifirms.customer_id like'=>'%'.'/2/'.'%','delete_status IS Null'),'order'=>array('Dmifirms.firm_name asc')))->toArray();
+       
         $this->set('printers_list',$printers_list);
 
         $attached_list =  $this->DmiCaPpLabMapings->find('all')->select(['customer_id','pp_id','lab_id','map_type'])->where(array('customer_id IS' => $customer_id))->toArray();

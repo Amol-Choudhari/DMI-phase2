@@ -423,8 +423,9 @@ class CustomerformsController extends AppController{
 		
 		//$commodities = $this->Dmi_commodity->find('list',array('fields'=>'commodity_name','conditions'=>array('display'=>'Y')));
 		//$this->set('commodities',$commodities);
+		//changes by shankhpal shende for oreder asc
+		$commodity_categories = $this->MCommodityCategory->find('list',array('valueField'=>'category_name','conditions'=>array('display'=>'Y'),'order'=>array('category_name asc')))->toArray();
 		
-		$commodity_categories = $this->MCommodityCategory->find('list',array('valueField'=>'category_name','conditions'=>array('display'=>'Y')))->toArray();
 		$this->set('commodity_categories',$commodity_categories);
 		
 		//$sub_commodities = $this->Dmi_sub_commodity->find('list',array('fields'=>'sub_comm_name', 'conditions'=>array('commodity_id'=>1)));

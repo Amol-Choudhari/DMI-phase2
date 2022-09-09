@@ -17,12 +17,12 @@
 			<section class="content form-middle">
 				<div class="container-fluid">
 					<div class="row">
-						<div class="col-md-10">
+						<div class="col-md-10 ">
 							<div class="card card-Teal">
 								<div class="card-header"><h4 class="card-title-new"><?php echo $masterAddTitle ?></h4></div>
 									<?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
 										<div class="form-horizontal">
-											<div class="card-body">
+											<div class="card-body ">
 												<div class="row">
 												 	<?php
 														if ($masterId=='1') {
