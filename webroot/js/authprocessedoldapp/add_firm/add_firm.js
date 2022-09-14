@@ -208,6 +208,9 @@
 
 					$.ajax({
 						type: "POST",
+						beforeSend: function (xhr) { // this line added by shankhpal shende on 12/09/2022
+							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+						},
 						url: "../customerforms/calculate_category_wise_charge",
 						data: form_data,
 						beforeSend: function (xhr) { // Add this line

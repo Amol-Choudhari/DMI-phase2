@@ -1954,9 +1954,13 @@
 						
 					} else {
 						$check_app_subm = $DmiFinalSubmits->find('all',array('conditions'=>array('status'=>'pending','customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
-						$app_sub_date = $check_app_subm['created'];
-						$app_sub_date = str_replace('/','-',$app_sub_date);
-						$get_grant_year = date('Y',strtotime($app_sub_date));
+			            
+						if(!empty($check_app_subm)){ // this line added by shankhpal shende on 12/09/2022
+							$app_sub_date = $check_app_subm['created'];
+							$app_sub_date = str_replace('/','-',$app_sub_date);
+							$get_grant_year = date('Y',strtotime($app_sub_date));
+						}
+						
 					}
 				}
 
