@@ -48,10 +48,11 @@ class OthermodulesController extends AppController{
 		}
 	}
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-/******************************************************************|Re-Esign Module|********************************************************************/
+                                                                /***###| RE-ESIGN MODULE|###***/
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ Re_Esign ]|
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ RE-ESIGN ]|
 	//To RE-ESIGN the Renewal Granted PDFs
 	public function reEsignModule(){
 
@@ -114,7 +115,7 @@ class OthermodulesController extends AppController{
 
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ Re-Esign ]|
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ RE-ESIGN ]|
 	//AJAX Function For Selecting Session IDs//
 	Public function onSelectSetCustomerIdSession(){
 
@@ -145,7 +146,7 @@ class OthermodulesController extends AppController{
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ Re-Esign ]|
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ RE-ESIGN ]|
 	//To Create re-esign Session when concent is checked
 	Public function createReEsignSession(){
 
@@ -181,9 +182,9 @@ class OthermodulesController extends AppController{
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ Re-Esign ]|
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ RE-ESIGN ]|
 	//To Create Grant Certificate PDFs to ReESign
-/*	public function createGrantCertificatePdfToReEsign() {
+    /*	public function createGrantCertificatePdfToReEsign() {
 
 		$customer_id = $this->Session->read('customer_id');
 		$split_customer_id = explode('/',$customer_id);
@@ -215,7 +216,7 @@ class OthermodulesController extends AppController{
 			$this->Mpdf->WriteHTML($all_data_pdf);
 		*/
 
-/*		$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+        /*		$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 
 		//Check Applicant Last Record Version to Increment
 		$this->loadModel('DmiGrantCertificatesPdfs');
@@ -242,490 +243,491 @@ class OthermodulesController extends AppController{
 
 	}*/
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-
-/**********************************************************************|DMI WORK TRANSFER MODULE|*********************************************************************/
-
-		// created new function to list of applications fro specific user which restrict admin to deactivate the user.
-		// This list will be available to RO/SO dashboard with option to get permission from HO to reallocate the work of any user under his office.
-		// Created on 23-06-2021 by Amol
-		////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
-		public function userWorkTransfer(){
-
-			//Load Models
-			$this->loadModel('DmiWorkTransferHoPermissions');
-			$this->loadModel('DmiRoOffices');
-			$this->loadModel('DmiUsers');
-			$this->loadModel('DmiUserRoles');
-			
-			$message='';
-			$redirect_to='';
-			$workNotPendingMsg = '';
-
-			//get RO/SO office id of current logged in RO/SO
-			$ro_email_id = $this->Session->read('username');
-			$get_office_id = $this->DmiRoOffices->find('list',array('keyField'=>'id','conditions'=>array('ro_email_id IS'=>$ro_email_id,'OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->toArray();
-
-			//get all users under the current logged in RO/SO
-			$users_list = $this->DmiUsers->find('list',array('keyField'=>'email','valueField'=>'email','conditions'=>array('posted_ro_office IN'=>$get_office_id,'status'=>'active')))->toArray();
-			
-			//added below loop //for email encoding
-				$newArray = array();
-				foreach($users_list as $key => $emailId) {
-
-					$newArray[$key] = base64_decode($emailId);
-				}
-				$users_list = $newArray;
-			//till here
-
-			$this->set('users_list',$users_list);
-
-			//if RO/SO officer handles more than one office
-			$req_by_office = implode(',',$get_office_id);
-
-			if (null !== ($this->request->getData('get_details'))) {
-
-				$postData = $this->request->getData();
-				$user_email_id = $postData['users_list'];
-				$inProgressWork = array();
-
-				//get ho permission status
-				$get_ho_perm_status = $this->DmiWorkTransferHoPermissions->find('all',array('fields'=>'status','conditions'=>array('req_by_office IN'=>$req_by_office,'req_by_user IS'=>$ro_email_id,'req_for_user IS'=>$user_email_id),'order'=>'id desc'))->first();
-
-				if (!empty($get_ho_perm_status)) {
-
-					$ho_perm_status = $get_ho_perm_status['status'];
-
-				} else {
-
-					$ho_perm_status = '';
-				}
-
-
-				//get scrutiny officers list
-				$scrutiny_officers = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('OR'=>array('mo_smo_inspection'=>'yes','ho_mo_smo'=>'yes'))))->toArray();
-				//added below loop //for email encoding
-					$newArray = array();
-					foreach($scrutiny_officers as $key => $emailId) {
-						$newArray[$key] = base64_decode($emailId);
-					}
-					$scrutiny_officers = $newArray;
-				//till here
-
-				//added below loop //for email encoding
-					$new_users_list = array();
-					foreach($users_list as $key => $emailId) {
-						$new_users_list[$key] = base64_encode($emailId);
-					}
-				//till here
-				
-				//get Inspection officers list
-				$inspection_officers = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('user_email_id IN'=>$new_users_list,'io_inspection'=>'yes')))->toArray();
-				//added below loop //for email encoding
-				$newArray = array();
-					foreach($inspection_officers as $key => $emailId) {
-						$newArray[$key] = base64_decode($emailId);
-					}
-					$inspection_officers = $newArray;
-				//till here
-				
-				$applTypeArray = $this->Session->read('applTypeArray');
-				//Index 1, Now Renewal application will not list except DDO dashboard, any where in list. on 20-10-2022
-				unset($applTypeArray['1']);
-				
-				//get flow wise tables
-				$this->loadModel('DmiFlowWiseTablesLists');
-				$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$applTypeArray),'order'=>'id ASC'))->toArray();
-				
-				$i=0;
-				foreach($flow_wise_tables as $each_flow){
-					
-					$appl_type_id = $each_flow['application_type'];
-					$DmiAllocations = $each_flow['allocation'];
-					$DmiHoLevelAllocations = $each_flow['ho_level_allocation'];
-					$DmiFinalSubmits = $each_flow['application_form'];
-					
-					$this->loadModel($DmiAllocations);
-					$this->loadModel($DmiHoLevelAllocations);
-					$this->loadModel($DmiFinalSubmits);
-					
-					//get application type name
-					$this->loadModel('DmiApplicationTypes');
-					$get_appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>'application_type','conditions'=>array('id'=>$appl_type_id)))->first();
-					$appl_type = $get_appl_type['application_type'];
-					
-					//check new application allocation
-					$find_first_allocation = $this->$DmiAllocations->find('all',array('conditions'=>array('OR'=>array('level_1'=>$user_email_id, 'level_2'=>$user_email_id, 'level_3'=>$user_email_id))))->toArray();
-
-					if (!empty($find_first_allocation)) {
-
-						foreach ($find_first_allocation as $each_allocation) {
-
-							$customer_id = $each_allocation['customer_id'];
-
-							//updated on 23-06-2021, check for scrutiny with approved level 1
-							$check_scrutiny_status = $this->$DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'approved','current_level'=>'level_1'),'order'=>'id desc'))->first();
-
-							if (empty($check_scrutiny_status)) {
-								//check from which the appl to be released
-								//for scrutiny
-								if($each_allocation['level_1'] == $user_email_id){
-
-									$inProgressWork[$i]['rels_from'] = 'Scrutiny Allocation';
-									$inProgressWork[$i]['appl_type'] = $appl_type;
-									$inProgressWork[$i]['appl_id'] = $customer_id;
-
-									$i=$i+1;
-								}
-							}
-							
-
-							//updated on 23-06-2021, check for inspection with approved level 3
-							$check_inspection_status = $this->$DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->first();
-
-							if(empty($check_inspection_status)) {
-								//for Inspection
-								if ($each_allocation['level_2'] == $user_email_id) {
-
-									$inProgressWork[$i]['rels_from'] = 'Inspection Allocation';
-									$inProgressWork[$i]['appl_type'] = $appl_type;
-									$inProgressWork[$i]['appl_id'] = $customer_id;
-
-									$i=$i+1;
-								}
-							}
-						}
-					}
-					
-					//Check HO level application allocation
-					$find_ho_allocation = $this->$DmiHoLevelAllocations->find('all',array('conditions'=>array('ho_mo_smo'=>$user_email_id)))->toArray();
-
-					if (!empty($find_ho_allocation)) {
-						
-						foreach ($find_ho_allocation as $each_allocation) {
-
-							$customer_id = $each_allocation['customer_id'];
-
-							//check in new flow
-							$check_new_status = $this->$DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->first();
-
-							//if pending in any flow
-							if (empty($check_new_status)) {
-								
-								$inProgressWork[$i]['rels_from'] = 'Scrutiny Allocation(HO)';
-								$inProgressWork[$i]['appl_type'] = $appl_type;
-								$inProgressWork[$i]['appl_id'] = $customer_id;
-
-								$i=$i+1;
-							}
-						}
-					}
-				}
-
-				if (empty($inProgressWork)) {
-
-					//get user table id
-					$get_id = $this->DmiUsers->find('all',array('fields'=>'id','conditions'=>array('email IS'=>$user_email_id)))->first();
-
-					$limsWork = $this->getLimsUserWiseSamplesInProgress($get_id['id']);
-
-					if ($limsWork == false) { //for email encoding
-						$workNotPendingMsg = '<p class="alert alert-primary middle">No work is pending with <span class="badge badge-info">'.base64_decode($user_email_id).'</span> in DMI module as <b>Scrutiny/Inspection Officer</b>, You can proceed to deactivate this user.</p>';
-					}else{
-						$workNotPendingMsg = '<p class="alert alert-primary middle">No work is pending with <span class="badge badge-info">'.base64_decode($user_email_id).'</span> in DMI module as <b>Scrutiny/Inspection Officer</b>,<br>But some work pending in <b>LIMS</b> module. Please contact Admin to Transfer LIMS work from <b>User Work Transfer</b> option in LIMS.</p>';
-					}
-				}
-
-				$this->set(compact('users_list','inProgressWork','scrutiny_officers','inspection_officers','get_ho_perm_status','ho_perm_status'));
-			}
-
-			$this->set('workNotPendingMsg',$workNotPendingMsg);
-
-			if (null !== ($this->request->getData('get_ho_permission'))){
-
-				$postData = $this->request->getData();
-				$user_email_id = $postData['users_list'];
-
-
-				$DmiWorkTranferEntity = $this->DmiWorkTransferHoPermissions->newEntity(array(
-
-					'req_by_office'=>$req_by_office,
-					'req_by_user'=>$ro_email_id,
-					'req_for_user'=>$user_email_id,
-					'status'=>'Requested',
-					'created'=>date('Y-m-d H:i:s'),
-					'modified'=>date('Y-m-d H:i:s'),
-				));
-
-				//save request record in ho permission table
-				if ($this->DmiWorkTransferHoPermissions->save($DmiWorkTranferEntity)) { //for email encoding
-
-					$message = 'The request for HO(QC) permisssion to transfer work of user id "'.base64_decode($user_email_id).'" has been made successfully. <br><br> Once HO(QC) permits the request, you will be able to transfer the work to another users. Thank you';
-					$redirect_to = 'user_work_transfer';
-				}
-			}
-
-			$this->set('message',$message);
-			$this->set('redirect_to',$redirect_to);
-
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
-		//to reallocate /transfer the selected application when action button hits by RO/SO user
-		//on 23-06-2021 by Amol
-		public function transferWork(){
-
-			$this->autoRender = false;
-			//get ajax post data
-			$for_user_id = $_POST['for_user_id'];
-			$appl_type = $_POST['appl_type'];
-			$appl_id = $_POST['appl_id'];
-			$rels_from = $_POST['rels_from'];
-			$allocate_to = $_POST['allocate_to'];
-
-			$ro_email_id = $this->Session->read('username');
-			$this->loadModel('DmiRoOffices');
-			$get_office_id = $this->DmiRoOffices->find('list',array('keyField'=>'id','conditions'=>array('ro_email_id IS'=>$ro_email_id,'delete_status is NULL')))->toArray();
-
-			//if RO/SO officer handles more than one office
-			$by_office = implode(',',$get_office_id);
-
-			//to replace the allocation conditionally
-			
-			//get application type from name
-			$this->loadModel('DmiApplicationTypes');
-			$get_appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>'id','conditions'=>array('application_type IS'=>$appl_type)))->first();
-			$appl_type_id = $get_appl_type['id'];
-			
-			//get flow wise tables
-			$this->loadModel('DmiFlowWiseTablesLists');
-			$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$appl_type_id),'order'=>'id ASC'))->first();
-			
-			$DmiAllocations = $flow_wise_tables['allocation'];
-			$DmiHoLevelAllocations = $flow_wise_tables['ho_level_allocation'];
-			
-			$this->loadModel($DmiAllocations);
-			$this->loadModel($DmiHoLevelAllocations);
-
-			//if HO allocation need to change
-			if ($rels_from == 'Scrutiny Allocation(HO)') {
-				
-				$allocation_table = $DmiHoLevelAllocations;
-				$level_to_update = 'ho_mo_smo';
-
-			} else {// else other allocation tables
-
-				$allocation_table = $DmiAllocations;
-				
-				if ($rels_from == 'Scrutiny Allocation') {
-
-					$level_to_update = 'level_1';
-
-				} elseif ($rels_from == 'Inspection Allocation') {
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+
+
+                                                                /***###| WORK TRANSFER MODULE|###***/
+
+    // created new function to list of applications fro specific user which restrict admin to deactivate the user.
+    // This list will be available to RO/SO dashboard with option to get permission from HO to reallocate the work of any user under his office.
+    // Created on 23-06-2021 by Amol
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+    public function userWorkTransfer(){
+
+        //Load Models
+        $this->loadModel('DmiWorkTransferHoPermissions');
+        $this->loadModel('DmiRoOffices');
+        $this->loadModel('DmiUsers');
+        $this->loadModel('DmiUserRoles');
+        
+        $message='';
+        $redirect_to='';
+        $workNotPendingMsg = '';
+
+        //get RO/SO office id of current logged in RO/SO
+        $ro_email_id = $this->Session->read('username');
+        $get_office_id = $this->DmiRoOffices->find('list',array('keyField'=>'id','conditions'=>array('ro_email_id IS'=>$ro_email_id,'OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->toArray();
+
+        //get all users under the current logged in RO/SO
+        $users_list = $this->DmiUsers->find('list',array('keyField'=>'email','valueField'=>'email','conditions'=>array('posted_ro_office IN'=>$get_office_id,'status'=>'active')))->toArray();
+        
+        //added below loop //for email encoding
+            $newArray = array();
+            foreach($users_list as $key => $emailId) {
+
+                $newArray[$key] = base64_decode($emailId);
+            }
+            $users_list = $newArray;
+        //till here
+
+        $this->set('users_list',$users_list);
+
+        //if RO/SO officer handles more than one office
+        $req_by_office = implode(',',$get_office_id);
+
+        if (null !== ($this->request->getData('get_details'))) {
+
+            $postData = $this->request->getData();
+            $user_email_id = $postData['users_list'];
+            $inProgressWork = array();
+
+            //get ho permission status
+            $get_ho_perm_status = $this->DmiWorkTransferHoPermissions->find('all',array('fields'=>'status','conditions'=>array('req_by_office IN'=>$req_by_office,'req_by_user IS'=>$ro_email_id,'req_for_user IS'=>$user_email_id),'order'=>'id desc'))->first();
+
+            if (!empty($get_ho_perm_status)) {
+
+                $ho_perm_status = $get_ho_perm_status['status'];
+
+            } else {
+
+                $ho_perm_status = '';
+            }
+
+
+            //get scrutiny officers list
+            $scrutiny_officers = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('OR'=>array('mo_smo_inspection'=>'yes','ho_mo_smo'=>'yes'))))->toArray();
+            //added below loop //for email encoding
+                $newArray = array();
+                foreach($scrutiny_officers as $key => $emailId) {
+                    $newArray[$key] = base64_decode($emailId);
+                }
+                $scrutiny_officers = $newArray;
+            //till here
+
+            //added below loop //for email encoding
+                $new_users_list = array();
+                foreach($users_list as $key => $emailId) {
+                    $new_users_list[$key] = base64_encode($emailId);
+                }
+            //till here
+            
+            //get Inspection officers list
+            $inspection_officers = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('user_email_id IN'=>$new_users_list,'io_inspection'=>'yes')))->toArray();
+            //added below loop //for email encoding
+            $newArray = array();
+                foreach($inspection_officers as $key => $emailId) {
+                    $newArray[$key] = base64_decode($emailId);
+                }
+                $inspection_officers = $newArray;
+            //till here
+            
+            $applTypeArray = $this->Session->read('applTypeArray');
+            //Index 1, Now Renewal application will not list except DDO dashboard, any where in list. on 20-10-2022
+            unset($applTypeArray['1']);
+            
+            //get flow wise tables
+            $this->loadModel('DmiFlowWiseTablesLists');
+            $flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$applTypeArray),'order'=>'id ASC'))->toArray();
+            
+            $i=0;
+            foreach($flow_wise_tables as $each_flow){
+                
+                $appl_type_id = $each_flow['application_type'];
+                $DmiAllocations = $each_flow['allocation'];
+                $DmiHoLevelAllocations = $each_flow['ho_level_allocation'];
+                $DmiFinalSubmits = $each_flow['application_form'];
+                
+                $this->loadModel($DmiAllocations);
+                $this->loadModel($DmiHoLevelAllocations);
+                $this->loadModel($DmiFinalSubmits);
+                
+                //get application type name
+                $this->loadModel('DmiApplicationTypes');
+                $get_appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>'application_type','conditions'=>array('id'=>$appl_type_id)))->first();
+                $appl_type = $get_appl_type['application_type'];
+                
+                //check new application allocation
+                $find_first_allocation = $this->$DmiAllocations->find('all',array('conditions'=>array('OR'=>array('level_1'=>$user_email_id, 'level_2'=>$user_email_id, 'level_3'=>$user_email_id))))->toArray();
+
+                if (!empty($find_first_allocation)) {
+
+                    foreach ($find_first_allocation as $each_allocation) {
+
+                        $customer_id = $each_allocation['customer_id'];
+
+                        //updated on 23-06-2021, check for scrutiny with approved level 1
+                        $check_scrutiny_status = $this->$DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'approved','current_level'=>'level_1'),'order'=>'id desc'))->first();
+
+                        if (empty($check_scrutiny_status)) {
+                            //check from which the appl to be released
+                            //for scrutiny
+                            if($each_allocation['level_1'] == $user_email_id){
+
+                                $inProgressWork[$i]['rels_from'] = 'Scrutiny Allocation';
+                                $inProgressWork[$i]['appl_type'] = $appl_type;
+                                $inProgressWork[$i]['appl_id'] = $customer_id;
+
+                                $i=$i+1;
+                            }
+                        }
+                        
+
+                        //updated on 23-06-2021, check for inspection with approved level 3
+                        $check_inspection_status = $this->$DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->first();
+
+                        if(empty($check_inspection_status)) {
+                            //for Inspection
+                            if ($each_allocation['level_2'] == $user_email_id) {
+
+                                $inProgressWork[$i]['rels_from'] = 'Inspection Allocation';
+                                $inProgressWork[$i]['appl_type'] = $appl_type;
+                                $inProgressWork[$i]['appl_id'] = $customer_id;
+
+                                $i=$i+1;
+                            }
+                        }
+                    }
+                }
+                
+                //Check HO level application allocation
+                $find_ho_allocation = $this->$DmiHoLevelAllocations->find('all',array('conditions'=>array('ho_mo_smo'=>$user_email_id)))->toArray();
+
+                if (!empty($find_ho_allocation)) {
+                    
+                    foreach ($find_ho_allocation as $each_allocation) {
+
+                        $customer_id = $each_allocation['customer_id'];
+
+                        //check in new flow
+                        $check_new_status = $this->$DmiFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'status'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->first();
+
+                        //if pending in any flow
+                        if (empty($check_new_status)) {
+                            
+                            $inProgressWork[$i]['rels_from'] = 'Scrutiny Allocation(HO)';
+                            $inProgressWork[$i]['appl_type'] = $appl_type;
+                            $inProgressWork[$i]['appl_id'] = $customer_id;
+
+                            $i=$i+1;
+                        }
+                    }
+                }
+            }
+
+            if (empty($inProgressWork)) {
+
+                //get user table id
+                $get_id = $this->DmiUsers->find('all',array('fields'=>'id','conditions'=>array('email IS'=>$user_email_id)))->first();
+
+                $limsWork = $this->getLimsUserWiseSamplesInProgress($get_id['id']);
+
+                if ($limsWork == false) { //for email encoding
+                    $workNotPendingMsg = '<p class="alert alert-primary middle">No work is pending with <span class="badge badge-info">'.base64_decode($user_email_id).'</span> in DMI module as <b>Scrutiny/Inspection Officer</b>, You can proceed to deactivate this user.</p>';
+                }else{
+                    $workNotPendingMsg = '<p class="alert alert-primary middle">No work is pending with <span class="badge badge-info">'.base64_decode($user_email_id).'</span> in DMI module as <b>Scrutiny/Inspection Officer</b>,<br>But some work pending in <b>LIMS</b> module. Please contact Admin to Transfer LIMS work from <b>User Work Transfer</b> option in LIMS.</p>';
+                }
+            }
+
+            $this->set(compact('users_list','inProgressWork','scrutiny_officers','inspection_officers','get_ho_perm_status','ho_perm_status'));
+        }
+
+        $this->set('workNotPendingMsg',$workNotPendingMsg);
+
+        if (null !== ($this->request->getData('get_ho_permission'))){
+
+            $postData = $this->request->getData();
+            $user_email_id = $postData['users_list'];
+
+
+            $DmiWorkTranferEntity = $this->DmiWorkTransferHoPermissions->newEntity(array(
+
+                'req_by_office'=>$req_by_office,
+                'req_by_user'=>$ro_email_id,
+                'req_for_user'=>$user_email_id,
+                'status'=>'Requested',
+                'created'=>date('Y-m-d H:i:s'),
+                'modified'=>date('Y-m-d H:i:s'),
+            ));
+
+            //save request record in ho permission table
+            if ($this->DmiWorkTransferHoPermissions->save($DmiWorkTranferEntity)) { //for email encoding
+
+                $message = 'The request for HO(QC) permisssion to transfer work of user id "'.base64_decode($user_email_id).'" has been made successfully. <br><br> Once HO(QC) permits the request, you will be able to transfer the work to another users. Thank you';
+                $redirect_to = 'user_work_transfer';
+            }
+        }
+
+        $this->set('message',$message);
+        $this->set('redirect_to',$redirect_to);
+
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+    //to reallocate /transfer the selected application when action button hits by RO/SO user
+    //on 23-06-2021 by Amol
+    public function transferWork(){
+
+        $this->autoRender = false;
+        //get ajax post data
+        $for_user_id = $_POST['for_user_id'];
+        $appl_type = $_POST['appl_type'];
+        $appl_id = $_POST['appl_id'];
+        $rels_from = $_POST['rels_from'];
+        $allocate_to = $_POST['allocate_to'];
+
+        $ro_email_id = $this->Session->read('username');
+        $this->loadModel('DmiRoOffices');
+        $get_office_id = $this->DmiRoOffices->find('list',array('keyField'=>'id','conditions'=>array('ro_email_id IS'=>$ro_email_id,'delete_status is NULL')))->toArray();
+
+        //if RO/SO officer handles more than one office
+        $by_office = implode(',',$get_office_id);
+
+        //to replace the allocation conditionally
+        
+        //get application type from name
+        $this->loadModel('DmiApplicationTypes');
+        $get_appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>'id','conditions'=>array('application_type IS'=>$appl_type)))->first();
+        $appl_type_id = $get_appl_type['id'];
+        
+        //get flow wise tables
+        $this->loadModel('DmiFlowWiseTablesLists');
+        $flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$appl_type_id),'order'=>'id ASC'))->first();
+        
+        $DmiAllocations = $flow_wise_tables['allocation'];
+        $DmiHoLevelAllocations = $flow_wise_tables['ho_level_allocation'];
+        
+        $this->loadModel($DmiAllocations);
+        $this->loadModel($DmiHoLevelAllocations);
+
+        //if HO allocation need to change
+        if ($rels_from == 'Scrutiny Allocation(HO)') {
+            
+            $allocation_table = $DmiHoLevelAllocations;
+            $level_to_update = 'ho_mo_smo';
+
+        } else {// else other allocation tables
+
+            $allocation_table = $DmiAllocations;
+            
+            if ($rels_from == 'Scrutiny Allocation') {
+
+                $level_to_update = 'level_1';
 
-					$level_to_update = 'level_2';
-				}
-			}
-
-			//get latest record id of allocation to update
-			$this->loadModel($allocation_table);
-			$get_last_id = $this->$allocation_table->find('all',array('conditions'=>array('customer_id IS'=>$appl_id,$level_to_update=>$for_user_id),'order'=>'id desc'))->first();
-			//update the allocation record
-			$mod_date = date('Y-m-d H:i:s');
-
-			//if current level also contain same user id
-			if($get_last_id['current_level'] == $for_user_id){
-				$this->$allocation_table->updateAll(array($level_to_update=>"$allocate_to",'modified'=>"$mod_date",'current_level IS'=>"$allocate_to"),array('id'=>$get_last_id['id']));
+            } elseif ($rels_from == 'Inspection Allocation') {
 
-			}else{
-				$this->$allocation_table->updateAll(array($level_to_update=>"$allocate_to",'modified'=>"$mod_date"),array('id IS'=>$get_last_id['id']));
+                $level_to_update = 'level_2';
+            }
+        }
 
-			}
+        //get latest record id of allocation to update
+        $this->loadModel($allocation_table);
+        $get_last_id = $this->$allocation_table->find('all',array('conditions'=>array('customer_id IS'=>$appl_id,$level_to_update=>$for_user_id),'order'=>'id desc'))->first();
+        //update the allocation record
+        $mod_date = date('Y-m-d H:i:s');
 
-			//to save application transfer logs
-			$this->loadModel('DmiWorkTransferLogs');
-			$DmiWorkTranferLogEntity = $this->DmiWorkTransferLogs->newEntity(array(
+        //if current level also contain same user id
+        if($get_last_id['current_level'] == $for_user_id){
+            $this->$allocation_table->updateAll(array($level_to_update=>"$allocate_to",'modified'=>"$mod_date",'current_level IS'=>"$allocate_to"),array('id'=>$get_last_id['id']));
 
-				'customer_id'=>$appl_id,
-				'by_office'=>$by_office,
-				'by_user'=>$ro_email_id,
-				'from_stage'=>$rels_from,
-				'from_user'=>$for_user_id,
-				'to_user'=>$allocate_to,
-				'appl_type'=>$appl_type,
-				'created'=>date('Y-m-d H:i:s'),
-				'modified'=>date('Y-m-d H:i:s'),
+        }else{
+            $this->$allocation_table->updateAll(array($level_to_update=>"$allocate_to",'modified'=>"$mod_date"),array('id IS'=>$get_last_id['id']));
 
-			));
+        }
 
-
-			if ($this->DmiWorkTransferLogs->save($DmiWorkTranferLogEntity)) {
-
-				echo '~done~';
-			}else{
-				echo '~error~';
-			}
-			exit;
-		}
-
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
-		//to display work transfer request on HO dashboard in work transfer request window
-		//added menu on left side for this, //on 23-06-2021 by Amol
-		public function workTransferRequests(){
-
-			$this->viewBuilder()->setLayout('admin_dashboard');
-			$this->loadModel('DmiWorkTransferHoPermissions');
-			$this->loadModel('DmiRoOffices');
-			$allRequests = $this->DmiWorkTransferHoPermissions->find('all',array('order'=>'id desc'))->toArray();
-
-			//get office name from office id
-			$i=1;
-			$office_name = array();
-
-			foreach ($allRequests as $each) {
-
-				$office_id = explode(',',(string) $each['req_by_office']); #For Deprecations
-				$get_office_name = '';
-
-				foreach ($office_id as $each_office) {
-
-					$office_details = $this->DmiRoOffices->find('all',array('fields'=>'ro_office','conditions'=>array('id'=>$each_office)))->first();
-					$get_office_name .= $office_details['ro_office'].', ';
-				}
-
-				$office_name[$i] = $get_office_name;
-				$i=$i+1;
-			}
-
-			$this->set(compact('allRequests','office_name'));
-
-		}
-
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
-		//to update the status as Permitted when HO click for permission
-		//on 23-06-2021 by Amol
-		public function hoPermittedForTransfer(){
-
-			$this->autoRender = false;
-			//get ajax post data
-			$req_by_user = base64_encode($_POST['req_by_user']); //for email encoding
-			$req_for_user = base64_encode($_POST['req_for_user']); //for email encoding
-			$mod_date = date('Y-m-d H:i:s');
-
-			$this->loadModel('DmiWorkTransferHoPermissions');
-			$this->DmiWorkTransferHoPermissions->updateAll(array('status'=>'Permitted','modified'=>"$mod_date"),array('req_by_user'=>$req_by_user,'req_for_user'=>$req_for_user));
-
-			echo '~done~';
-
-		}
-
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
-		//to update the status as rejected when HO click for rejection
-		//on 23-06-2021 by Amol
-		public function hoRejectedForTransfer(){
-
-			$this->autoRender = false;
-			//get ajax post data
-			$req_by_user = base64_encode($_POST['req_by_user']); //for email encoding
-			$req_for_user = base64_encode($_POST['req_for_user']); //for email encoding
-			$mod_date = date('Y-m-d H:i:s');
-
-			$this->loadModel('DmiWorkTransferHoPermissions');
-			$this->DmiWorkTransferHoPermissions->updateAll(array('status'=>'Rejected','modified'=>"$mod_date"),array('req_by_user'=>$req_by_user,'req_for_user'=>$req_for_user));
-
-			echo '~done~';
-
-		}
-
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
-		//to show application basic details to RO/SO user in popup
-		//on 23-06-2021 by Amol
-		public function showApplStatusPopup(){
-
-			$this->autoRender = false;
-			//get ajax post data
-			$appl_id = $_POST['appl_id'];
-			$appl_type = trim($_POST['appl_type']);
-
-			//get firm details
-			$this->loadModel('DmiFirms');
-			$this->loadModel('DmiAllApplicationsCurrentPositions');
-			$this->loadModel('DmiFinalSubmits');
-			$this->loadModel('DmiRenewalAllCurrentPositions');
-			$this->loadModel('DmiRenewalFinalSubmits');
-			$this->loadModel('DmiApplicationTypes');
-			$this->loadModel('DmiFlowWiseTablesLists');
-			
-			$firm_details = $this->DmiFirms->find('all',array('fields'=>array('firm_name','created'),'conditions'=>array('customer_id'=>$appl_id)))->first();
-			$firm_name = $firm_details['firm_name'];
-
-			//get application type from name
-			$get_appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>'id','conditions'=>array('application_type'=>$appl_type)))->first();
-			$appl_type_id = $get_appl_type['id'];
-			
-			//get flow wise tables
-			$flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type'=>$appl_type_id),'order'=>'id ASC'))->first();
-			$current_position_table = $flow_wise_tables['appl_current_pos'];
-			$final_submit_table = $flow_wise_tables['application_form'];
-			
-			//get application applied on
-			$this->loadModel($final_submit_table);
-			$applied_on_details = $this->$final_submit_table->find('all',array('fields'=>'created','conditions'=>array('customer_id'=>$appl_id,'status'=>'pending'),'order'=>'id desc'))->first();
-			$applied_on = $applied_on_details['created'];
-
-			//get application last status
-			$applied_on_details = $this->$final_submit_table->find('all',array('fields'=>array('status','created','current_level'),'conditions'=>array('customer_id IS'=>$appl_id),'order'=>'id desc'))->first();
-			$last_status = $applied_on_details['status'];
-			$last_status_date = $applied_on_details['created'];
-
-			if ($last_status=='approved' && $applied_on_details['current_level']=='level_1') {
-
-				$last_status = 'Scrutinized';
-
-			} elseif ($last_status=='approved' && $applied_on_details['current_level']=='level_2') {
-
-				$last_status = 'Report Filed';
-			}
-
-			//get current position details
-			$this->loadModel($current_position_table);
-			$get_pos_details = $this->$current_position_table->find('all',array('fields'=>array('current_level'),'conditions'=>array('customer_id'=>$appl_id),'order'=>'id desc'))->first();
-			$current_level = $get_pos_details['current_level'];
-
-			if ($current_level == 'applicant') {
-				$currently_with = 'Applicant';
-			} elseif ($current_level == 'level_1') {
-				$currently_with = 'Scrutiny Officer';
-			} elseif ($current_level == 'level_2') {
-				$currently_with = 'Inspection Officer';
-			} elseif ($current_level == 'level_3') {
-				 $currently_with = 'RO/SO In-charge';
-			} elseif ($current_level == 'level_4') {
-				 $currently_with = 'HO(QC)';
-			}
-
-			//create a array to return result
-			$result = array(
-				'appl_id'=>$appl_id,
-				'firm_name'=>$firm_name,
-				'applied_on'=>$applied_on,
-				'last_status'=>$last_status,
-				'currently_with'=>$currently_with,
-				'last_status_date'=>$last_status_date
-			);
-
-			echo '~'.json_encode($result).'~';
-			exit;
-
-		}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+        //to save application transfer logs
+        $this->loadModel('DmiWorkTransferLogs');
+        $DmiWorkTranferLogEntity = $this->DmiWorkTransferLogs->newEntity(array(
+
+            'customer_id'=>$appl_id,
+            'by_office'=>$by_office,
+            'by_user'=>$ro_email_id,
+            'from_stage'=>$rels_from,
+            'from_user'=>$for_user_id,
+            'to_user'=>$allocate_to,
+            'appl_type'=>$appl_type,
+            'created'=>date('Y-m-d H:i:s'),
+            'modified'=>date('Y-m-d H:i:s'),
+
+        ));
+
+
+        if ($this->DmiWorkTransferLogs->save($DmiWorkTranferLogEntity)) {
+
+            echo '~done~';
+        }else{
+            echo '~error~';
+        }
+        exit;
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+    //to display work transfer request on HO dashboard in work transfer request window
+    //added menu on left side for this, //on 23-06-2021 by Amol
+    public function workTransferRequests(){
+
+        $this->viewBuilder()->setLayout('admin_dashboard');
+        $this->loadModel('DmiWorkTransferHoPermissions');
+        $this->loadModel('DmiRoOffices');
+        $allRequests = $this->DmiWorkTransferHoPermissions->find('all',array('order'=>'id desc'))->toArray();
+
+        //get office name from office id
+        $i=1;
+        $office_name = array();
+
+        foreach ($allRequests as $each) {
+
+            $office_id = explode(',',(string) $each['req_by_office']); #For Deprecations
+            $get_office_name = '';
+
+            foreach ($office_id as $each_office) {
+
+                $office_details = $this->DmiRoOffices->find('all',array('fields'=>'ro_office','conditions'=>array('id'=>$each_office)))->first();
+                $get_office_name .= $office_details['ro_office'].', ';
+            }
+
+            $office_name[$i] = $get_office_name;
+            $i=$i+1;
+        }
+
+        $this->set(compact('allRequests','office_name'));
+
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+    //to update the status as Permitted when HO click for permission
+    //on 23-06-2021 by Amol
+    public function hoPermittedForTransfer(){
+
+        $this->autoRender = false;
+        //get ajax post data
+        $req_by_user = base64_encode($_POST['req_by_user']); //for email encoding
+        $req_for_user = base64_encode($_POST['req_for_user']); //for email encoding
+        $mod_date = date('Y-m-d H:i:s');
+
+        $this->loadModel('DmiWorkTransferHoPermissions');
+        $this->DmiWorkTransferHoPermissions->updateAll(array('status'=>'Permitted','modified'=>"$mod_date"),array('req_by_user'=>$req_by_user,'req_for_user'=>$req_for_user));
+
+        echo '~done~';
+
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+    //to update the status as rejected when HO click for rejection
+    //on 23-06-2021 by Amol
+    public function hoRejectedForTransfer(){
+
+        $this->autoRender = false;
+        //get ajax post data
+        $req_by_user = base64_encode($_POST['req_by_user']); //for email encoding
+        $req_for_user = base64_encode($_POST['req_for_user']); //for email encoding
+        $mod_date = date('Y-m-d H:i:s');
+
+        $this->loadModel('DmiWorkTransferHoPermissions');
+        $this->DmiWorkTransferHoPermissions->updateAll(array('status'=>'Rejected','modified'=>"$mod_date"),array('req_by_user'=>$req_by_user,'req_for_user'=>$req_for_user));
+
+        echo '~done~';
+
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
+    //to show application basic details to RO/SO user in popup
+    //on 23-06-2021 by Amol
+    public function showApplStatusPopup(){
+
+        $this->autoRender = false;
+        //get ajax post data
+        $appl_id = $_POST['appl_id'];
+        $appl_type = trim($_POST['appl_type']);
+
+        //get firm details
+        $this->loadModel('DmiFirms');
+        $this->loadModel('DmiAllApplicationsCurrentPositions');
+        $this->loadModel('DmiFinalSubmits');
+        $this->loadModel('DmiRenewalAllCurrentPositions');
+        $this->loadModel('DmiRenewalFinalSubmits');
+        $this->loadModel('DmiApplicationTypes');
+        $this->loadModel('DmiFlowWiseTablesLists');
+        
+        $firm_details = $this->DmiFirms->find('all',array('fields'=>array('firm_name','created'),'conditions'=>array('customer_id'=>$appl_id)))->first();
+        $firm_name = $firm_details['firm_name'];
+
+        //get application type from name
+        $get_appl_type = $this->DmiApplicationTypes->find('all',array('fields'=>'id','conditions'=>array('application_type'=>$appl_type)))->first();
+        $appl_type_id = $get_appl_type['id'];
+        
+        //get flow wise tables
+        $flow_wise_tables = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type'=>$appl_type_id),'order'=>'id ASC'))->first();
+        $current_position_table = $flow_wise_tables['appl_current_pos'];
+        $final_submit_table = $flow_wise_tables['application_form'];
+        
+        //get application applied on
+        $this->loadModel($final_submit_table);
+        $applied_on_details = $this->$final_submit_table->find('all',array('fields'=>'created','conditions'=>array('customer_id'=>$appl_id,'status'=>'pending'),'order'=>'id desc'))->first();
+        $applied_on = $applied_on_details['created'];
+
+        //get application last status
+        $applied_on_details = $this->$final_submit_table->find('all',array('fields'=>array('status','created','current_level'),'conditions'=>array('customer_id IS'=>$appl_id),'order'=>'id desc'))->first();
+        $last_status = $applied_on_details['status'];
+        $last_status_date = $applied_on_details['created'];
+
+        if ($last_status=='approved' && $applied_on_details['current_level']=='level_1') {
+
+            $last_status = 'Scrutinized';
+
+        } elseif ($last_status=='approved' && $applied_on_details['current_level']=='level_2') {
+
+            $last_status = 'Report Filed';
+        }
+
+        //get current position details
+        $this->loadModel($current_position_table);
+        $get_pos_details = $this->$current_position_table->find('all',array('fields'=>array('current_level'),'conditions'=>array('customer_id'=>$appl_id),'order'=>'id desc'))->first();
+        $current_level = $get_pos_details['current_level'];
+
+        if ($current_level == 'applicant') {
+            $currently_with = 'Applicant';
+        } elseif ($current_level == 'level_1') {
+            $currently_with = 'Scrutiny Officer';
+        } elseif ($current_level == 'level_2') {
+            $currently_with = 'Inspection Officer';
+        } elseif ($current_level == 'level_3') {
+                $currently_with = 'RO/SO In-charge';
+        } elseif ($current_level == 'level_4') {
+                $currently_with = 'HO(QC)';
+        }
+
+        //create a array to return result
+        $result = array(
+            'appl_id'=>$appl_id,
+            'firm_name'=>$firm_name,
+            'applied_on'=>$applied_on,
+            'last_status'=>$last_status,
+            'currently_with'=>$currently_with,
+            'last_status_date'=>$last_status_date
+        );
+
+        echo '~'.json_encode($result).'~';
+        exit;
+
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ WORK-TRANSFER ]|
 	//For LIMS user deactivation check on 13-08-2019
 	//this function is used to check the LIMS sample in prgress with user, which is selected to deactivate
 	public function getLimsUserWiseSamplesInProgress($user_table_id) {
@@ -896,16 +898,14 @@ class OthermodulesController extends AppController{
 	}
 
 
-/*************************************************************************************************************************************************** */
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-
-/*********************************************************|UPDATE FIRM DETAILS MODULE|*********************************************************************/
-
+                                                                /***###| UPDATE FIRM DETAILS MODULE|###***/
 
 	//Update Details Function For Update the Firm Details For Primary and Secondary Firm on 29-12-2021 By Akash
 	//for request to change email id and mobile no. of firms and primary applicants
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
 	public function firmsListToUpdate(){
 
 		$this->viewBuilder()->setLayout('admin_dashboard');
@@ -954,18 +954,12 @@ class OthermodulesController extends AppController{
 
 			foreach($districtlis as $each){
 
-				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				//																																																																																																																				//
-				//	/*	$firmDetails  = $this->DmiFirms->find('all',array('fields'=>array('Dmi_firm.customer_id','Dmi_firm.firm_name','Dmi_firm.id','Dmi_firm.email','Dmi_firm.modified','ds.district_name','Dmi_firm.customer_primary_id','fp.email'),		//
-				//													'joins'=>array(array('table' => 'dmi_districts','alias' => 'ds','type' => 'INNER','conditions' => array('ds.id = Dmi_firm.district::integer')),																																//
-				//																	array('table' => 'dmi_customers','alias' => 'fp','type' => 'INNER','conditions' => array('fp.customer_id = Dmi_firm.customer_primary_id'))),																													//
-				//													'conditions'=>array('Dmi_firm.district'=>$each,'OR'=>array('Dmi_firm.delete_status'=>null,'Dmi_firm.delete_status ='=>'no'))))->toArray();																																		//
-				//		*/																																																																																																																	//
-				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				$firmDetails = $conn->execute("SELECT df.id,df.modified,df.customer_id, df.firm_name, df.email, dd.district_name, df.customer_primary_id, dc.email 
+                                               FROM dmi_firms AS df 
+                                               INNER JOIN dmi_districts AS dd ON dd.id = df.district::integer
+											   INNER JOIN dmi_customers AS dc ON dc.customer_id = df.customer_primary_id 
+                                               WHERE df.district='$each' OR df.delete_status = 'null' OR df.delete_status = 'no'")->fetchAll('assoc');
 
-				$firmDetails = $conn->execute("select df.id,df.modified,df.customer_id, df.firm_name, df.email, dd.district_name, df.customer_primary_id, dc.email from dmi_firms as df inner join dmi_districts as dd on dd.id = df.district::integer
-																									inner join dmi_customers as dc on dc.customer_id = df.customer_primary_id where df.district='$each' or df.delete_status = 'null' or df.delete_status = 'no'")->fetchAll('assoc');
-				//print_r($firmDetails);
 				if(!empty($firmDetails)){ $list[] = $firmDetails; }
 			}
 
@@ -978,7 +972,7 @@ class OthermodulesController extends AppController{
 
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
 	//for fetching the id to edit
 	public function fetchFirmId($id) {
 
@@ -988,7 +982,7 @@ class OthermodulesController extends AppController{
 
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
 	//for fetching the id to edit
 	public function fetchPrimaryFirmId($id) {
 
@@ -998,7 +992,7 @@ class OthermodulesController extends AppController{
 
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ UPDATE FIRM DETAILS ]|
 	//Main Function to edit the firm details
 	public function updateFirmDetails() {
 
@@ -1245,235 +1239,293 @@ class OthermodulesController extends AppController{
 	}
 
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
+                                                                /***###| APPLICANT DETAILS MODULE|###***/
 
-/**********************************************************************|APPLICANT DETAILS MODULE|*********************************************************************/
-
-
-		// APPLICANT DETAILS
-		// DESCRIPTION : Show applicant email details for new audit changes
-		// @AUTHOR : PRAVIN BHAKARE
-		// @CONTRIBUTER : AKASH THAKRE (migration)
-		// DATE : 25-02-2021
+    // APPLICANT DETAILS
+    // DESCRIPTION : Show applicant email details for new audit changes
+    // @AUTHOR : PRAVIN BHAKARE
+    // @CONTRIBUTER : AKASH THAKRE (migration)
+    // DATE : 25-02-2021
 		
-		public function applicantDetails() {
+    public function applicantDetails() {
 
-			$this->viewBuilder()->setLayout('admin_dashboard');
-			$userName = $this->Session->read('username');
-			$this->loadModel('DmiUsers');
-			$this->loadModel('DmiDistricts');
-			$this->loadModel('DmiFirms');
-			$this->loadModel('DmiRoOffices');
-			$this->loadModel('DmiUserRoles');
-			$conn = ConnectionManager::get('default');
-			$user_role = $this->DmiUserRoles->find('all', array('fields' => 'super_admin', 'conditions' => array('user_email_id IS' => $this->Session->read('username'))))->first();
+        $this->viewBuilder()->setLayout('admin_dashboard');
+        $userName = $this->Session->read('username');
+        $this->loadModel('DmiUsers');
+        $this->loadModel('DmiDistricts');
+        $this->loadModel('DmiFirms');
+        $this->loadModel('DmiRoOffices');
+        $this->loadModel('DmiUserRoles');
+        $conn = ConnectionManager::get('default');
+        $user_role = $this->DmiUserRoles->find('all', array('fields' => 'super_admin', 'conditions' => array('user_email_id IS' => $this->Session->read('username'))))->first();
 
-			if ($user_role['super_admin'] == 'yes') {
+        if ($user_role['super_admin'] == 'yes') {
 
-				$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'order' => array('district_name')))->toArray();
+            $districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'order' => array('district_name')))->toArray();
 
-			} else {
+        } else {
 
-				$userOffice = $this->DmiUsers->find('all', array('fields' => array('posted_ro_office'), 'conditions' => array('email IS' => $userName)))->first();
-				$userPostedOffice = $userOffice['posted_ro_office'];
+            $userOffice = $this->DmiUsers->find('all', array('fields' => array('posted_ro_office'), 'conditions' => array('email IS' => $userName)))->first();
+            $userPostedOffice = $userOffice['posted_ro_office'];
 
-				$roDistricts = $this->DmiRoOffices->find('list', array('fields' => array('id'), 'conditions' => array('ro_email_id' => $userName)))->toArray();
+            $roDistricts = $this->DmiRoOffices->find('list', array('fields' => array('id'), 'conditions' => array('ro_email_id' => $userName)))->toArray();
 
-				if (!empty($roDistricts)) {
-					$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IN' => $roDistricts)))->toArray();
-				} else {
-					$districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IS' => $userPostedOffice)))->toArray();
-				}
+            if (!empty($roDistricts)) {
+                $districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IN' => $roDistricts)))->toArray();
+            } else {
+                $districtlist = $this->DmiDistricts->find('list', array('fields' => array('id'), 'conditions' => array('ro_id IS' => $userPostedOffice)))->toArray();
+            }
 
-			}
+        }
 
-			$list = array();
-			foreach ($districtlist as $each) {
+        $list = array();
+        foreach ($districtlist as $each) {
 
-				$firmDetails = $conn->execute("SELECT df.customer_id, df.firm_name, df.email, dd.district_name, df.customer_primary_id, dc.email
-											   FROM dmi_firms AS df INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
-											   INNER JOIN dmi_customers AS dc ON dc.customer_id = df.customer_primary_id WHERE df.district='$each'")->fetchAll('assoc');
-				if (!empty($firmDetails)) {
-					$list[] = $firmDetails;
-				}
-			}
-			
-			$this->set('datalist', $list);
+            $firmDetails = $conn->execute("SELECT df.customer_id, df.firm_name, df.email, dd.district_name, df.customer_primary_id, dc.email
+                                            FROM dmi_firms AS df INNER JOIN dmi_districts AS dd ON dd.id = df.district::INTEGER
+                                            INNER JOIN dmi_customers AS dc ON dc.customer_id = df.customer_primary_id WHERE df.district='$each'")->fetchAll('assoc');
+            if (!empty($firmDetails)) {
+                $list[] = $firmDetails;
+            }
+        }
+        
+        $this->set('datalist', $list);
 
-		}
+    }
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-
-/**********************************************************************|MY TEAM Module|*********************************************************************/
-		
+                                                                /***###| MY TEAM MODULE|###***/
+    
 	// myTeam
-		// Author : Akash Thakre
-		// Description : This function is created to show the list of office users
-		// Date : 30-05-2022
+    // Author : Akash Thakre
+    // Description : This function is created to show the list of office users
+    // Date : 30-05-2022
 
-        public function myTeam(){
+    public function myTeam(){
 
-            $message = '';
-            $message_theme = '';
-            $redirect_to = '';
+        $message = '';
+        $message_theme = '';
+        $redirect_to = '';
 
-            $username = $this->Session->read('username');
+        $username = $this->Session->read('username');
 
-            $this->loadModel('DmiRoOffices');
-			$this->loadModel('DmiApplWithRoMappings');
-			$this->loadModel('DmiUsers');
-			$this->loadModel('DmiUserRoles');
-			$this->loadModel('DmiPaoDetails');
-            $this->loadModel('DmiFirms');
-			$this->loadModel('DmiDistricts');
+        $this->loadModel('DmiRoOffices');
+        $this->loadModel('DmiApplWithRoMappings');
+        $this->loadModel('DmiUsers');
+        $this->loadModel('DmiUserRoles');
+        $this->loadModel('DmiPaoDetails');
+        $this->loadModel('DmiFirms');
+        $this->loadModel('DmiDistricts');
 
-			//get details
-			$officeDetails = $this->DmiRoOffices->getOfficeDetails($username);
-   
-			$office_name = $officeDetails[0];
-			$office_type = $officeDetails[1];
-			
-			//set pao
-			$getPao = $this->DmiPaoDetails->getPaoDetails($username,null);
-			
-			//Set HO Usersd
-			$getHoUsers = $this->DmiUserRoles->getHORoles();
+        //get details
+        $officeDetails = $this->DmiRoOffices->getOfficeDetails($username);
 
-			$dy_ama = $getHoUsers['dy_ama'];
-			$jt_ama = $getHoUsers['jt_ama'];
-			$ama = $getHoUsers['ama'];
-			
-			//Full Name for Head Office Users
-			$dy_ama_name = $this->DmiUsers->getFullName($dy_ama);
-			$jt_ama_name = $this->DmiUsers->getFullName($jt_ama);
-			$ama_name = $this->DmiUsers->getFullName($ama);
-			
-			//Get Scrutiny Officers
-			$get_scrutinizers_list = $this->DmiRoOffices->getScrutinizerForCurrentOffice();
-			$this->set('get_scrutinizers_list',$get_scrutinizers_list);
+        $office_name = $officeDetails[0];
+        $office_type = $officeDetails[1];
+        
+        //set pao
+        $getPao = $this->DmiPaoDetails->getPaoDetails($username,null);
+        
+        //Set HO Usersd
+        $getHoUsers = $this->DmiUserRoles->getHORoles();
 
-			// Get Inspection Officers
-			$get_io_list = $this->DmiRoOffices->getIoForCurrentOffice();
-			$this->set('get_io_list',$get_io_list);
+        $dy_ama = $getHoUsers['dy_ama'];
+        $jt_ama = $getHoUsers['jt_ama'];
+        $ama = $getHoUsers['ama'];
+        
+        //Full Name for Head Office Users
+        $dy_ama_name = $this->DmiUsers->getFullName($dy_ama);
+        $jt_ama_name = $this->DmiUsers->getFullName($jt_ama);
+        $ama_name = $this->DmiUsers->getFullName($ama);
+        
+        //Get Scrutiny Officers
+        $get_scrutinizers_list = $this->DmiRoOffices->getScrutinizerForCurrentOffice();
+        $this->set('get_scrutinizers_list',$get_scrutinizers_list);
 
-			//Set HO MO SMO
-			$ho_scrutinizers_list = $this->DmiUserRoles->getHoScrutinizerForCurrentOffice();
-			$this->set('ho_scrutinizers_list',$ho_scrutinizers_list);
+        // Get Inspection Officers
+        $get_io_list = $this->DmiRoOffices->getIoForCurrentOffice();
+        $this->set('get_io_list',$get_io_list);
 
-			if ($officeDetails[1] == 'SO') {
-				
-				$soInchargeEmail = $officeDetails[2];
-				$soInchargeName = $this->DmiUsers->getFullName($soInchargeEmail);
-				
-				$roInchargeEmail = $this->DmiRoOffices->getRoOfficeEmail($officeDetails[3]);
-				$roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
-				
-			} else {
+        //Set HO MO SMO
+        $ho_scrutinizers_list = $this->DmiUserRoles->getHoScrutinizerForCurrentOffice();
+        $this->set('ho_scrutinizers_list',$ho_scrutinizers_list);
 
-				$soInchargeEmail = '';
-				$soInchargeName = '';
-				$roInchargeEmail = $officeDetails[2];
-				$roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
+        if ($officeDetails[1] == 'SO') {
+            
+            $soInchargeEmail = $officeDetails[2];
+            $soInchargeName = $this->DmiUsers->getFullName($soInchargeEmail);
+            
+            $roInchargeEmail = $this->DmiRoOffices->getRoOfficeEmail($officeDetails[3]);
+            $roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
+            
+        } else {
 
-			}
+            $soInchargeEmail = '';
+            $soInchargeName = '';
+            $roInchargeEmail = $officeDetails[2];
+            $roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
+
+        }
 
 
-           	//post values
-			if ($this->request->is('post')) {
+        //post values
+        if ($this->request->is('post')) {
 
-                //get the post value
-                $postData = $this->request->getData();
-                $customer_id = trim($postData['search_applicant_id']);
-               
-                $firm_details = $this->DmiFirms->firmDetails($customer_id);
-			
-                if (!empty($firm_details)) {
+            //get the post value
+            $postData = $this->request->getData();
+            $customer_id = trim($postData['search_applicant_id']);
+            
+            $firm_details = $this->DmiFirms->firmDetails($customer_id);
+        
+            if (!empty($firm_details)) {
 
-				 
-					$officeDetails = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
-					//pr($officeDetails); exit;
-					$ro_id_from_district = $this->DmiDistricts->getRoIdFromDistrictId($firm_details['district']);
-					$ro_id_from_session = $this->DmiUsers->getPostedOffId($_SESSION['username']);
+                
+                $officeDetails = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+                //pr($officeDetails); exit;
+                $ro_id_from_district = $this->DmiDistricts->getRoIdFromDistrictId($firm_details['district']);
+                $ro_id_from_session = $this->DmiUsers->getPostedOffId($_SESSION['username']);
 
-					if (in_array($ro_id_from_session,$ro_id_from_district)) {
-						//DDO Details
-						$getPao = $this->DmiPaoDetails->getPaoDetails(null,$customer_id);
-					
-						//Get Scrutiny Officers
-						$get_scrutinizers_list = $this->DmiRoOffices->getScrutinizerForCurrentOffice();
-						// Get Inspection Officers
-						$get_io_list = $this->DmiRoOffices->getIoForCurrentOffice();
-	
-					   
-						$office_name = $officeDetails['ro_office'];
-						$office_type = $officeDetails['office_type'];
-	
-						//check the Office type
-						if ($officeDetails['office_type'] == 'SO') {
-	
-							$soInchargeEmail = $officeDetails['ro_email_id'];
-							$soInchargeName = $this->DmiUsers->getFullName($soInchargeEmail);
-	
-							$roInchargeEmail = $this->DmiRoOffices->getRoOfficeEmail($officeDetails['ro_id_for_so']);
-							$roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
-	
-					   } elseif ($officeDetails['office_type'] == 'RO') {
-	
-							$roInchargeEmail = $officeDetails['ro_email_id'];
-							$roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
-						}
+                if (in_array($ro_id_from_session,$ro_id_from_district)) {
+                    //DDO Details
+                    $getPao = $this->DmiPaoDetails->getPaoDetails(null,$customer_id);
+                
+                    //Get Scrutiny Officers
+                    $get_scrutinizers_list = $this->DmiRoOffices->getScrutinizerForCurrentOffice();
+                    // Get Inspection Officers
+                    $get_io_list = $this->DmiRoOffices->getIoForCurrentOffice();
 
-					} else {
-																				  
-											   
-												 
+                    
+                    $office_name = $officeDetails['ro_office'];
+                    $office_type = $officeDetails['office_type'];
 
-						$message = 'Sorry, The entered Applicant Id is not belongs to this office';
-						$message_theme = 'failed';
-						$redirect_to = '../othermodules/my_team';
-					}
+                    //check the Office type
+                    if ($officeDetails['office_type'] == 'SO') {
+
+                        $soInchargeEmail = $officeDetails['ro_email_id'];
+                        $soInchargeName = $this->DmiUsers->getFullName($soInchargeEmail);
+
+                        $roInchargeEmail = $this->DmiRoOffices->getRoOfficeEmail($officeDetails['ro_id_for_so']);
+                        $roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
+
+                    } elseif ($officeDetails['office_type'] == 'RO') {
+
+                        $roInchargeEmail = $officeDetails['ro_email_id'];
+                        $roInchargeName = $this->DmiUsers->getFullName($roInchargeEmail);
+                    }
 
                 } else {
-
-                    $message = 'Sorry, The entered Applicant Id is not Valid';
+                
+                    $message = 'Sorry, The entered Applicant Id is not belongs to this office';
                     $message_theme = 'failed';
                     $redirect_to = '../othermodules/my_team';
-	 
-			
-	 
-													  
-																	  
                 }
 
-			}
+            } else {
 
-			//Set DDO
-			$this->set('getPao',$getPao);
+                $message = 'Sorry, The entered Applicant Id is not Valid';
+                $message_theme = 'failed';
+                $redirect_to = '../othermodules/my_team';
+            }
+        }
 
-			//Set Office
-			$this->set('office_name',$office_name);
-			$this->set('office_type',$office_type);
+        //Set DDO
+        $this->set('getPao',$getPao);
 
-			//Set RO Information
-			$this->set('roInchargeEmail',$roInchargeEmail);
-			$this->set('roInchargeName',$roInchargeName);
+        //Set Office
+        $this->set('office_name',$office_name);
+        $this->set('office_type',$office_type);
 
-			//set SO Information
-			$this->set('soInchargeEmail',$soInchargeEmail);
-			$this->set('soInchargeName',$soInchargeName);
+        //Set RO Information
+        $this->set('roInchargeEmail',$roInchargeEmail);
+        $this->set('roInchargeName',$roInchargeName);
 
-			$this->set(compact('dy_ama','jt_ama','ama'));
-			$this->set(compact('dy_ama_name','jt_ama_name','ama_name'));
+        //set SO Information
+        $this->set('soInchargeEmail',$soInchargeEmail);
+        $this->set('soInchargeName',$soInchargeName);
 
-            $this->set('message', $message);
-            $this->set('message_theme', $message_theme);
-            $this->set('redirect_to', $redirect_to);
+        $this->set(compact('dy_ama','jt_ama','ama'));
+        $this->set(compact('dy_ama_name','jt_ama_name','ama_name'));
+
+        $this->set('message', $message);
+        $this->set('message_theme', $message_theme);
+        $this->set('redirect_to', $redirect_to);
+    
+    }
 
 
 
-		}
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+
+                                                                /***###| SUSPENSION/CANCELLATION MODULE|###***/
+
+    // Suspension Home
+    // DESCRIPTION : Show applicant email details for new audit changes
+    // @AUTHOR : AKASH THAKRE
+    // DATE : 09-12-2022
+
+    public function actionsOnMisgrading(){
+
+        //Load Models
+        $this->loadModel('DmiApplWithRoMappings');
+        $this->loadModel('DmiUsers');
+        $conn = ConnectionManager::get('default');
+
+        $username = $this->Session->read('username');
+
+        //get posted office id
+        $postedOffice = $this->DmiUsers->getPostedOffId($username);
+        
+        $underThisOffice =   $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type
+                                             FROM dmi_grant_certificates_pdfs AS dg 
+                                             INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
+                                             INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
+                                             INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
+                                             WHERE dd.office_id='$postedOffice'")->fetchAll('assoc');
+        
+        $this->set('underThisOffice',$underThisOffice);
+
+    }
+
+    //for fetching the id to edit
+	public function fetchActionId($id) {
+
+        $this->loadModel('DmiGrantCertificatesPdfs');
+        $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
+		$this->Session->write('firm_id',$firm_details['customer_id']);
+		$this->redirect(array('controller'=>'othermodules','action'=>'misgrading_actions_home'));
+	}
+
+
+    //For ActionsOnMisgradins
+
+    public function misgradingActionsHome(){
+
+        $customer_id = $this->Session->read('firm_id');
+        
+        //Load Models
+        $this->loadModel('DmiMisgradingCategories');
+        $this->loadModel('DmiMisgradingLevels');
+        $this->loadModel('DmiMisgradingActions');
+
+        //Misgrading Category
+        $misgradingCategories = $this->DmiMisgradingCategories->getMisgradingCategoriesList();
+        $this->set('misgradingCategories',$misgradingCategories);
+
+        //Misgrading Levels 
+        $misgradingLevels = $this->DmiMisgradingLevels->getMisgradingLevelsList();
+        $this->set('misgradingLevels',$misgradingLevels);
+
+        //Misgrading Actions
+        $misgradingActions = $this->DmiMisgradingActions->getMisgradingActionList();
+        $this->set('misgradingActions',$misgradingActions);
+    }
+
+
+
+
 
 
 

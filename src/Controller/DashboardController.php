@@ -51,6 +51,9 @@ class DashboardController extends AppController{
 					exit();
 				}
 			}
+			
+			#This below Sesion delete is added to unset the application_type session on click - Akash[05-12-2022]
+			$this->Session->Delete('application_type');
 		}
 
 //phase 2 new code from here
@@ -770,6 +773,11 @@ class DashboardController extends AppController{
 									if($NablDate != null){
 										$inspection = 'no';
 									}
+								
+								//This condition block is applied for the flow of Surrender [SOC] having application_type = 9.
+								//to skip the skip the allocation for inspection part - Akash [05-12-2022]
+								}elseif($each_flow['application_type']=='9'){
+									$inspection = 'no';
 								}
 
 								

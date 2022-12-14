@@ -11,115 +11,123 @@ class DmiCustomersTable extends Table{
 	var $name = "Dmi_customer";
 	
 	public $validate = array(
-			'customer_id'=>array(
-				'rule1'=>array(
-						'rule'=>array('maxLength',20),
-						'allowEmpty' => false,
-						'message'=>'Company/Premises Id is Not Valid',
-						'last' => false
-					),
+
+		'customer_id'=>array(
+			'rule1'=>array(
+					'rule'=>array('maxLength',20),
+					'allowEmpty' => false,
+					'message'=>'Company/Premises Id is Not Valid',
+					'last' => false
+				),
+
 			/*	'rule2'=>array(
-						'rule'=>'alphaNumeric',	
-						'message'=>'Company/Premises Id is Not Valid'
-					),		*/						
-				),					
-						
-			'password'=>array(
-					'rule'=>array('maxLength',100),
-					'allowEmpty' => false,
-					'message'=>'Password is Not Valid',
-				),
+					'rule'=>'alphaNumeric',	
+					'message'=>'Company/Premises Id is Not Valid'
+				),		*/						
+			),					
 					
-			'f_name'=>array(
-					'rule'=>array('maxLength',50),
-					'allowEmpty' => false,
-					'message'=>'First Name is Not Valid',
-				),
+		'password'=>array(
+				'rule'=>array('maxLength',100),
+				'allowEmpty' => false,
+				'message'=>'Password is Not Valid',
+			),
 				
-			'm_name'=>array(
-					'rule'=>array('maxLength',50),
-					'message'=>'Middle Name is Not Valid',
-				),
-				
-			'l_name'=>array(
-					'rule'=>array('maxLength',50),
-					'allowEmpty' => false,
-					'message'=>'Last Name is Not Valid',
-				),
-				
-			'street_address'=>array(
-					'rule'=>array('maxLength',200),
-					'allowEmpty' => false,
-					'message'=>'Address is Not Valid',
-				),
-				
-			'district'=>array(
-					'rule1'=>array(
-						'rule'=>array('maxLength',20),
-						'allowEmpty'=>false,
-						'last'=>false),
-					'rule2'=>array(
-						'rule'=>'Numeric')
-				),
-				
-			'state'=>array(
-					'rule1'=>array(
-						'rule'=>array('maxLength',20),
-						'allowEmpty'=>false,
-						'last'=>false),
-					'rule2'=>array(
-						'rule'=>'Numeric')
-				),
-				
-			'postal_code'=>array(
-					'rule'=>array('maxLength',20),
-					'allowEmpty' => false,
-					'message'=>'Postal Code is Not Valid',
-				),
-				
-			'mobile'=>array(
-					'rule'=>array('maxLength',12),
-					'allowEmpty' => false,
-					'message'=>'Mobile No. is Not Valid',
-				),
+		'f_name'=>array(
+				'rule'=>array('maxLength',50),
+				'allowEmpty' => false,
+				'message'=>'First Name is Not Valid',
+			),
 			
-			'landline'=>array(
-					'rule'=>array('maxLength',15),
-					'message'=>'Landline No. is Not Valid',
-				),
-			'file'=>array(
-					'rule'=>array('maxLength',100),
-					'message'=>'File is Not Valid',
-				),
-				
-			'email'=>array(
-					'rule'=>array('maxLength',200),
-					'allowEmpty' => false,
-					'message'=>'Email is Not Valid',
-				),
-			'document'=>array(
-					'rule1'=>array(
-						'rule'=>array('maxLength',20),
-						'allowEmpty'=>false,
-						'last'=>false),
-					'rule2'=>array(
-						'rule'=>'Numeric')
-				),
-			'once_card_no'=>array(
+		'm_name'=>array(
+				'rule'=>array('maxLength',50),
+				'message'=>'Middle Name is Not Valid',
+			),
+			
+		'l_name'=>array(
+				'rule'=>array('maxLength',50),
+				'allowEmpty' => false,
+				'message'=>'Last Name is Not Valid',
+			),
+			
+		'street_address'=>array(
+				'rule'=>array('maxLength',200),
+				'allowEmpty' => false,
+				'message'=>'Address is Not Valid',
+			),
+			
+		'district'=>array(
+				'rule1'=>array(
 					'rule'=>array('maxLength',20),
-					'message'=>'Aadhar is Not Valid',
-				),
-			'photo_id_no'=>array(
-					'rule'=>array('maxLength',100),
-					'allowEmpty' => false,
-					'message'=>'Id is Not Valid',
-				),
-					
+					'allowEmpty'=>false,
+					'last'=>false),
+				'rule2'=>array(
+					'rule'=>'Numeric')
+			),
+			
+		'state'=>array(
+				'rule1'=>array(
+					'rule'=>array('maxLength',20),
+					'allowEmpty'=>false,
+					'last'=>false),
+				'rule2'=>array(
+					'rule'=>'Numeric')
+			),
+			
+		'postal_code'=>array(
+				'rule'=>array('maxLength',20),
+				'allowEmpty' => false,
+				'message'=>'Postal Code is Not Valid',
+			),
+			
+		'mobile'=>array(
+				'rule'=>array('maxLength',12),
+				'allowEmpty' => false,
+				'message'=>'Mobile No. is Not Valid',
+			),
 		
-		);
+		'landline'=>array(
+				'rule'=>array('maxLength',15),
+				'message'=>'Landline No. is Not Valid',
+			),
+		'file'=>array(
+				'rule'=>array('maxLength',100),
+				'message'=>'File is Not Valid',
+			),
+			
+		'email'=>array(
+				'rule'=>array('maxLength',200),
+				'allowEmpty' => false,
+				'message'=>'Email is Not Valid',
+			),
+		'document'=>array(
+				'rule1'=>array(
+					'rule'=>array('maxLength',20),
+					'allowEmpty'=>false,
+					'last'=>false),
+				'rule2'=>array(
+					'rule'=>'Numeric')
+			),
+		'once_card_no'=>array(
+				'rule'=>array('maxLength',20),
+				'message'=>'Aadhar is Not Valid',
+			),
+		'photo_id_no'=>array(
+				'rule'=>array('maxLength',100),
+				'allowEmpty' => false,
+				'message'=>'Id is Not Valid',
+			),
+				
+	
+	);
 		
 		
-		
+
+	public function getCustomerDetails($customer_id){
+		$result = $this->find()->where(['customer_id IS'=>$customer_id])->order(['id'=>'DESC'])->first();
+		if (!empty($result)) {
+			return $result;
+		}
+	}	
 		
 		
 	

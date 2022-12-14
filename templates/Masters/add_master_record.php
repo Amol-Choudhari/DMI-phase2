@@ -19,9 +19,9 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-10">
-					<div class="card card-Teal">
-						<div class="card-header"><h4 class="card-title-new"><?php echo $masterAddTitle ?></h4></div>
-						<?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
+					<?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
+						<div class="card">
+							<div class="card-header card-master"><h4 class="card-title-new"><?php echo $masterAddTitle ?></h4></div>
 							<div class="form-horizontal">
 								<div class="card-body">
 									<div class="row">
@@ -93,18 +93,34 @@
 											} elseif  ($masterId=='19') {
 
 												echo $this->element('masters_management_elements/add_master_elements/add_document_type');
+											
+											} elseif ($masterId=='20') {
+
+												echo $this->element('masters_management_elements/add_master_elements/add_misgrade_category');
+											
+											} elseif  ($masterId=='21') {
+
+												echo $this->element('masters_management_elements/add_master_elements/add_misgrade_levels');
+
+											} elseif ($masterId == '22') {
+
+												echo $this->element('masters_management_elements/add_master_elements/add_misgrade_actions');
 											}
 										?>
 									</div>
 								</div>
 							</div>
-						<?php echo $this->Form->end(); ?>
-					</div>
+							<div class="card-footer cardFooterBackground">
+								<?php echo $this->element('masters_management_elements/button_elements/add_submit_common_btn'); ?>
+							</div>
+						</div>
+					<?php echo $this->Form->end(); ?>
 				</div>
 			</div>
 		</div>
 	</section>
 </div>
+
 
 <input type="hidden" id="form_id" value="<?php echo $form_id; ?>">
 <input type="hidden" id="masterId" value="<?php echo $masterId; ?>">

@@ -1,5 +1,6 @@
 var countarray = null; //declare as global here, and used below functions
 var maintabid = null; //declare as global here, and used below functions
+
 $(document).ready(function(){
 	
 	$("#common_applications_list").hide();
@@ -21,9 +22,9 @@ $(document).ready(function(){
 	
         $.ajax({
             type: "POST",
-            async:true,//updated from false to true on 07-11-2022, to check loader on tab click
+            async:false,
             url:"../dashboard/common_count_fetch",
-			data:{fetchStatus:fetchStatus},							 
+			data:{fetchStatus:fetchStatus},
             beforeSend: function (xhr) {
 				$(".loader").show();$(".loadermsg").show();
                 xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
@@ -33,20 +34,20 @@ $(document).ready(function(){
                 countarray = data.match(/~([^']+)~/)[1];
                 countarray = JSON.parse(countarray);
                
-            /*   $("#pending_count_no").text(countarray.pending);
-               $("#reports_filed_count_no").text(countarray.reports_filed);
-               $("#ref_back_count_no").text(countarray.ref_back);
-               $("#replied_count_no").text(countarray.replied);
-               $("#approved_count_no").text(countarray.approved);
-               $("#rejected_count_no").text(countarray.rejected);
-				$("#allocation_count_no").text(countarray.alloc_main);*/
+				/*   $("#pending_count_no").text(countarray.pending);
+				$("#reports_filed_count_no").text(countarray.reports_filed);
+				$("#ref_back_count_no").text(countarray.ref_back);
+				$("#replied_count_no").text(countarray.replied);
+				$("#approved_count_no").text(countarray.approved);
+				$("#rejected_count_no").text(countarray.rejected);
+					$("#allocation_count_no").text(countarray.alloc_main);*/
 
 				$("#pending_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
-               $("#reports_filed_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
-               $("#ref_back_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
-               $("#replied_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
-               $("#approved_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
-               $("#rejected_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
+				$("#reports_filed_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
+				$("#ref_back_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
+				$("#replied_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
+				$("#approved_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
+				$("#rejected_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
 				$("#allocation_count_no").html('<span class="glyphicon glyphicon-search" ></span>');
 				
 				if(fetchStatus=='pending'){$("#pending_count_no").text(countarray.pending);}
@@ -60,61 +61,64 @@ $(document).ready(function(){
 				$(".loader").hide();$(".loadermsg").hide();
             }
 		});
-
 	}
-//ajax to fetch pending list
-$("#pending_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();	
-	maintabid = 'pending';
-	
-	getStatusWiseCount('pending');//applied on 03-06-2022 by Amol														  
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/pending_applications",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
-			$(".loader").hide();$(".loadermsg").hide();
-			$("#common_applications_list").show();
-			$("#list_heading_text").text("Given Below is Pending List:");
-			
-			$("#common_applications_list").html(data);
-			
-			//to hide scrutiny tab on pending, bcoz MO/SMO allocated application are in scrutiny pending, not pending for RO/SO
-			$("#scrutiny_tab").hide();
-			
-			//to hide with reg office tab on pending, bcoz So forward application to RO, it will pending on RO side
-			$("#with_reg_offs_tab").hide();
-			
-			//to hide with HO office tab on pending, bcoz RO forward application to HO, it will pending on HO side
-			$("#with_ho_offs_tab").hide();
 
-			MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
-		}
+
+	//ajax to fetch pending list
+	$("#pending_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();	
+		maintabid = 'pending';
+		
+		getStatusWiseCount('pending');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/pending_applications",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
+				$(".loader").hide();$(".loadermsg").hide();
+				$("#common_applications_list").show();
+				$("#list_heading_text").text("Given Below is Pending List:");
+				
+				$("#common_applications_list").html(data);
+				
+				//to hide scrutiny tab on pending, bcoz MO/SMO allocated application are in scrutiny pending, not pending for RO/SO
+				$("#scrutiny_tab").hide();
+				
+				//to hide with reg office tab on pending, bcoz So forward application to RO, it will pending on RO side
+				$("#with_reg_offs_tab").hide();
+				
+				//to hide with HO office tab on pending, bcoz RO forward application to HO, it will pending on HO side
+				$("#with_ho_offs_tab").hide();
+
+				MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
+			}
+		});
 	});
-	
-});
 
-//ajax to fetch reports filed lists
-$("#reports_filed_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	maintabid = 'reports_filed';
-	
-	getStatusWiseCount('reports_filed');//applied on 03-06-2022 by Amol																
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/reports_filed",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+
+	//ajax to fetch reports filed lists
+	$("#reports_filed_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		maintabid = 'reports_filed';
+		
+		getStatusWiseCount('reports_filed');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/reports_filed",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is Filed Reports List:");
@@ -122,26 +126,28 @@ $("#reports_filed_count_box").click(function(){
 				$("#common_applications_list").html(data);
 
 				MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
-		}
+			}
+		});
 	});
-});
 
-//ajax to fetch ref_back lists
-$("#ref_back_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	maintabid = 'ref_back';
-	
-	getStatusWiseCount('ref_back');//applied on 03-06-2022 by Amol														   
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/ref_back_applications",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+
+	//ajax to fetch ref_back lists
+	$("#ref_back_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		maintabid = 'ref_back';
+		
+		getStatusWiseCount('ref_back');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/ref_back_applications",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is Referred back List:");
@@ -149,26 +155,27 @@ $("#ref_back_count_box").click(function(){
 				$("#common_applications_list").html(data);
 
 				MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
-		}
+			}
+		});
 	});
-});
 
-//ajax to fetch replied lists
-$("#replied_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	maintabid = 'replied';
-	
-	getStatusWiseCount('replied');//applied on 03-06-2022 by Amol														  
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/replied_applications",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+
+	//ajax to fetch replied lists
+	$("#replied_count_box").click(function(){
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		maintabid = 'replied';
+		
+		getStatusWiseCount('replied');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/replied_applications",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is Replied List:");
@@ -176,26 +183,28 @@ $("#replied_count_box").click(function(){
 				$("#common_applications_list").html(data);
 
 				MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
-		}
+			}
+		});
 	});
-});
 
-//ajax to fetch approved lists
-$("#approved_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	maintabid = 'approved';
-	
-	getStatusWiseCount('approved');//applied on 03-06-2022 by Amol														   
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/approved_applications",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+
+	//ajax to fetch approved lists
+	$("#approved_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		maintabid = 'approved';
+		
+		getStatusWiseCount('approved');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/approved_applications",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is Approved List:");
@@ -203,26 +212,27 @@ $("#approved_count_box").click(function(){
 				$("#common_applications_list").html(data);
 
 				MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
-		}
+			}
+		});
 	});
-});
 
-//ajax to fetch rejected lists
-$("#rejected_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	maintabid = 'rejected';
-	
-	getStatusWiseCount('rejected');//applied on 03-06-2022 by Amol														   
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/rejected_applications",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+	//ajax to fetch rejected lists
+	$("#rejected_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		maintabid = 'rejected';
+		
+		getStatusWiseCount('rejected');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/rejected_applications",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is Rejected List:");
@@ -230,26 +240,26 @@ $("#rejected_count_box").click(function(){
 				$("#common_applications_list").html(data);
 
 				MainTabsScriptscall(current_level_script_id,show_list_for_script_id);
-		}
+			}
+		});
 	});
-});
 
 
-//ajax to fetch allocations lists
-$("#allocations_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	
-	getStatusWiseCount('allocation');//applied on 03-06-2022 by Amol															 
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/allocations_main_tab",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+	//ajax to fetch allocations lists
+	$("#allocations_count_box").click(function(){
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		
+		getStatusWiseCount('allocation');//applied on 03-06-2022 by Amol
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/allocations_main_tab",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is List of Applications for Allocation/Reallocation:");
@@ -257,66 +267,70 @@ $("#allocations_count_box").click(function(){
 				$("#common_applications_list").html(data);
 
 				allocation_common_tabs_js_call();
-				
-		}
+					
+			}
+		});
 	});
-});
 
-//ajax to fetch allocations lists
-/*$("#jat_status_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/jtama_jat_status_main_tab",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+	//ajax to fetch allocations lists
+	/*$("#jat_status_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/jtama_jat_status_main_tab",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is List of Laboratory (Export) applications for JAT");
 				
 				$("#common_applications_list").html(data);
-		}
-	});
-});*/
+			}
+		});
+	});*/
 
-/*
-//ajax to fetch all list in one
-$("#all_count_box").click(function(){
-	$("#common_applications_list").hide();
-	$("#all_applications_list").hide();
-	$.ajax({
-		type: "POST",
-		async:true,
-		url:"../dashboard/all_applications",
-		beforeSend: function (xhr) { // Add this line
-				$(".loader").show();$(".loadermsg").show();
-				xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-		}, 
-		success: function (data) {
+
+
+	/*
+	//ajax to fetch all list in one
+	$("#all_count_box").click(function(){
+
+		$("#common_applications_list").hide();
+		$("#all_applications_list").hide();
+		$.ajax({
+			type: "POST",
+			async:true,
+			url:"../dashboard/all_applications",
+			beforeSend: function (xhr) { // Add this line
+					$(".loader").show();$(".loadermsg").show();
+					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+			}, 
+			success: function (data) {
 				$(".loader").hide();$(".loadermsg").hide();
 				$("#common_applications_list").show();
 				$("#list_heading_text").text("Given Below is All Application List:");
 				
 				$("#common_applications_list").html(data);
-		}
+			}
+		});
 	});
-});
-*/
+	*/
 
 
 
-//to slove the CSP policy issue, as script not worked if loaded on the fly
-//so created the functions for all the scripts called in dashboard counts and listing view
-//now these functions will be call at the time of view loaded, to wake up the script call
-//created on 21-10-2021 by Amol
+	//to slove the CSP policy issue, as script not worked if loaded on the fly
+	//so created the functions for all the scripts called in dashboard counts and listing view
+	//now these functions will be call at the time of view loaded, to wake up the script call
+	//created on 21-10-2021 by Amol
 
-//for common listing view script
+	//for common listing view script
 	function appl_common_list_js_call(){
 
 		$('#common_app_list_table').DataTable({"ordering": false});
@@ -328,13 +342,11 @@ $("#all_count_box").click(function(){
 			autoclose: true,
 			startDate: new Date(),
 			clearBtn: true
-
 		});
 
 		var current_level_script_id = $("#current_level_script_id").val();
-			
-
-			//added pao in this condition on 07-09-2022 for rejection option script
+		
+		//added pao in this condition on 07-09-2022 for rejection option script
 		if(current_level_script_id=='level_2' || current_level_script_id=='level_3' || current_level_script_id=='level_4' || current_level_script_id=='pao'){
 			
 			var i=1;
@@ -345,7 +357,7 @@ $("#all_count_box").click(function(){
 				(function(p) {
 					
 					//for scrutiny allocation
-				//	$('#allocate-scrutiny'+p).click(function(){
+					//	$('#allocate-scrutiny'+p).click(function(){
 					$('#common_app_list_table').on('click', '#allocate-scrutiny'+p, function(){
 						
 						var appl_type = $("#appl_type"+p).val();
@@ -353,29 +365,29 @@ $("#all_count_box").click(function(){
 						var comm_with = $("#comm_with"+p).text();
 						
 						$.ajax({
-								type: "POST",
-								async:true,
-								url:"../dashboard/open_scrutiny_allocation_popup",
-								data:{customer_id:customer_id,appl_type:appl_type,comm_with:comm_with},
-								beforeSend: function (xhr) { // Add this line
-										$(".loader").show();$(".loadermsg").show();
-										xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-								}, 
-								success: function (data) {
-										$(".loader").hide();$(".loadermsg").hide();
-										$("#allocation_popup_box").show();
-										$("#allocation_popup_box").html(data);
-										$("#scrutiny_alloction_Modal").show();
-										
-										scrutiny_alloc_js_call();
-								}
+							type: "POST",
+							async:true,
+							url:"../dashboard/open_scrutiny_allocation_popup",
+							data:{customer_id:customer_id,appl_type:appl_type,comm_with:comm_with},
+							beforeSend: function (xhr) { // Add this line
+									$(".loader").show();$(".loadermsg").show();
+									xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+							}, 
+							success: function (data) {
+								$(".loader").hide();$(".loadermsg").hide();
+								$("#allocation_popup_box").show();
+								$("#allocation_popup_box").html(data);
+								$("#scrutiny_alloction_Modal").show();
+								
+								scrutiny_alloc_js_call();
+							}
 						});
 					});
 					
 					
 					
 					//for Inspection allocation
-				//	$('#allocate-inspection'+p).click(function(){
+					//	$('#allocate-inspection'+p).click(function(){
 					$('#common_app_list_table').on('click', '#allocate-inspection'+p, function(){
 						
 						var appl_type = $("#appl_type"+p).val();
@@ -383,22 +395,22 @@ $("#all_count_box").click(function(){
 						var comm_with = $("#comm_with"+p).text();
 						
 						$.ajax({
-								type: "POST",
-								async:true,
-								url:"../dashboard/open_inspection_allocation_popup",
-								data:{customer_id:customer_id,appl_type:appl_type,comm_with:comm_with},
-								beforeSend: function (xhr) { // Add this line
-										$(".loader").show();$(".loadermsg").show();
-										xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-								}, 
-								success: function (data) {
-										$(".loader").hide();$(".loadermsg").hide();
-										$("#allocation_popup_box").show();
-										$("#allocation_popup_box").html(data);
-										$("#inspection_alloction_Modal").show();
-										
-										inspection_alloc_js_call();
-								}
+							type: "POST",
+							async:true,
+							url:"../dashboard/open_inspection_allocation_popup",
+							data:{customer_id:customer_id,appl_type:appl_type,comm_with:comm_with},
+							beforeSend: function (xhr) { // Add this line
+									$(".loader").show();$(".loadermsg").show();
+									xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+							}, 
+							success: function (data) {
+								$(".loader").hide();$(".loadermsg").hide();
+								$("#allocation_popup_box").show();
+								$("#allocation_popup_box").html(data);
+								$("#inspection_alloction_Modal").show();
+								
+								inspection_alloc_js_call();
+							}
 						});
 					});
 					
@@ -415,7 +427,7 @@ $("#all_count_box").click(function(){
 					});
 					
 					
-				//	$("#change_date"+p).click(function(){
+					//	$("#change_date"+p).click(function(){
 					$('#common_app_list_table').on('click', '#change_date'+p, function(){
 						
 						var appl_type = $("#appl_type"+p).val();
@@ -434,67 +446,63 @@ $("#all_count_box").click(function(){
 						}
 						//for change date
 						$.ajax({
-								type: "POST",
-								async:true,
-								url:"../dashboard/change_inspection_date",
-								data:{customer_id:customer_id,appl_type:appl_type,io_scheduled_date:io_scheduled_date,io_sched_date_comment:io_sched_date_comment},//updated on 12-05-2021 by Amol
-								beforeSend: function (xhr) { // Add this line
-										$(".loader").show();$(".loadermsg").show();
-										xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-								}, 
-								success: function (response) {
-										$(".loader").hide();$(".loadermsg").hide();
-										
-										alert('The Site Inspection Date for Application id '+customer_id+' is Re-scheduled Successfully.');
-										
-								}
+							type: "POST",
+							async:true,
+							url:"../dashboard/change_inspection_date",
+							data:{customer_id:customer_id,appl_type:appl_type,io_scheduled_date:io_scheduled_date,io_sched_date_comment:io_sched_date_comment},//updated on 12-05-2021 by Amol
+							beforeSend: function (xhr) { // Add this line
+									$(".loader").show();$(".loadermsg").show();
+									xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+							}, 
+							success: function (response) {
+								$(".loader").hide();$(".loadermsg").hide();
+								$.alert('The Site Inspection Date for Application id '+customer_id+' is Re-scheduled Successfully.');
+							}
 						});	
 					});
 					
 					
 					
 					//for Rejection of Application
-				//	$('#reject_appln'+p).click(function(){
+					//	$('#reject_appln'+p).click(function(){
 					$('#common_app_list_table').on('click', '#reject_appln'+p, function(){
 						
 						var appl_type = $("#appl_type"+p).val();
 						var customer_id = $("#customer_id"+p).val();
 						
 						$.ajax({
-								type: "POST",
-								async:true,
-								url:"../dashboard/open_reject_appl_popup",
-								data:{customer_id:customer_id,appl_type:appl_type},
-								beforeSend: function (xhr) { // Add this line
-										$(".loader").show();$(".loadermsg").show();
-										xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-								}, 
-								success: function (data) {
-										$(".loader").hide();$(".loadermsg").hide();
-										$("#allocation_popup_box").show();
-										$("#allocation_popup_box").html(data);
-										$("#common_reject_Modal").show();
-										
-										common_rej_appl_popup_js_call();
-								}
+							type: "POST",
+							async:true,
+							url:"../dashboard/open_reject_appl_popup",
+							data:{customer_id:customer_id,appl_type:appl_type},
+							beforeSend: function (xhr) { // Add this line
+									$(".loader").show();$(".loadermsg").show();
+									xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+							}, 
+							success: function (data) {
+								$(".loader").hide();$(".loadermsg").hide();
+								$("#allocation_popup_box").show();
+								$("#allocation_popup_box").html(data);
+								$("#common_reject_Modal").show();
+								
+								common_rej_appl_popup_js_call();
+							}
 						});
 					});
-					
+				
 				})(i);
-
 			}
-
-			
 		}
 	}
 
-//for RO/SO common sub tabs scripts
+	//for RO/SO common sub tabs scripts
 	function ro_so_common_tabs_js_call(){
 				
 		$(".loader").hide();
+
 		$("#ro_tabs_div li a").click(function() {
-		$("#ro_tabs_div li").removeClass('active');
-		$(this).parent().addClass('active');
+			$("#ro_tabs_div li").removeClass('active');
+			$(this).parent().addClass('active');
 		});
 
 		//to get and append counts in Nodal office sub tabs
@@ -502,7 +510,6 @@ $("#all_count_box").click(function(){
 		$("#with_applicant_tab_count").text(countarray['with_applicant'][maintabid]);
 		$("#scrutiny_tab_count").text(countarray['scrutiny'][maintabid]);
 		$("#reports_tab_count").text(countarray['reports'][maintabid]);
-
 
 		var ro_so_session_level = $("#ro_so_session_level").val();
 		var ro_so_level_3_for = $("#ro_so_level_3_for").val();
@@ -518,140 +525,157 @@ $("#all_count_box").click(function(){
 
 		//ajax to fetch listing for RO/SO with MO/SMO
 		$("#with_applicant_tab").click(function(){
+
 			$("#level_3_common_applications_list").hide();
 			$("#level_3_all_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/with_applicant_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_3_common_applications_list").show();
-							$("#level_3_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/with_applicant_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_3_common_applications_list").show();
+					$("#level_3_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
+
 
 		//ajax to fetch listing for RO/SO with MO/SMO
 		$("#scrutiny_tab").click(function(){
+
 			$("#level_3_common_applications_list").hide();
 			$("#level_3_all_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/scrutiny_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_3_common_applications_list").show();
-							$("#level_3_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/scrutiny_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_3_common_applications_list").show();
+					$("#level_3_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
+
 
 		//ajax to fetch listing for RO/SO with IO reports
 		$("#reports_tab").click(function(){
+
 			$("#level_3_common_applications_list").hide();
 			$("#level_3_all_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/reports_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_3_common_applications_list").show();
-							$("#level_3_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/reports_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_3_common_applications_list").show();
+					$("#level_3_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
+
 
 		//ajax to fetch listing for RO with SO officer
 		$("#with_sub_offs_tab").click(function(){
+
 			$("#level_3_common_applications_list").hide();
 			$("#level_3_all_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/with_sub_offs_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_3_common_applications_list").show();
-							$("#level_3_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/with_sub_offs_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_3_common_applications_list").show();
+					$("#level_3_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
+
 
 		//ajax to fetch listing for SO to Ro officer
 		$("#with_reg_offs_tab").click(function(){
+
 			$("#level_3_common_applications_list").hide();
 			$("#level_3_all_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/with_reg_offs_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_3_common_applications_list").show();
-							$("#level_3_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/with_reg_offs_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_3_common_applications_list").show();
+					$("#level_3_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
+
 		//ajax to fetch listing for RO/SO with HO office
 		$("#with_ho_offs_tab").click(function(){
+
 			$("#level_3_common_applications_list").hide();
 			$("#level_3_all_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/with_ho_offs_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_3_common_applications_list").show();
-							$("#level_3_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/with_ho_offs_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_3_common_applications_list").show();
+					$("#level_3_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
 	}
 
 
-//for RO/SO reject appl popup scripts
+	//for RO/SO reject appl popup scripts
 	function common_rej_appl_popup_js_call(){
 
 		$(".close").click(function(){		
@@ -674,43 +698,48 @@ $("#all_count_box").click(function(){
 			if(confirm('Are you sure to reject this application')){
 			
 				$.ajax({
-						type: "POST",
-						async:true,
-						url:"../dashboard/reject_application",
-						data:{customer_id:customer_id,appl_type:appl_type,remark:remark},
-						beforeSend: function (xhr) { // Add this line
-								$(".loader").show();$(".loadermsg").show();
-								xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-						}, 
-						success: function (data) {
-		
-								$(".loader").hide();$(".loadermsg").hide();
-								$("#common_reject_Modal").hide();
-								alert("The Application "+customer_id+" is successfully Rejected.");
-								
-								var from_sub_tab = data.match(/~([^']+)~/)[1];
-								
-								//to reload list after application rejected from popup
-								if(from_sub_tab=='with_applicant'){								
-									$('#with_applicant_tab').click();
-									
-								}else if(from_sub_tab=='scrutiny'){									
-									$('#scrutiny_tab').click();
-									
-								}else if(from_sub_tab=='reports'){									
-									$('#reports_tab').click();
-									
-								}else if(from_sub_tab=='with_sub_office'){									
-									$('#with_sub_offs_tab').click();
-									
-								}else if(from_sub_tab=='with_reg_office'){									
-									$('#with_reg_offs_tab').click();
-									
-								}else if(from_sub_tab=='with_ho_office'){									
-									$('#with_ho_offs_tab').click();
-									
-								}
+					type: "POST",
+					async:true,
+					url:"../dashboard/reject_application",
+					data:{customer_id:customer_id,appl_type:appl_type,remark:remark},
+					beforeSend: function (xhr) { // Add this line
+							$(".loader").show();$(".loadermsg").show();
+							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+					}, 
+					success: function (data) {
+	
+						$(".loader").hide();$(".loadermsg").hide();
+						$("#common_reject_Modal").hide();
+						alert("The Application "+customer_id+" is successfully Rejected.");
+						
+						var from_sub_tab = data.match(/~([^']+)~/)[1];
+						
+						//to reload list after application rejected from popup
+						if(from_sub_tab=='with_applicant'){
+
+							$('#with_applicant_tab').click();
+							
+						}else if(from_sub_tab=='scrutiny'){
+
+							$('#scrutiny_tab').click();
+							
+						}else if(from_sub_tab=='reports'){
+
+							$('#reports_tab').click();
+							
+						}else if(from_sub_tab=='with_sub_office'){
+
+							$('#with_sub_offs_tab').click();
+							
+						}else if(from_sub_tab=='with_reg_office'){
+
+							$('#with_reg_offs_tab').click();
+							
+						}else if(from_sub_tab=='with_ho_office'){
+							
+							$('#with_ho_offs_tab').click();
 						}
+					}
 				});
 			
 			}else{
@@ -722,11 +751,11 @@ $("#all_count_box").click(function(){
 
 //for scrutiny common sub tabs view scripts
 	function scrutiny_common_tabs_js_call(){
-		
+
 		$(".loader").hide();
 		$("#ro_tabs_div li a").click(function() {
-		$("#ro_tabs_div li").removeClass('active');
-		$(this).parent().addClass('active');
+			$("#ro_tabs_div li").removeClass('active');
+			$(this).parent().addClass('active');
 		});
 
 		//to get and append counts in scutiny office sub tabs
@@ -738,76 +767,83 @@ $("#all_count_box").click(function(){
 
 		//ajax to fetch listing for scrutiny with nodal officer
 		$("#with_nodal_office_tab").click(function(){
-			$("#level_1_common_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/scrutiny_with_nodal_office_Tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_1_common_applications_list").show();
-							$("#level_1_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$("#level_1_common_applications_list").hide();
+
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/scrutiny_with_nodal_office_Tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_1_common_applications_list").show();
+					$("#level_1_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
 		//ajax to fetch listing for scrutiny with Reg. Office
 		$("#with_reg_office_tab").click(function(){
+			
 			$("#level_1_common_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/scrutiny_with_reg_office_Tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_1_common_applications_list").show();
-							$("#level_1_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/scrutiny_with_reg_office_Tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_1_common_applications_list").show();
+					$("#level_1_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
 		//ajax to fetch listing for scrutiny with HO QC
 		$("#with_ho_office_tab").click(function(){
-			$("#level_1_common_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/scrutiny_with_ho_office_Tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#level_1_common_applications_list").show();
-							$("#level_1_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$("#level_1_common_applications_list").hide();
+
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/scrutiny_with_ho_office_Tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#level_1_common_applications_list").show();
+					$("#level_1_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
 	}
 
-//for HO common sub tabs view scripts
+
+	//for HO common sub tabs view scripts
 	function ho_common_tabs_js_call(){
 
 		$(".loader").hide();
 		$("#ho_tabs_div li a").click(function() {
-		$("#ho_tabs_div li").removeClass('active');
-		$(this).parent().addClass('active');
+			$("#ho_tabs_div li").removeClass('active');
+			$(this).parent().addClass('active');
 		});
 
 		//to get and append counts in HO sub tabs
@@ -851,7 +887,9 @@ $("#all_count_box").click(function(){
 		});
 
 	}
-//this function used in ho common sub tabs scripts call
+
+
+	//this function used in ho common sub tabs scripts call
 	function fetch_ho_list_ajax(list_for){
 			
 		$.ajax({
@@ -864,23 +902,24 @@ $("#all_count_box").click(function(){
 					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
 			}, 
 			success: function (data) {
-					$(".loader").hide();$(".loadermsg").hide();
-					$("#ho_level_common_applications_list").show();
-					$("#ho_level_common_applications_list").html(data);
+				$(".loader").hide();$(".loadermsg").hide();
+				$("#ho_level_common_applications_list").show();
+				$("#ho_level_common_applications_list").html(data);
 
-					appl_common_list_js_call();
+				appl_common_list_js_call();
 			}
 		});
 		
 	}
 
-//for allocation common sub tabs view scripts
+
+	//for allocation common sub tabs view scripts
 	function allocation_common_tabs_js_call(){
 
 		$(".loader").hide();
 		$("#ro_tabs_div li a").click(function() {
-		$("#ro_tabs_div li").removeClass('active');
-		$(this).parent().addClass('active');
+			$("#ro_tabs_div li").removeClass('active');
+			$(this).parent().addClass('active');
 		});
 
 		//to get and append counts in allocation sub tabs
@@ -891,44 +930,48 @@ $("#all_count_box").click(function(){
 
 		//ajax to fetch listing for Allocation to scrutiny
 		$("#for_scrutiny_allocation_tab").click(function(){
+			
 			$("#allocation_common_applications_list").hide();
+			
 			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/allocation_for_scrutiny_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#allocation_common_applications_list").show();
-							$("#allocation_common_applications_list").html(data);
+				type: "POST",
+				async:true,
+				url:"../dashboard/allocation_for_scrutiny_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#allocation_common_applications_list").show();
+					$("#allocation_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-
-					}
+					appl_common_list_js_call();
+				}
 			});
 		});
 
+
 		//ajax to fetch listing for allocation of Siteinspection
 		$("#for_inspection_allocation_tab").click(function(){
-			$("#allocation_common_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/allocation_for_inspection_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#allocation_common_applications_list").show();
-							$("#allocation_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$("#allocation_common_applications_list").hide();
+
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/allocation_for_inspection_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#allocation_common_applications_list").show();
+					$("#allocation_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
@@ -936,22 +979,24 @@ $("#all_count_box").click(function(){
 
 		//ajax to fetch listing for scrutiny allocation by Ro for SO appli.
 		$("#for_scrutiny_of_so_appl_tab").click(function(){
-			$("#allocation_common_applications_list").hide();
-			$.ajax({
-					type: "POST",
-					async:true,
-					url:"../dashboard/allocation_for_scrutiny_by_level4_ro_tab",
-					beforeSend: function (xhr) { // Add this line
-							$(".loader").show();$(".loadermsg").show();
-							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-					}, 
-					success: function (data) {
-							$(".loader").hide();$(".loadermsg").hide();
-							$("#allocation_common_applications_list").show();
-							$("#allocation_common_applications_list").html(data);
 
-							appl_common_list_js_call();
-					}
+			$("#allocation_common_applications_list").hide();
+
+			$.ajax({
+				type: "POST",
+				async:true,
+				url:"../dashboard/allocation_for_scrutiny_by_level4_ro_tab",
+				beforeSend: function (xhr) { // Add this line
+						$(".loader").show();$(".loadermsg").show();
+						xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+				}, 
+				success: function (data) {
+					$(".loader").hide();$(".loadermsg").hide();
+					$("#allocation_common_applications_list").show();
+					$("#allocation_common_applications_list").html(data);
+
+					appl_common_list_js_call();
+				}
 			});
 		});
 
@@ -959,7 +1004,8 @@ $("#all_count_box").click(function(){
 
 	}
 
-//for scrutiny allocation popup view scripts
+
+	//for scrutiny allocation popup view scripts
 	function scrutiny_alloc_js_call(){
 
 		$(".close").click(function(){		
@@ -973,33 +1019,41 @@ $("#all_count_box").click(function(){
 			var customer_id = $("#alloc_customer_id").val();
 			var mo_user_id = $("#mo_users_list").val();
 			
-			if (appl_type != '' && customer_id !='' && mo_user_id !=null) {													  
-				$.ajax({
-						type: "POST",
-						async:true,
-						url:"../dashboard/allocate_appl_for_scrutiny",
-						data:{customer_id:customer_id,appl_type:appl_type,mo_user_id:mo_user_id},
-						beforeSend: function (xhr) { // Add this line
-								$(".loader").show();$(".loadermsg").show();
-								xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-						}, 
-						success: function (data) {
+			if (appl_type != '' && customer_id !='' && mo_user_id !=null) {
 
-								$(".loader").hide();$(".loadermsg").hide();
-								$("#scrutiny_alloction_Modal").hide();
-								alert("The Application "+customer_id+" is successfully allocated for scrutiny to Scrutiny Officer.");
-								
+				$.ajax({
+					type: "POST",
+					async:true,
+					url:"../dashboard/allocate_appl_for_scrutiny",
+					data:{customer_id:customer_id,appl_type:appl_type,mo_user_id:mo_user_id},
+					beforeSend: function (xhr) { // Add this line
+							$(".loader").show();$(".loadermsg").show();
+							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+					}, 
+					success: function (data) {
+
+						$(".loader").hide();$(".loadermsg").hide();
+						$("#scrutiny_alloction_Modal").hide();
+						
+						//This alert is changed from normal alert to plugin alert - Akash[30-11-2022]
+						$.alert({
+							title: "Allocation",
+							icon: 'fas fa-check-circle',
+							columnClass: 'm',
+							content:"The Application <b>"+customer_id+"</b> is successfully allocated for scrutiny to Scrutiny Officer.",
+							onClose: function(){
 								var allocation_by = data.match(/~([^']+)~/)[1];
-								
 								//to reload list after allocation
 								if(allocation_by=='nodal' || allocation_by=='dy_ama'){
 									$('#for_scrutiny_allocation_tab').click();
 								}else if(allocation_by=='level_4_ro'){
 									$('#for_scrutiny_of_so_appl_tab').click();
 								}
-						}
+							}
+						});
+					}
 				});
-		   } else {
+		   	} else {
 				$.alert('Please Select All Details. It can not be blank');
 				return false;
 			}
@@ -1007,7 +1061,7 @@ $("#all_count_box").click(function(){
 	}
 
 
-//for scrutiny allocation popup view scripts
+	//for scrutiny allocation popup view scripts
 	function inspection_alloc_js_call(){
 
 		$(".close").click(function(){		
@@ -1031,27 +1085,34 @@ $("#all_count_box").click(function(){
 			var io_user_id = $("#io_users_list").val();
 			var ro_scheduled_date = $("#ro_scheduled_date").val();
 			
-			if (appl_type != '' && io_user_id != null && customer_id != '' && customer_id != '')
-			{
+			if (appl_type != '' && io_user_id != null && customer_id != '' && ro_scheduled_date != '') {
 			
 				$.ajax({
-						type: "POST",
-						async:true,
-						url:"../dashboard/allocate_appl_for_inspection",
-						data:{customer_id:customer_id,appl_type:appl_type,io_user_id:io_user_id,ro_scheduled_date:ro_scheduled_date},
-						beforeSend: function (xhr) { // Add this line
-								$(".loader").show();$(".loadermsg").show();
-								xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
-						}, 
-						success: function (data) {
+					type: "POST",
+					async:true,
+					url:"../dashboard/allocate_appl_for_inspection",
+					data:{customer_id:customer_id,appl_type:appl_type,io_user_id:io_user_id,ro_scheduled_date:ro_scheduled_date},
+					beforeSend: function (xhr) { // Add this line
+							$(".loader").show();$(".loadermsg").show();
+							xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+					}, 
+					success: function (data) {
 
-								$(".loader").hide();$(".loadermsg").hide();
-								$("#inspection_alloction_Modal").hide();
-								alert("The Application "+customer_id+" is successfully allocated for Site Inspection to IO user.");
+						$(".loader").hide();$(".loadermsg").hide();
+						$("#inspection_alloction_Modal").hide();
+				
+						//This alert is changed from normal alert to plugin alert - Akash[30-11-2022]
+						$.alert({
+							title: "Allocation",
+							icon: 'fas fa-check-circle',
+							columnClass: 'm',
+							content:"The Application <b>"+customer_id+"</b> is successfully allocated for Site Inspection to IO user.",
+							onClose: function(){
 								//to reload list after allocation
 								$('#for_inspection_allocation_tab').click();
-
-						}
+							}
+						});
+					}
 				});
 				
 			}else{
@@ -1063,7 +1124,7 @@ $("#all_count_box").click(function(){
 	}
 
 
-//to call the specific script function on specific call conditionally
+	//to call the specific script function on specific call conditionally
 	function MainTabsScriptscall(current_level_script_id,show_list_for_script_id){
 
 		if(current_level_script_id == 'level_3' && show_list_for_script_id != 'rejected'){

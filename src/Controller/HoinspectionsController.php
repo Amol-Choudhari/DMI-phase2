@@ -607,7 +607,7 @@ use App\Network\Response\Response;
 				$report_pdf_field = 'pdf_file';
 			
 			}elseif($appl_type_id == '2'){//for renewal
-
+				
 				$condition = array('pdf_version >'=>'1','user_email_id !='=>'old_application','date(created) >=' => $from_dt, 'date(created) <=' => $to_dt);
 				$report_pdf_field = 'firm_renewal_docs';
 				
@@ -623,7 +623,7 @@ use App\Network\Response\Response;
 				
 			//get records from grant certificate table
 			$fetch_all_granted_pdf = $this->$grant_cert_table->find('all',array('fields'=>array('customer_id','id','pdf_file','created','user_email_id'),'group'=>'customer_id,id,pdf_file,created','conditions'=>$condition,'order'=>'id DESC'))->toArray();
-			
+			//pr($grant_cert_table); exit;
 			$i=0;
 			$appl_array = array();
 			foreach($fetch_all_granted_pdf as $each_record)

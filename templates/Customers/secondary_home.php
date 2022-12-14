@@ -1,441 +1,198 @@
 <div class="content-wrapper">
     <section id="applicanthome" class="content">
         <div class="applhome container-fluid">
-        <?php 
-            $customer_id = $_SESSION['username'];
-            
-            if ($final_submit_status == 'no_final_submit') {  ?>
+            <div id="accordion">
+                <div class="card bsc">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Applications
+                            </button>
+                        </h5>
+                    </div>
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="alert alert-info alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <h5><i class="icon fas fa-info"></i> Please Note !</h5>
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                        <div class="card-body">
                             <?php 
-                                if ($is_already_granted == 'yes') {
-                                    echo "To fill your old application details please click on 'Apply' button. Thankyou";
+                                $customer_id = $_SESSION['username']; 
+
+                                if (!empty($isSurrender)) {
+                                    echo $this->element('customer_elements/dash_messages/surrender_appl_msg');
+                                }
+
+                                if ($final_submit_status == 'no_final_submit') { 
+                                    echo $this->element('customer_elements/dash_messages/new_or_old');
                                 } else {
-                                    echo "Please click on 'Apply' button to fill application details. Thankyou";
+
+                                    if ($is_already_granted == 'no') {
+
+                                        #This Below Block is added to Show the Message when the application is rejected -= Akash [25-11-2022]
+                                        if($is_appl_rejected != NULL){
+                                            echo $this->element('customer_elements/dash_messages/for_rejected');
+                                        }
+                                        
+                                        #For Displaying the Application PDF Table#
+                                        echo $this->element('customer_elements/pdf_table_view/application/general_application');
+                                        
+                                    } else if (!($final_submit_status == 'approved' && $final_submit_level == 'level_3')) {
+
+                                        #This Below Block is added to Show the Message when the application is rejected - Akash [25-11-2022]
+                                        if($is_appl_rejected != NULL){
+                                            echo $this->element('customer_elements/dash_messages/for_rejected');
+                                        }else{
+                                            echo $this->element('customer_elements/dash_messages/for_old_appl_saved');
+                                        } 
+                                    }
+                                }
+
+              
+
+                                $show_grant_table = null;
+
+                                //check if primary application approved
+                                if ($final_submit_status == 'approved' && $final_submit_level == 'level_3') {
+
+                                    //check if old application
+                                    if ($is_already_granted == 'yes') {
+
+                                        //check if old application online renewal granted
+                                        if ($renewal_final_submit_status == 'approved' && $renewal_final_submit_level == 'level_3') {
+                                            $show_grant_table = 'yes';
+                                        } else {
+                                            $show_grant_table = 'no';
+                                        }
+
+                                    } else { //if new application
+                                        $show_grant_table = 'yes';
+                                    }
+
+                                    #For Displaying the Grant PDF Table#
+                                    if ($show_grant_table == 'yes') {
+
+                                        if (!empty($isSurrender)) {
+                                            echo $this->element('customer_elements/pdf_table_view/grant/surr_grant');
+                                        } else {
+                                            echo $this->element('customer_elements/pdf_table_view/grant/gen_grant');
+                                        }
+                                    }
+
+                                    #For Displaying the Renewal PDF Table#
+                                    if (!empty($renewal_final_submit_details)) { 
+                                        echo $this->element('customer_elements/pdf_table_view/grant/renewal');
+                                    } 
+
+                                }
+
+                                #To Displaying Message of renewal status
+                                if ($is_already_granted == 'yes' && $show_grant_table == 'no' && empty($renewal_final_submit_details)) {
+                                    echo $this->element('customer_elements/dash_messages/for_renewal_stats');
+                                }
+
+                                #To Displaying Message of applied for renewal 
+                                if (!empty($renewal_final_submit_details)) {
+                                    if ($show_renewal_btn == 'yes') { 
+                                        echo $this->element('customer_elements/dash_messages/if_renewal_applied');
+                                    }
+                                }
+                        
+                                if ($show_applied_to_popup == 'yes') {
+                                    echo $this->element('firm_applying_to_view/applying_to_view');
                                 }
                             ?>
                         </div>
                     </div>
                 </div>
 
-            <?php } else {
+                <?php if(!empty($appl_15_digit_pdfs) || !empty($cert_15_digit_pdfs)) { ?>
 
-                if ($is_already_granted == 'no') { ?>
-
-                    <!-- #This Below Block is added to Show the Message if teh application is rejected -->
-                    <?php if($is_appl_rejected != NULL){ ?>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="alert alert-info alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                    <h5><i class="icon fas fa-info"></i> Please Note !</h5>
-                                    Your Application Has Been Rejected by the DMI.
-                                    <p>Reason For Rejection : <?php echo $is_appl_rejected; ?></p>
-                                </div>
-                            </div>  
+                    <div class="card bsc">
+                        <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                15-Digit Code Application
+                                </button>
+                            </h5>
                         </div>
-                    <?php } ?>
-                 
-                    <div class="row">
-                        <section class="col-lg-12 connectedSortable">
-                            <div class="card card-info">
-                                <div class="card-header"><h3 class="card-title-new">Application Versions for Certificate</h3></div>
-                                <div class="card-body">
-                                    <table id="example1" class="table m-0 table-bordered table-hover">
-                                        <thead class="tablehead">
-                                            <tr>
-                                                <th>Applicant Id</th>
-                                                <th>Application Pdf</th>
-                                                <th>Date</th>
-                                                <th>Version</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($application_pdfs as $each_record) { ?>
-                                                <tr>
-                                                    <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                                    <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                                        <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                                    </td>
-                                                    <td><?php echo substr($each_record['modified'],0,-9); ?></td>
-                                                    <td><?php echo $each_record['pdf_version']; ?></td>
-                                                </tr>
-                                            <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                    
-                <?php } else if (!($final_submit_status == 'approved' && $final_submit_level == 'level_3')) { ?>
-
-                    <!-- #This Below Block is added to Show the Message if teh application is rejected -->
-                    <?php if($is_appl_rejected != NULL){ ?>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="alert alert-info alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                    <h5><i class="icon fas fa-info"></i> Please Note !</h5>
-                                    Your Application Has Been Rejected by the DMI.
-                                    <p>Reason For Rejection : <?php echo $is_appl_rejected; ?></p>
-                                </div>
-                            </div>  
-                        </div>
-                    <?php }else{ ?>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="alert alert-info alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                    <h5><i class="icon fas fa-info"></i> Please Note !</h5>
-                                    Your old application details are saved and finally submitted, to check application status please click on "Application Status" button. Thankyou
-                                </div>
-                            </div>  
-                        </div>
-                    <?php } ?>
-                <?php }
-            }
-
-            $show_grant_table = null;
-            //check if primary application approved
-            if ($final_submit_status == 'approved' && $final_submit_level == 'level_3') {
-                //check if old application
-                if ($is_already_granted == 'yes') {
-                //check if old application online renewal granted
-                if ($renewal_final_submit_status == 'approved' && $renewal_final_submit_level == 'level_3') {
-                    $show_grant_table = 'yes';
-                } else {
-                    $show_grant_table = 'no';
-                }
-                //if new application
-                } else {
-                    $show_grant_table = 'yes';
-                }
-
-
-                if ($show_grant_table == 'yes') { ?>
-
-                    <div class="row">
-                        <section class="col-lg-12 connectedSortable">
-                            <div class="card card-info">
-                                <div class="card-header"><h3 class="card-title-new">Granted Certificate Versions</h3></div>
-                                <div class="card-body">
-                                    <table id="example2" class="table m-0 table-bordered">
-                                        <thead class="tablehead">
-                                            <tr>
-                                                <th>Applicant Id</th>
-                                                <th>Certificate Pdf</th>
-                                                <th>Grant Date</th>
-                                            </tr>
-                                        </thead>  
-                                        <tbody>
-                                            <?php foreach ($grant_certificate_pdf as $each_record) { ?>
-                                                <tr>
-                                                    <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                                    <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                                        <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                                    </td>
-                                                    <td><?php echo substr($each_record['date'],0,-9); ?></td>
-                                                </tr>
-                                            <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>  
-                        </section>
-                    </div>
-
-                <?php } ?>
-
-                <?php if (!empty($renewal_final_submit_details)) { ?>
-
-                    <div class="row">
-                        <section class="col-lg-12 connectedSortable">
-                            <div class="card card-info">
-                                <div class="card-header"><h3 class="card-title-new">Certificate Renewal Application versions</h3></div>
-                                <div class="card-body">
-                                    <table id="example3" class="table m-0 table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Applicant Id</th>
-                                                <th>Application Pdf</th>
-                                                <th>Date</th>
-                                                <th>Version</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($renewal_application_pdfs as $each_record) { ?>
-                                                <tr>
-                                                    <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                                    <td><?php $split_file_path = explode("/",$each_record['pdf_file']);$file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                                        <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                                    </td>
-                                                    <td><?php echo substr($each_record['modified'],0,-9); ?></td>
-                                                    <td><?php echo $each_record['pdf_version']; ?></td>
-                                                </tr>
-                                            <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                <?php } ?>
-
-            <?php } ?>
-
-            <?php if ($is_already_granted == 'yes' && $show_grant_table == 'no' && empty($renewal_final_submit_details)) { ?>
-
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="alert alert-info alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <h5><i class="icon fas fa-info"></i> Please Note !</h5>
-                            <?php 
-                                if ($show_renewal_btn == 'yes') {
-                                    if ($show_renewal_button == 'Renewal') {
-                                        echo "Please click on 'Renewal' button to proceed for renewal application. Thankyou";
-                                    } elseif ($show_renewal_button == 'Renewal Status') {
-                                        echo "To check your renewal application status please click on 'Renewal Status' button. Thankyou";
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">
+                                <?php 
+                                    #For 15-Digit Code Application PDF Table View - Amol [2022]
+                                    if(!empty($appl_15_digit_pdfs)) {
+                                        echo $this->element('customer_elements/pdf_table_view/application/fdc_application');
                                     }
-                                } else {
-                                    echo "Your Old Application has been successfully verified. <br />Your Certificate is valid upto ".$valid_upto_date."<br /> A 'Renewal' button option will be available to you from the date of verification or three months before valid upto date, whichever is later.<br />This option for 'Renewal' will be available till one month from date of validity, after which you won't be able to apply for renewal. Thank you";
-                                } 
-                            ?>
-                        </div>
-                    </div>
-                </div>
 
-            <?php } ?>
-
-            <?php if (!empty($renewal_final_submit_details)) { ?>
-
-                <?php if ($show_renewal_btn == 'yes') { ?>
-
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="alert alert-info alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                <h5><i class="icon fas fa-info"></i> Please Note !</h5>
-                                <?php
-                                if ($show_renewal_button == 'Renewal') {
-                                    echo "Please click on 'Renewal' button to proceed for renewal application. Thankyou";
-                                } elseif ($show_renewal_button == 'Renewal Status') {
-                                    echo "To check your renewal application status please click on 'Renewal Status' button. Thankyou";
-                                } ?>
+                                    #For 15-Digit Code Grant PDF Table View - Amol [2022]
+                                    if(!empty($cert_15_digit_pdfs)) { 
+                                        echo $this->element('customer_elements/pdf_table_view/grant/fdc_grant');
+                                    } 
+                                ?>
                             </div>
                         </div>
                     </div>
 
                 <?php } ?>
-            <?php }
 
-            if ($show_applied_to_popup == 'yes') {
-                echo $this->element('firm_applying_to_view/applying_to_view');
-            }
-        ?>
-    
-    
-        <!-- Added to show list of pdfs for 15 digit code approval application and certificates -->
-        <div class="row">
-            <?php if(!empty($appl_15_digit_pdfs)) { ?>
-                <section class="col-lg-12 connectedSortable">
-                    <div class="card card-info">
-                        <div class="card-header"><h3 class="card-title-new">Application Versions to use 15 Digit Code</h3></div>
-                        <div class="card-body">
-                            <table id="example1" class="table m-0 table-bordered table-hover">
-                                <thead class="tablehead">
-                                <tr>
-                                    <th>Applicant Id</th>
-                                    <th>Application Pdf</th>
-                                    <th>Date</th>
-                                    <th>Version</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <?php foreach ($appl_15_digit_pdfs as $each_record) { ?>
-                                <tr>
-                                    <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                    <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                        <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                    </td>
-                                    <td><?php echo substr($each_record['modified'],0,-9); ?></td>
-                                    <td><?php echo $each_record['pdf_version']; ?></td>
-                                </tr>
-                                <?php } ?>
-                                </tbody>
-                            </table>
+                <?php if(!empty($appl_e_code_pdfs) || !empty($cert_e_code_pdfs)) { ?>
+
+                    <div class="card bsc">
+                        <div class="card-header" id="headingThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                E-Code Application
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                                <?php 
+                                    #For E-Code Application PDF Table View - Amol [2022]
+                                    if(!empty($appl_e_code_pdfs)) {
+                                        echo $this->element('customer_elements/pdf_table_view/application/ecode_application');
+                                    }
+
+                                    #For E-Code Grant PDF Table View - Amol [2022]
+                                    if(!empty($cert_e_code_pdfs)) { 
+                                        echo $this->element('customer_elements/pdf_table_view/grant/ecode_grant');
+                                    } 
+                                ?>                    
+                            </div>
                         </div>
                     </div>
-                </section>
-            <?php } ?>
 
-            <?php if(!empty($cert_15_digit_pdfs)) { ?>
-                <section class="col-lg-12 connectedSortable">
-                    <div class="card card-info">
-                        <div class="card-header"><h3 class="card-title-new">Certificate of Approval to Use 15 Digit Code</h3></div>
-                        <div class="card-body">
-                            <table id="example2" class="table m-0 table-bordered">
-                                <thead class="tablehead">
-                                    <tr>
-                                        <th>Applicant Id</th>
-                                        <th>Certificate Pdf</th>
-                                        <th>Grant Date</th>
-                                    </tr>
-                                </thead>  
-                                <tbody>
-                                    <?php foreach ($cert_15_digit_pdfs as $each_record) { ?>
-                                    <tr>
-                                        <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                        <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                                <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                        </td>
-                                        <td><?php echo substr($each_record['date'],0,-9); ?></td>
-                                    </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
+                <?php } ?>
+
+                <?php if(!empty($appl_adp_pdfs_records) || !empty($appl_adp_grant_pdfs)) { ?>
+
+                    <div class="card bsc">
+                        <div class="card-header" id="headingThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Approval of Designated Person Application
+                                </button>
+                            </h5>
                         </div>
-                    </div>  
-                </section>
-            <?php } ?>
-        </div>
-    
-  
-        <!-- Added to show list of pdfs for E-code approval application and certificates -->
-        <div class="row">
-            <?php if(!empty($appl_e_code_pdfs)) { ?>
-                <section class="col-lg-12 connectedSortable">
-                    <div class="card card-info">
-                        <div class="card-header"><h3 class="card-title-new">Application Versions to use E-Code</h3></div>
-                        <div class="card-body">
-                            <table id="example1" class="table m-0 table-bordered table-hover">
-                                <thead class="tablehead">
-                                    <tr>
-                                        <th>Applicant Id</th>
-                                        <th>Application Pdf</th>
-                                        <th>Date</th>
-                                        <th>Version</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($appl_e_code_pdfs as $each_record) { ?>
-                                        <tr>
-                                            <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                            <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                                <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                            </td>
-                                            <td><?php echo substr($each_record['modified'],0,-9); ?></td>
-                                            <td><?php echo $each_record['pdf_version']; ?></td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                                <?php 
+                                    #For ADP Application PDF Table View - Shankhpal [18/11/2022] 
+                                    if(!empty($appl_adp_pdfs_records)) { 
+                                        echo $this->element('customer_elements/pdf_table_view/application/adp_application');
+                                    } 
+
+                                    #For ADP Grant PDF Table View - Shankhpal [18/11/2022]
+                                    if(!empty($appl_adp_grant_pdfs)) {
+                                        echo $this->element('customer_elements/pdf_table_view/grant/adp_grant');
+                                    }
+                                ?>  
+                            </div>
                         </div>
                     </div>
-                </section>
-            <?php } ?>
 
-            <?php if(!empty($cert_e_code_pdfs)) { ?>
-                <section class="col-lg-12 connectedSortable">
-                    <div class="card card-info">
-                        <div class="card-header"><h3 class="card-title-new">Certificate of Approval to Use E-Code</h3></div>
-                        <div class="card-body">
-                            <table id="example2" class="table m-0 table-bordered">
-                                <thead class="tablehead">
-                                    <tr>
-                                        <th>Applicant Id</th>
-                                        <th>Certificate Pdf</th>
-                                        <th>Grant Date</th>
-                                    </tr>
-                                </thead>  
-                                <tbody>
-                                    <?php foreach ($cert_e_code_pdfs as $each_record) { ?>
-                                    <tr>
-                                        <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                                        <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                                <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                                        </td>
-                                        <td><?php echo substr($each_record['date'],0,-9); ?></td>
-                                    </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>  
-                </section>
-            <?php } ?>
-
-        <!-- condition added by shankhpal shende on 18/11/2022  -->
-        <?php  if(!empty($appl_adp_pdfs_records)) { ?>
-          <section class="col-lg-12 connectedSortable">
-            <div class="card card-info">
-              <div class="card-header"><h3 class="card-title-new">Application Pdf for Approval of Designated persons</h3></div>
-                <div class="card-body">
-                  <table id="example2" class="table m-0 table-bordered">
-                    <thead class="tablehead">
-                      <tr>
-                        <th>Applicant Id</th>
-                        <th>Certificate Pdf</th>
-                        <th>Grant Date</th>
-                    </tr>
-                    </thead>  
-                    <tbody>
-                    <?php foreach ($appl_adp_pdfs_records as $each_record) { ?>
-                      <tr>
-                        <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                        <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                  <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                        </td>
-                        <td><?php echo substr($each_record['date'],0,-9); ?></td>
-                      </tr>
-                    <?php } ?>
-                    </tbody>
-                </table>
-              </div>
-            </div>  
-          </section>
-        <?php } ?>
-
-         <!-- condition added by shankhpal shende on 18/11/2022  -->
-         <?php  if(!empty($appl_adp_grant_pdfs)) { ?>
-          <section class="col-lg-12 connectedSortable">
-            <div class="card card-info">
-              <div class="card-header"><h3 class="card-title-new">Grant Certificate Pdf for Approval of Designated persons</h3></div>
-                <div class="card-body">
-                  <table id="example2" class="table m-0 table-bordered">
-                    <thead class="tablehead">
-                      <tr>
-                        <th>Applicant Id</th>
-                        <th>Certificate Pdf</th>
-                        <th>Grant Date</th>
-                    </tr>
-                    </thead>  
-                    <tbody>
-                    <?php foreach ($appl_adp_grant_pdfs as $each_record) { ?>
-                      <tr>
-                        <td class="boldtext"><?php echo $each_record['customer_id']; ?></td>
-                        <td><?php $split_file_path = explode("/",$each_record['pdf_file']); $file_name = $split_file_path[count($split_file_path) - 1]; ?>
-                                  <a target="blank" href="<?php echo $each_record['pdf_file']; ?>"><?php echo $file_name; ?></a>
-                        </td>
-                        <td><?php echo substr($each_record['date'],0,-9); ?></td>
-                      </tr>
-                    <?php } ?>
-                    </tbody>
-                </table>
-              </div>
-            </div>  
-          </section>
-        <?php } ?>
-
+                <?php } ?>
+                </div>
+            </div>
         </div>
-    </div>
-  </section>
+    </section>
 </div>
 
 

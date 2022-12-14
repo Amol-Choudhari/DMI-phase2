@@ -16,21 +16,19 @@
 ?>
 <!DOCTYPE html>
 <html>
-<head>
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-    <?php 
-	echo $this->fetch('css');
-	echo $this->Html->css('my_custom_error'); ?>
-</head>
-<body>
-    <div class="error-container">
-        <div class="myerrorclass">
-		
-			<h3>Oops!</h3>
-			<h4>Something Wrong Happened.. Please Try Again</h4>
-			<p><a href="/"> Way to Home Page</a></p>
-		
+	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<?php 
+		echo $this->fetch('css');
+		echo $this->Html->css('my_custom_error'); ?>
+	</head>
+	<body>
+		<div class="error-container">
+			<div class="myerrorclass">
+				<h3>Oops!</h3>
+				<h4>Something Wrong Happened.. Please Try Again</h4>
+				<p><a href="/"> Way to Home Page</a></p>
+			</div>
 		</div>
-    </div>
-</body>
+	</body>
 </html>

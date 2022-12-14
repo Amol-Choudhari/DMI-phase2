@@ -200,9 +200,9 @@ class MastersController extends AppController {
 			$this->masterListHeader = 'Other';
 			$this->fieldNameForCheck = 'feedback_type';
 
-		//[ 16 For the Replica Charges Master ]
+		//[ 16 For the Replica Charges Master ] -> Akash [12-08-2022]
 		} elseif ($masterId=='16') {
-			/*NOTE: mastertable variables not set here*/
+
 			$this->masterTable = 'DmiReplicaChargesDetails';
 			$this->masterListTitle = 'List of Replica Charges';
 			$this->masterAddTitle = 'Add Replica Charge';
@@ -210,9 +210,9 @@ class MastersController extends AppController {
 			$this->masterListHeader = 'Replica';
 			$this->fieldNameForCheck = 'replica_charges';
 
-		//17 For the Education Type Master
+		//[ 17 For the Education Type Master ] -> Akash [12-08-2022]
 		} elseif ($masterId=='17') {
-			//for education, added on 24-08-2021 by Akash
+
 			$this->masterTable = 'DmiEducationTypes';
 			$this->masterListTitle = 'List of All Education Types';
 			$this->masterListHeader = 'Education Type';
@@ -220,9 +220,9 @@ class MastersController extends AppController {
 			$this->masterEditTitle = 'Edit Education Type';
 			$this->fieldNameForCheck = 'education_types';
 
-		//18 For the Division Type Master
+		//[ 18 For the Division Type Master ] -> Akash [12-08-2022]
 		} elseif ($masterId=='18') {
-			//for division, added on 24-08-2021 by Akash
+
 			$this->masterTable = 'DmiDivisionGrades';
 			$this->masterListTitle = 'List of All Division Grade';
 			$this->masterListHeader = 'Division Grade';
@@ -230,15 +230,45 @@ class MastersController extends AppController {
 			$this->masterEditTitle = 'Edit Division Grade';
 			$this->fieldNameForCheck = 'division_grade';
 		
-		//19 For the Documents List Master
+		//[ 19 For the Documents List Master ] -> Akash [12-08-2022]
 		} elseif ($masterId=='19') {
-			//for division, added on 09-08-2022 by Akash
+
 			$this->masterTable = 'DmiDocumentLists';
 			$this->masterListTitle = 'List of All Documents';
 			$this->masterListHeader = 'Documents List';
 			$this->masterAddTitle = 'Add Documents Type';
 			$this->masterEditTitle = 'Edit Documents Type';
 			$this->fieldNameForCheck = 'document_type';
+		
+		//[ 20 For the Misgrade Categories Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='20') {
+
+			$this->masterTable = 'DmiMisgradingCategories';
+			$this->masterListTitle = 'List of All Misgrade Categories';
+			$this->masterListHeader = 'Misgrade Categories List';
+			$this->masterAddTitle = 'Add Misgrade Category';
+			$this->masterEditTitle = 'Edit Misgrade Category';
+			$this->fieldNameForCheck = 'misgrade_category';
+		
+		//[ 21 For the Misgrade Levels Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='21') {
+
+			$this->masterTable = 'DmiMisgradingLevels';
+			$this->masterListTitle = 'List of All Misgrade Levels';
+			$this->masterListHeader = 'Misgrade Levels';
+			$this->masterAddTitle = 'Add Misgrade Levels';
+			$this->masterEditTitle = 'Edit Misgrade Levels';
+			$this->fieldNameForCheck = 'misgrade_levels';
+
+		//[ 22 For the Misgrade Actions Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='22') {
+
+			$this->masterTable = 'DmiMisgradingActions';
+			$this->masterListTitle = 'List of All Misgrade Actions';
+			$this->masterListHeader = 'Misgrade Actions';
+			$this->masterAddTitle = 'Add Misgrade Action';
+			$this->masterEditTitle = 'Edit Misgrade Action';
+			$this->fieldNameForCheck = 'misgrade_actions';
 		}
 	
 	}
@@ -842,7 +872,7 @@ class MastersController extends AppController {
 		
 			$this->callAddEditCommonFunctions($masterId,$postData,$record_id);
 		
-			$this->redirect_to = 'edit-master-record';
+			$this->redirect_to = 'list-master-records';
 
 			$this->set('message',$this->message);
 			$this->set('message_theme',$this->message_theme);
@@ -1226,7 +1256,7 @@ class MastersController extends AppController {
 				$this->message_theme = 'success';
 			}
 
-		// For Replica Charges
+		// For Replica Charges -> Akash [09-08-2022]
 		} elseif ($masterId=='16') {
 
 			if ($this->Mastertablecontent->addEditReplicaChargesMaster($postData,$record_id)) {
@@ -1238,7 +1268,7 @@ class MastersController extends AppController {
 			}
 
 
-		// For Education Type
+		// For Education Type -> Akash [09-08-2022]
 		} elseif ($masterId=='17') {
 
 			if ($this->Mastertablecontent->addEditEducationTypeMaster($postData,$record_id)) {
@@ -1249,7 +1279,7 @@ class MastersController extends AppController {
 				$this->message_theme = 'success';
 			}
 
-		// For Division Type
+		// For Documents Grades -> Akash [09-08-2022]
 		} elseif ($masterId=='18') {
 
 			if ($this->Mastertablecontent->addEditDivisionGradeMaster($postData,$record_id)) {
@@ -1260,7 +1290,7 @@ class MastersController extends AppController {
 				$this->message_theme = 'success';
 			}
 
-		// For Documents Type  # Added on the 09-08-2022 by Akash
+		// For Document Types -> Akash [12-12-2022]
 		} elseif ($masterId=='19') {
 
 			if ($this->Mastertablecontent->addEditDocumentsMaster($postData,$record_id)) {
@@ -1268,6 +1298,39 @@ class MastersController extends AppController {
 				///Added this call to save the user action log on 21-02-2022 by Akash
 				$this->Customfunctions->saveActionPoint('Documents Master '."($forActionLog)", 'Success');
 				$this->message = 'You have '.$action_var.' Documents Type Successfully.';
+				$this->message_theme = 'success';
+			}
+		
+		// For Misgrade Categories -> Akash [12-12-2022]
+		} elseif ($masterId=='20') {
+
+			if ($this->Mastertablecontent->addEditMisgradeCategories($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint('Misgrade Categories '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Misgrade Category Successfully.';
+				$this->message_theme = 'success';
+			}
+		
+		// For Misgrade Levels -> Akash [12-12-2022]
+		} elseif ($masterId=='21') {
+
+			if ($this->Mastertablecontent->addEditMisgradeLevels($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint('Misgrade Levels '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Misgrade Level Successfully.';
+				$this->message_theme = 'success';
+			}
+		
+		// For Misgrade Action -> Akash [12-12-2022]
+		} elseif ($masterId=='22') {
+
+			if ($this->Mastertablecontent->addEditMisgradeActions($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint(' Misgrade Action '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Misgrade Action Successfully.';
 				$this->message_theme = 'success';
 			}
 		}

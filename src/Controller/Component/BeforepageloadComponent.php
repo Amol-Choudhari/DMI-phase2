@@ -296,7 +296,7 @@ class BeforepageloadComponent extends Component {
 		if (!empty($fetch_count)) {
 			
 			$convert_current_date = strtotime($current_date);
-			$convert_table_date  = explode(' ',$fetch_count['created']);
+			$convert_table_date  = explode(' ',(string) $fetch_count['created']); #For Deprecations
 			$explode_table_date = strtotime(str_replace('/','-',$convert_table_date[0]));
 		
 		} else {
@@ -514,12 +514,22 @@ class BeforepageloadComponent extends Component {
 			}
 		}
 		
+		#For Surrender
+		$DmiSurrenderGrantCertificatePdfs = TableRegistry::getTableLocator()->get('DmiSurrenderGrantCertificatePdfs');
+		$checkApplication = $DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS ' => $customer_id])->first();
+		if (!empty($checkApplication)) {
+			$isAppSurrender = 'yes';
+		}else{
+			$isAppSurrender = 'no';
+		}
+
 		$this->Controller->set('IsApproved',$IsApproved);
 		$this->Controller->set('show_renewal_btn',$show_renewal_btn);
 		$this->Controller->set('show_button', $show_button);
 		$this->Controller->set('show_renewal_button', $show_renewal_button);
 		$this->Controller->set('Is15DigitApproved',$Is15DigitApproved);
 		$this->Controller->set('IsECodeApproved',$IsECodeApproved);
+		$this->Controller->set('isAppSurrender',$isAppSurrender);
 
 	}
 	

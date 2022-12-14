@@ -19,9 +19,9 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-10">
-                    <div class="card card-teal">
-                        <div class="card-header"><h5 class="card-title-new"><?php echo $masterEditTitle ?></h5></div>
-                        <?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
+                    <?php echo $this->Form->create(null,array('class'=>'form-group','id'=>$form_id)); ?>
+                        <div class="card">
+                            <div class="card-header card-master"><h5 class="card-title-new"><?php echo $masterEditTitle ?></h5></div>
                             <div class="form-horizontal">
                                 <div class="card-body">
                                     <div class="row">
@@ -30,25 +30,32 @@
 
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_state');
 
-                                            } elseif ($masterId=='2'){
+                                            } elseif ($masterId=='2') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_district');
 
-                                            } elseif ($masterId=='3'){
+                                            } elseif ($masterId=='3') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_business_type');
 
-                                            } elseif ($masterId=='4'){
+                                            } elseif ($masterId=='4') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_packing_type');
 
-                                            } elseif ($masterId=='5'){
+                                            } elseif ($masterId=='5') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_laboratory_type');
 
-                                            } elseif ($masterId=='6'){
+                                            } elseif ($masterId=='6') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_machine_type');
 
-                                            } elseif ($masterId=='7'){
+                                            } elseif ($masterId=='7') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_tank_shape');
 
-                                            } elseif ($masterId=='8'){
+                                            } elseif ($masterId=='8') {
+
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_charge');
 
                                             } elseif ($masterId=='9') {
@@ -75,24 +82,39 @@
 
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_replica_charges');
 
-                                            } elseif  ($masterId=='17') {
+                                            } elseif ($masterId=='17') {
 
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_education_type');
 
-                                            } elseif  ($masterId=='18') {
+                                            } elseif ($masterId=='18') {
 
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_division_type');
 
-                                            } elseif  ($masterId=='19') {
+                                            } elseif ($masterId=='19') {
 
                                                 echo $this->element('masters_management_elements/edit_master_elements/edit_documents_list');
+                                                
+                                            } elseif ($masterId=='20') {
+
+                                                echo $this->element('masters_management_elements/edit_master_elements/edit_misgrade_category');
+
+                                            } elseif ($masterId=='21') {
+
+                                                echo $this->element('masters_management_elements/edit_master_elements/edit_misgrade_levels');
+
+                                            } elseif ($masterId=='22') {
+
+                                                echo $this->element('masters_management_elements/edit_master_elements/edit_misgrade_actions');
                                             }
                                         ?>
                                     </div>
                                 </div>
                             </div>
-                        <?php echo $this->Form->end(); ?>
-                    </div>
+                            <div class="card-footer">
+                                <?php echo $this->element('masters_management_elements/button_elements/edit_submit_common_btn'); ?>
+                            </div>
+                        </div>
+                    <?php echo $this->Form->end(); ?>
                 </div>
             </div>
         </div>

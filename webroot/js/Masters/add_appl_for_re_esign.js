@@ -1,10 +1,10 @@
 $(document).ready(function() {
-
-
-    $('#added_appl_list').DataTable({"order": []});
+	
+	$('#added_appl_list').DataTable({"order": []});
 	
 	//below functinality added on 08-04-2022 by Amol
 	//to notify Admin if last Incharge of that office changed who granted the application
+	
 	$("#add_appl").click(function(e){
 
 		e.preventDefault();
@@ -23,8 +23,8 @@ $(document).ready(function() {
 				success:function(res){	
 	
 					var res = res.match(/~([^']+)~/)[1];//getting data bitween ~..~ from response
+
 					if(res!=1){
-	
 						$.confirm({
 							title: 'Note:',
 							content: "The incharge who granted this application has been changed, So application will forwarded to current in-charge <b>"+res+"</b> for re-esign.",
@@ -36,7 +36,6 @@ $(document).ready(function() {
 								},
 								cancel: function () {
 									$.alert("The application is not added for re-esign, as you have cancel the allocation");
-									
 								}
 							}
 						});
@@ -44,12 +43,10 @@ $(document).ready(function() {
 					}else{
 						$("#add_reesign_form").submit();
 					}
-				}			
+				}
 			});
 		} else {
 			$.alert("Please Enter the Application ID !");
 		}
-		
-		
 	});
 });

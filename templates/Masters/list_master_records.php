@@ -14,7 +14,6 @@
             </div>
         </div>
     </div>
-
     <section class="content form-middle">
         <div class="container-fluid">
             <div class="row">
@@ -22,7 +21,6 @@
                     <?php echo $this->Html->link('Add New', array('controller' => 'masters', 'action' => 'add_master_record'), array('class' => 'add_btn btn btn-success')); ?>
                     <?php echo $this->Html->link('Back', array('controller' => 'masters', 'action' => 'masters_home'), array('class' => 'add_btn btn btn-secondary float-right')); ?>
                 </div>
-
                 <div class="col-md-12">
                     <?php echo $this->Form->create(); ?>
                         <div class="card card-Lightblue">
@@ -101,6 +99,18 @@
                                         } elseif ($masterId == '19') {
 
                                             echo $this->element('masters_management_elements/list_master_elements/all_documents_list');
+
+                                        } elseif ($masterId == '20') {
+
+                                            echo $this->element('masters_management_elements/list_master_elements/all_misgrade_category');
+
+                                        } elseif ($masterId == '21') {
+
+                                            echo $this->element('masters_management_elements/list_master_elements/all_misgrade_levels');
+
+                                        } elseif ($masterId == '22') {
+
+                                            echo $this->element('masters_management_elements/list_master_elements/all_misgrade_actions');
 
                                         }
                                     ?>

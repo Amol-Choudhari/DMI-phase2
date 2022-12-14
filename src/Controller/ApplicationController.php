@@ -283,18 +283,29 @@ class ApplicationController extends AppController{
 		// get current section all details
 		$this->loadModel('DmiCommonScrutinyFlowDetails');
 
-		// pravin bhakare 28-09-2021
+		//For Chemist Approval (CHM) Flow HAVING Application Type [4] - Pravin [28-09-2021]
 		if ($application_type == 4) {
 
 			$customer_id = $chemist_id;
 			$form_type='CHM';
 		}
 
-		// added for ADP flow as application_type is 8 by shankhpal on 09/11/2022
+		//For Approval of Designated Person (ADP) Flow HAVING Application Type [8] - Shankhpal [09/11/2022]
 		if ($application_type == 8) {
 			
 			$form_type='ADP';
+			$this->loadModel('DmiAdpGrantCertificatePdfs');  
+			//added for checking if application is Granted on 24/11/2022
+			$checkIfgrant = $this->DmiAdpGrantCertificatePdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+			$this->set('checkIfgrant',$checkIfgrant);
 		}
+
+		//For Surrender of Certificate (SOC) Flow HAVING Application Type [9] - Akash [24-11-2022]
+		if ($application_type == 9) {
+	
+			$form_type='SOC';
+		}
+
 		$this->set('form_type',$form_type);
 		
 		$firm_type_text = $this->Customfunctions->firmTypeText($customer_id);
@@ -313,7 +324,7 @@ class ApplicationController extends AppController{
 
 		// get section details
 		$section_form_details = $this->$section_model->sectionFormDetails($customer_id);
-
+	
 
 		// if return value 1 (all forms saved), return value 2 (all forms approved), return value 0 (all forms not saved or approved)
 		$all_section_status = $this->Customfunctions->formStatusValue($allSectionDetails,$customer_id);
@@ -454,7 +465,7 @@ class ApplicationController extends AppController{
 
 					$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
 
-					//Added this call to save the user action log on 04-03-2022 by Akash
+					#Action: Application Section Saved
 					if ($application_type == 4) {
 						$this->Customfunctions->saveActionPoint('Application '."($process_query)", 'Success');
 					} else {
@@ -858,20 +869,25 @@ class ApplicationController extends AppController{
 						$this->DmiSmsEmailTemplates->sendMessage(5,$customer_id); #APPLICANT , RO , DDO
 						$this->DmiSmsEmailTemplates->sendMessage(6,$customer_id); #Applicant , RO , DDO
 						
-						$message_theme = 'success';
 						$message = $firm_type_text.' - Final submitted successfully ';
+						$message_theme = 'success';
 						$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
+
 						$this->viewBuilder()->setVar('message', $message);
+						$this->viewBuilder()->setVar('message_theme', $message_theme);
 						$this->viewBuilder()->setVar('redirect_to', $redirect_to);
 
 					} else {
 
 						//Added this call to save the user action log on 04-03-2022 by Akash
 						$this->Customfunctions->saveActionPoint('Firm Final Submitted', 'Failed');
-						$message_theme = 'failed';
+						
 						$message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
+						$message_theme = 'failed';
 						$redirect_to = '../application/application-for-certificate';
+
 						$this->viewBuilder()->setVar('message', $message);
+						$this->viewBuilder()->setVar('message_theme', $message_theme);
 						$this->viewBuilder()->setVar('redirect_to', $redirect_to);
 					}
 
@@ -911,14 +927,17 @@ class ApplicationController extends AppController{
 
 				$get_payment_details = $this->Paymentdetails->saveApplicantPaymentDetails($this->request->getData(), $payment_table);
 
-				if ($get_payment_details == true)
-				{	
+				if ($get_payment_details == true) {
+
 					#SMS: Applicant Replied to DDO
 					//$this->DmiSmsEmailTemplates->sendMessage(50,$customer_id); # DDO
-					$message_theme = 'success';
+					
 					$message = $firm_type_text.' - Payment Section, '.$process_query.' successfully';
+					$message_theme = 'success';
 					$redirect_to = 'payment';
+
 					$this->viewBuilder()->setVar('message', $message);
+					$this->viewBuilder()->setVar('message_theme', $message_theme);
 					$this->viewBuilder()->setVar('redirect_to', $redirect_to);
 		
 					$this->render('/element/message_boxes');

@@ -232,11 +232,10 @@
 							</a>
 						</li>
 
+								<!--added new conditions on 05-05-2021 by Amol, to show all granted applications to HO users-->
 					<?php } if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' ||
-
-						//added new conditions on 05-05-2021 by Amol, to show all granted applications to HO users
-						$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||
-						$current_user_roles['ama'] == 'yes' || $current_user_roles['super_admin'] == 'yes') { ?>
+								$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||
+								$current_user_roles['ama'] == 'yes' || $current_user_roles['super_admin'] == 'yes') { ?>
 
 						<!-- for granted pdf list -->
 						<li class="nav-item">
@@ -277,14 +276,24 @@
 								</ul>
 							</li>
 						</li>
-
-						<!-- below li added on 07-09-2022  -->
-						<li class="nav-item">
-							<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/rejectedApplList" class="nav-link <?php echo $menu_add_menu; ?>">
-								<i class="far fas fa-close nav-icon"></i>
-								<p>Rejected/Junked Appl.</p>
+						<li class="nav-item has-treeview">
+							<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/surrendered" class="nav-link <?php echo $menu_add_menu; ?>">
+								<i class="nav-icon fas far fa-share"></i>
+								<p class="nav-icon-p">Surrendered Applications</p>
 							</a>
 						</li>
+						
+					<?php } if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' || 
+								$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||
+								$current_user_roles['ama'] == 'yes' || $current_user_roles['super_admin'] == 'yes' || $current_user_roles['pao'] == 'yes') { ?>
+
+								<!-- below li added on 07-09-2022  -->
+								<li class="nav-item">
+									<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/rejectedApplList" class="nav-link <?php echo $menu_add_menu; ?>">
+										<i class="far fas fa-close nav-icon"></i>
+										<p>Rejected/Junked Appl.</p>
+									</a>
+								</li>
 
 					<?php } if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection'] == 'yes' && $current_user_roles['super_admin'] != 'yes') { ?>
 
@@ -299,21 +308,27 @@
 									<li class="nav-item has-treeview">
 										<!-- Added for update firm details option menu for secondary firms that is for RO / SO user on 29-12-2021 by AKASH -->
 										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot'); ?>othermodules/firms_list_to_update" class="nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot'); ?>othermodules/firms_list_to_update" class="bg-gray nav-link ">
 												<i class="fas fa-user-edit nav-icon"></i>
 												<p class="nav-icon-p">Update Firm Details</p>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/re_esign_module" class="nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/re_esign_module" class="bg-gray nav-link">
 												<i class="fas fa-redo-alt nav-icon"></i>
 												<p class="nav-icon-p">Re-esign</p>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/user_work_transfer" class="nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/user_work_transfer" class="bg-gray nav-link">
 												<i class="fas fa-retweet nav-icon"></i>
 												<p class="nav-icon-p">Work Transfer</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/actions_on_misgrading" class="bg-gray nav-link">
+												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+												<p class="nav-icon-p">Actions On Misgrading</p>
 											</a>
 										</li>
 									</li>
@@ -437,14 +452,6 @@
 							<a href="<?php echo $this->request->getAttribute('webroot');?>commercial/commercial_verfication" class="nav-link">
 								<i class="fas fa-money-check-alt nav-icon"></i>
 								<p class="nav-icon-p badge">Sample Payment Verification</p>
-							</a>
-						</li>
-
-						<!-- below li added on 07-09-2022  -->
-						<li class="nav-item">
-							<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/rejectedApplList" class="nav-link <?php echo $menu_add_menu; ?>">
-								<i class="far fas fa-close nav-icon"></i>
-								<p>Rejected/Junked Appl.</p>
 							</a>
 						</li>
 

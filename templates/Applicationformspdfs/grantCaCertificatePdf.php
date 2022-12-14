@@ -10,7 +10,20 @@
 		font-size: 9pt;
 		font-family: times;
 	}
+	.cRed{
+		color: red;
+	}
 </style>
+
+	<?php if ($isSurrender== 'yes') { ?>
+		<table width="100%" border="1">
+			<tr>
+				<td>
+					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('Y-m-d'); ?></h4>
+				</td>
+			</tr>
+		</table>
+	<?php } ?>
 
 	<table width="100%" border="1">
 		<tr>				

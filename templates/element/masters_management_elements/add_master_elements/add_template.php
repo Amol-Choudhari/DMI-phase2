@@ -1,41 +1,38 @@
-<?php ?>
+<div class="col-md-12">
+	<div class="row">
+		<div class="col-md-6">
+			<label>Short Description <span class="cRed">*</span></label>
+			<?php echo $this->Form->control('description', array('type'=>'textarea', 'id'=>'description','class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter Short Description Here')); ?>
+			<span id="error_description" class="error invalid-feedback"></span>
+		</div>
 
-	<div class="col-md-12">
+		<div class="col-md-6">
+			<label>SMS Message <span class="cRed">*</span></label>
+			<?php echo $this->Form->control('sms_message', array('type'=>'textarea', 'id'=>'sms_message','class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter SMS Message Here')); ?>
+			<span id="error_sms_message" class="error invalid-feedback"></span>
+		</div>
 
-		<div class="row">
-			<div class="col-md-6">
-				<label>Short Description <span class="cRed">*</span></label>
-				<?php echo $this->Form->control('description', array('type'=>'textarea', 'id'=>'description','class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter Short Description Here')); ?>
-                <span id="error_description" class="error invalid-feedback"></span>
-			</div>
+		<div class="col-md-6 mt-2">
+			<label>Subject </label>
+			<?php echo $this->Form->control('email_subject', array('type'=>'text', 'id'=>'email_subject', 'class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter Subject Here')); ?>
+			<span id="error_email_subject" class="error invalid-feedback"></span>
+		</div>
 
-			<div class="col-md-6">
-				<label>SMS Message <span class="cRed">*</span></label>
-				<?php echo $this->Form->control('sms_message', array('type'=>'textarea', 'id'=>'sms_message','class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter SMS Message Here')); ?>
-				<span id="error_sms_message" class="error invalid-feedback"></span>
-			</div>
+		<div class="col-md-6 mt-2">
+			<label>Email Message </label>
+			<?php echo $this->Form->control('email_message', array('type'=>'textarea', 'class'=>'form-control','id'=>'email_message',  'label'=>false, 'placeholder'=>'Enter Email Message Here')); ?>
+		</div>
 
-			<div class="col-md-6 mt-2">
-				<label>Subject </label>
-				<?php echo $this->Form->control('email_subject', array('type'=>'text', 'id'=>'email_subject', 'class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter Subject Here')); ?>
-				<span id="error_email_subject" class="error invalid-feedback"></span>
-			</div>
+		<div class="col-md-12">
+			<label class="badge badge-info">Send To :
+			<?php
+				$options = array('dmi'=>'DMI','lmis'=>'LIMS');
+				$attributes = array('legend'=>false, 'id'=>'template_for');
+				echo $this->Form->radio('template_for',$options,$attributes,);
+			?>
+			</label>
 
-			<div class="col-md-6 mt-2">
-				<label>Email Message </label>
-				<?php echo $this->Form->control('email_message', array('type'=>'textarea', 'class'=>'form-control','id'=>'email_message',  'label'=>false, 'placeholder'=>'Enter Email Message Here')); ?>
-			</div>
-
-			<div class="col-md-12">
-				<label class="badge badge-info">Send To :
-				<?php
-					$options = array('dmi'=>'DMI','lmis'=>'LIMS');
-					$attributes = array('legend'=>false, 'id'=>'template_for');
-					echo $this->Form->radio('template_for',$options,$attributes,);
-				?>
-				</label>
-
-				<div id="dmi_roles" class="form-horizontal">
+			<div id="dmi_roles" class="form-horizontal">
 					<div class="card-body">
 						<div class="boxformenus row color1">
 							<div class="col-md-3">
@@ -112,10 +109,6 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-3 mt-3">
-				<?php echo $this->Form->submit('Add', array('name'=>'add_sms_template', 'id'=>'add_sms_template_btn','label'=>false,'class'=>'btn btn-success')); ?>
-			</div>
-			<div class="clearfix"></div>
 		</div>
 	</div>
 </div>

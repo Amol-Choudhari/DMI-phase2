@@ -245,16 +245,15 @@ class MastertablecontentComponent extends Component {
 	}
 
 
-	//For Education Type Master used for Chemist
+	//For Education Type Master -> Akash [09-08-2022]
 	public function allEducationType(){
 
 		$DmiEducationTypes = TableRegistry::getTableLocator()->get('DmiEducationTypes');
 		$all_education_types = $DmiEducationTypes->find('all',array('conditions'=>array('delete_status'=>'no')))->toArray();
 		return $all_education_types;
-
 	}
 
-	//For Division Grades Master used for Chemist
+	//For Division Grades Master -> Akash [09-08-2022]
 	public function allDivisionGrade(){
 
 		$DmiDivisionGrades = TableRegistry::getTableLocator()->get('DmiDivisionGrades');
@@ -262,12 +261,36 @@ class MastertablecontentComponent extends Component {
 		return $all_division_types;
 	}
 
-	//For Dmi Document Lists # Added on the 09-08-2022 by Akash
+	//For Dmi Document Lists -> Akash [09-08-2022]
 	public function allDocumentsList(){
 
 		$DmiDocumentLists = TableRegistry::getTableLocator()->get('DmiDocumentLists');
 		$all_documents_list = $DmiDocumentLists->find('list', array('valueField' => 'document_name', 'conditions' => array()))->toArray();
 		return $all_documents_list;
+	}
+
+	//For Dmi Misgrade Categories -> Akash [12-12-2022]
+	public function allMisgradeCategories(){
+
+		$DmiMisgradingCategories = TableRegistry::getTableLocator()->get('DmiMisgradingCategories');
+		$all_misgrade_categories = $DmiMisgradingCategories->find('list', array('valueField' => 'misgrade_category_name', 'conditions' => array()))->toArray();
+		return $all_misgrade_categories;
+	}
+
+	//For Dmi Misgrade Levels -> Akash [12-12-2022]
+	public function allMisgradeLevels(){
+
+		$DmiMisgradingLevels = TableRegistry::getTableLocator()->get('DmiMisgradingLevels');
+		$all_misgrade_levels = $DmiMisgradingLevels->find('list', array('valueField' => 'misgrade_level_name', 'conditions' => array()))->toArray();
+		return $all_misgrade_levels;
+	}
+
+	//For Dmi Misgrade Actions -> Akash [12-12-2022]
+	public function allMisgradeActions(){
+
+		$DmiMisgradingActions = TableRegistry::getTableLocator()->get('DmiMisgradingActions');
+		$all_misgrade_actions = $DmiMisgradingActions->find('list', array('valueField' => 'misgrade_action_name', 'conditions' => array()))->toArray();
+		return $all_misgrade_actions;
 	}
 
 	//--------------------------------------------//
@@ -1458,6 +1481,117 @@ class MastertablecontentComponent extends Component {
 		$entity = $DmiDocumentLists->newEntity($data_array);
 
 		if ($DmiDocumentLists->save($entity)) {
+
+			return true;
+		}
+
+	}
+
+
+	//For Adding and Editing the Misgrade Category Master # Added on the 12-12-2022 By Akash
+	public function addEditMisgradeCategories($postData,$record_id=null){
+
+		$username = $this->Session->read('username');
+		$DmiMisgradingCategories = TableRegistry::getTableLocator()->get('DmiMisgradingCategories');
+
+		//html encoding
+		$encodedCategoryName = htmlentities($postData['misgrade_category_name'], ENT_QUOTES);
+		$encodedCategoryDscp = htmlentities($postData['misgrade_category_dscp'], ENT_QUOTES);
+
+		//edit array
+		if ($record_id == null) {
+
+			$data_array = array('misgrade_category_name'=>$encodedCategoryName,
+								'misgrade_category_dscp'=>$encodedCategoryDscp,
+								'created'=>date('Y-m-d H:i:s'),
+								'modified'=>date('Y-m-d H:i:s'),
+								'user_email'=>$username);
+		} else {
+
+			$data_array = array('id'=>$record_id,
+								'misgrade_category_name'=>$encodedCategoryName,
+								'misgrade_category_dscp'=>$encodedCategoryDscp,
+								'modified'=>date('Y-m-d H:i:s'),
+								'user_email'=>$username);
+		}
+
+		$entity = $DmiMisgradingCategories->newEntity($data_array);
+
+		if ($DmiMisgradingCategories->save($entity)) {
+
+			return true;
+		}
+
+	}
+
+
+	//For Adding and Editing the Misgrade Levels Master # Added on the 12-12-2022 By Akash
+	public function addEditMisgradeLevels($postData,$record_id=null){
+
+		$username = $this->Session->read('username');
+		$DmiMisgradingLevels = TableRegistry::getTableLocator()->get('DmiMisgradingLevels');
+
+		//html encoding
+		$encodedLevelName = htmlentities($postData['misgrade_level_name'], ENT_QUOTES);
+		$encodedLevelDscp = htmlentities($postData['misgrade_level_dscp'], ENT_QUOTES);
+
+		//edit array
+		if ($record_id == null) {
+
+			$data_array = array('misgrade_level_name'=>$encodedLevelName,
+								'misgrade_level_dscp'=>$encodedLevelDscp,
+								'created'=>date('Y-m-d H:i:s'),
+								'modified'=>date('Y-m-d H:i:s'),
+								'user_email'=>$username);
+		} else {
+
+			$data_array = array('id'=>$record_id,
+								'misgrade_level_name'=>$encodedLevelName,
+								'misgrade_level_dscp'=>$encodedLevelDscp,
+								'modified'=>date('Y-m-d H:i:s'),
+								'user_email'=>$username);
+		}
+
+		$entity = $DmiMisgradingLevels->newEntity($data_array);
+
+		if ($DmiMisgradingLevels->save($entity)) {
+
+			return true;
+		}
+
+	}
+
+
+	//For Adding and Editing the Misgrade Actions Master # Added on the 12-12-2022 By Akash
+	public function addEditMisgradeActions($postData,$record_id=null){
+
+		$username = $this->Session->read('username');
+		$DmiMisgradingActions = TableRegistry::getTableLocator()->get('DmiMisgradingActions');
+
+		//html encoding
+		$encodedActionName = htmlentities($postData['misgrade_action_name'], ENT_QUOTES);
+		$encodedActionDscp = htmlentities($postData['misgrade_action_dscp'], ENT_QUOTES);
+
+		//edit array
+		if ($record_id == null) {
+
+			$data_array = array('misgrade_action_name'=>$encodedActionName,
+								'misgrade_action_dscp'=>$encodedActionDscp,
+								'created'=>date('Y-m-d H:i:s'),
+								'modified'=>date('Y-m-d H:i:s'),
+								'user_email'=>$username);
+		} else {
+
+			$data_array = array('id'=>$record_id,
+								'misgrade_action_name'=>$encodedActionName,
+								'misgrade_action_dscp'=>$encodedActionDscp,
+								'modified'=>date('Y-m-d H:i:s'),
+								'user_email'=>$username);
+		}
+
+		$entity = $DmiMisgradingActions->newEntity($data_array);
+
+		if ($DmiMisgradingActions->save($entity)) {
 
 			return true;
 		}

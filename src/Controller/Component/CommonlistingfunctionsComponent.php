@@ -506,7 +506,9 @@
 			$creat_array = false;
 			$username = $this->Session->read('username');
 			
-			if ($appl_type_id == 2) {
+			#This below condition block is modified.
+			# -> To allow the listing of the Surrender Flow the application_type = 9 is added to the block - Akash[05-12-2022]
+			if ($appl_type_id == 2 || $appl_type_id == 9) {
 				$level2 = null;
 			} else {
 				$level2 = "and al.level_2 IS NOT NULL";
@@ -736,8 +738,13 @@
 
 			//added condition for lab export, as there will be no siteinspection, so default set to true
 			//29-09-2021 by Amol
+			
 			if($split_customer_id[1]==3 && ($export_unit_status == 'yes' || $NablDate != null)){//updated on 30-09-2021
 
+				$all_report_status = 'true';
+			
+			//The below application type 9 is added - Akash[02-12-2022]
+			}elseif($appl_type_id == 9){ 
 				$all_report_status = 'true';
 			}
 

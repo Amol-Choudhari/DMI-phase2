@@ -92,13 +92,19 @@ class AppController extends Controller
 		}
 
 
-	//added on 30-09-201 by Amol
-	//to set application types id array, for which the dashboard will count and list applications.for DMI users
-	$this->Session->write('applTypeArray',array('1','2','3','4','5','6','8'));
+		//This Below we defined the Array for the Application Types from which dashboard will count and list will recognize 
+		//the Flow for DMI users - Amol
+		// # The Application type no. is given #//
+		// #1- New / #2- Renewal / #3- Change / #4- Approval of Chemist(CHM)
+		// #5- 15-Digit-Code (FDC) / #6- Allotment of E-Code (EC) / #7- Advance Payment (AP)
+		// #8- Approval of Designated Person (ADP) / #9- Surrender of Certificate (SOC)
+		// #10-  
+		$this->Session->write('applTypeArray',array('1','2','3','4','5','6','8','9'));
 
-	//added on 01-10-2021 by Amol
-	//if not in advance payment mode
-	$this->Session->write('advancepayment','no');
+		//added on 01-10-2021 by Amol
+		//if not in advance payment mode
+		$this->Session->write('advancepayment','no');
+		$this->Session->write('forReplica','no');
 
 	   //call to aqcms_statistics data on footer section.
 		$this->loadModel('DmiFrontStatistics');
@@ -133,6 +139,18 @@ class AppController extends Controller
 		$current_user_division = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$username)))->first();
 		$this->set('current_user_division',$current_user_division);
 
+		//Is Approved
+		$IsApproved=null;
+		$final_submit_id = $this->DmiFinalSubmits->find('all', array('conditions' => array('customer_id IS' => $username),'order'=>'id desc'))->first();
+		if (!empty($final_submit_id)) {
+			//get grant status		
+			if ($final_submit_id['status']=='approved' && $final_submit_id['current_level']=='level_3') {
+				$IsApproved='yes';
+			}
+			$this->Session->write('IsApproved',$IsApproved);
+		}else{
+			$this->Session->write('IsApproved',$IsApproved);
+		}
 
 		if(null == ($this->Session->read('paymentforchange'))){
 			$this->Session->write('paymentforchange','available');
@@ -198,10 +216,11 @@ class AppController extends Controller
 
 			$get_logs_records = $this->$table->find('all',array('conditions'=>array('customer_id IS'=>$user_id),'order'=>'id Desc'))->toArray();
 
-    } elseif ($table == 'DmiChemistLogs') {
+		} elseif ($table == 'DmiChemistLogs') {
 
-      $get_logs_records = $this->$table->find('all',array('conditions'=>array('customer_id IS'=>$user_id),'order'=>'id Desc'))->toArray();
-    }
+			$get_logs_records = $this->$table->find('all',array('conditions'=>array('customer_id IS'=>$user_id),'order'=>'id Desc'))->toArray();
+		}
+
 		$i = 0;
 		foreach ($get_logs_records as $each) {
 
@@ -240,7 +259,7 @@ class AppController extends Controller
 			return 'Sorry... Your account is disabled for today, on account of 3 login failure.';
 		}
 
-  }
+  	}
 
   	//created/updated/added on 25-06-2021 for multiple logged in check security updates, by Amol
 	//this function is called from element "already_loggedin_msg", if applicant/user proceeds.

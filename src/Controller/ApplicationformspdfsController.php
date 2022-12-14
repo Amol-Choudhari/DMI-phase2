@@ -92,7 +92,7 @@ class ApplicationformspdfsController extends AppController{
 		}elseif($application_type==6){
 			$pdfPrefix = 'EC-';
 		}elseif($application_type==8){ //added by shankhpal shende on 15-11-2022
-			$pdfPrefix = 'LAB-';
+			$pdfPrefix = 'ADP-';
 		}
 
 	
@@ -225,7 +225,7 @@ class ApplicationformspdfsController extends AppController{
 		//if present then remove that record, delete file from temp folder, and update record from main esign status table
 		//added on 02-10-2018 by Amol
 		$Dmi_temp_esign_status = TableRegistry::getTableLocator()->get('DmiTempEsignStatuses');
-		$Dmi_temp_esign_status->checkTempEsignRecordExist($this->Session->read('customer_id'),$this->Session->read('current_level'));																															 
+		$Dmi_temp_esign_status->checkTempEsignRecordExist($this->Session->read('customer_id'),$this->Session->read('current_level'));
 		
 		$application_type = $this->Session->read('application_type');
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
@@ -249,6 +249,9 @@ class ApplicationformspdfsController extends AppController{
 		
 		}elseif($application_type==6){
 			$pdfPrefix = 'EC-';
+  
+		}elseif($application_type==8){ //added by shankhpal shende on 15-11-2022
+			$pdfPrefix = 'ADP-';
 		}
 		
 		$rearranged_id = 'I-'.$pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
@@ -349,6 +352,9 @@ class ApplicationformspdfsController extends AppController{
 		
 		}elseif($application_type==6){
 			$pdfPrefix = 'EC-';
+  
+		}elseif($application_type==8){ //added by shankhpal shende on 15-11-2022
+			$pdfPrefix = 'ADP-';
 		}
 		
 		$rearranged_id = 'G-'.$pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
@@ -814,7 +820,7 @@ class ApplicationformspdfsController extends AppController{
 		/*--Code end by pravin 18/3/2017--*/
 		
 		
-	// to show firm address name form id
+		// to show firm address name form id
 	
 		$fetch_district_name = $this->DmiDistricts->find('all',array('fields'=>'district_name','conditions'=>array('id IS'=>$customer_firm_data['district'])))->first();
 		$firm_district_name = $fetch_district_name['district_name'];
@@ -1505,6 +1511,7 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiAllDirectorsDetails');
 		$this->loadModel('DmiRenewalFinalSubmits');
 		$this->loadModel('DmiCustomerLaboratoryDetails');
+		$this->loadModel('DmiSurrenderFinalSubmits');
 		
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
@@ -1748,6 +1755,10 @@ class ApplicationformspdfsController extends AppController{
 			$result_for_qr = $this->Customfunctions->getQrCode($data);
 			$this->set('result_for_qr',$result_for_qr);
 			
+			
+			$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+			$this->set('isSurrender',$isSurrender);
+
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantCaCertificatePdf'); 
 					
 		}
@@ -1766,6 +1777,7 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiPrintingFirmProfiles');
 		$this->loadModel('DmiAllDirectorsDetails');
 		$this->loadModel('DmiRenewalFinalSubmits');
+		$this->loadModel('DmiSurrenderFinalSubmits');
 		
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
@@ -1776,6 +1788,10 @@ class ApplicationformspdfsController extends AppController{
 		// Fetch grant date conditions get latest records.
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 		
+		$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+		$this->set('isSurrender',$isSurrender);
+
+
 		// Fetch data from DMI firm Table					
 		$customer_firm_data = $this->DmiFirms->firmDetails($customer_id);	
 		$this->set('customer_firm_data',$customer_firm_data);
@@ -1991,14 +2007,21 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiLaboratoryFirmDetails');
 		$this->loadModel('DmiAllDirectorsDetails');
 		$this->loadModel('DmiRenewalFinalSubmits');
+		$this->loadModel('DmiSurrenderFinalSubmits');
 				
 		//Apply check " customer_id available status " (Done By pravin 27/10/2017)
 		$customer_id = $this->Session->read('customer_id');
 		$this->set('customer_id',$customer_id);
 		
+		$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+		$this->set('form_type',$form_type);
+		
 		// Fetch grant date conditions get latest records.
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-			
+
+		$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+		$this->set('isSurrender',$isSurrender);
+
 		$pdf_date = date('d-m-Y');
 		$this->set('pdf_date',$pdf_date);	
 		
@@ -2587,8 +2610,20 @@ class ApplicationformspdfsController extends AppController{
 		}		
 		$this->set('commodity_names',$commodity_names);
 		
-		//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
-		$result_for_qr = $this->Customfunctions->getQrCode($customer_id,'FDC');
+		//This below line is added for the QR Code genration on Shankhpal [16-08-2022]
+		$this->loadModel('DmiChemistRegistrations');
+		$chemistDetails = $this->DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id,'delete_status IS NULL')))->first();
+		$chemist_fname = $chemistDetails['chemist_fname'];
+		$ca_name = $firm_details['firm_name']; // get firm name
+		
+		//get nodal office of the applied CA
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$region = $get_office['ro_office'];
+		
+		$qr_data = [$customer_id, $ca_name, $chemist_fname,$pdf_date, $region]; // this array send required data to customeFunctionComponent for print qr code
+		
+		$result_for_qr = $this->Customfunctions->getQrCode($qr_data,'FDC');
 		$this->set('result_for_qr',$result_for_qr);
 		
 		$this->generateGrantCerticatePdf('/Applicationformspdfs/grant15DigitCertificate'); 
@@ -2860,8 +2895,19 @@ class ApplicationformspdfsController extends AppController{
 		$this->set('eCode',$eCode);
 		
 		//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
-		$data = [$customer_id,$eCode];
-		$result_for_qr = $this->Customfunctions->getQrCode($data,'ECode');
+		$this->loadModel('DmiChemistRegistrations');
+		$chemistDetails = $this->DmiChemistRegistrations->find('all',array('conditions'=>array('created_by IS'=>$customer_id,'delete_status IS NULL')))->first();
+		$chemist_fname = $chemistDetails['chemist_fname'];
+		$ca_name = $firm_details['firm_name']; // get firm name
+
+		//get nodal office of the applied CA
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$region = $get_office['ro_office'];
+
+		// $data = [$customer_id,$eCode];
+		$qr_data = [$customer_id, $ca_name, $chemist_fname,$pdf_date, $region]; // this array send required data to customeFunctionComponent for print qr code
+		$result_for_qr = $this->Customfunctions->getQrCode($qr_data,'ECode');
 		$this->set('result_for_qr',$result_for_qr);
 		
 		$this->generateGrantCerticatePdf('/Applicationformspdfs/grantECodeCertificate'); 
@@ -2929,7 +2975,190 @@ class ApplicationformspdfsController extends AppController{
 
 
 
-	
+	// Surrender Application PDF for CA
+	// applPdfSurrenderCa
+	// Created By: Akash
+	// Date: 08-12-2022
+
+	public function applPdfSurrenderCa(){
+
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiCustomers');
+		$this->loadModel('DmiDistricts');
+		$this->loadModel('DmiStates');
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiSurrenderFormsDetails');
+		
+		$customer_id = $this->Session->read('username');
+		$this->set('customer_id',$customer_id);
+		
+		//get nodal office of the applied CA
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$this->set('get_office',$get_office);
+		
+		$pdf_date = date('d-m-Y');
+		$this->set('pdf_date',$pdf_date);
+		
+		// data from DMI Firm Table
+		$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$this->set('firmData',$firmData);
+
+		// data from DMI Customer Table
+		$customerData = $this->DmiCustomers->getCustomerDetails($firmData['customer_primary_id']);
+		$this->set('customerData',$customerData);
+
+		// to show firm distric name form id	
+		$firm_district_name = $this->DmiDistricts->getDistrictNameById($firmData['district']);
+		$this->set('firm_district_name',$firm_district_name);
+		
+		// to show firm state name form id	
+		$firm_state_name = $this->DmiStates->getStateNameById($firmData['state']);
+		$this->set('firm_state_name',$firm_state_name);		
+		
+		//surrender details
+		$surrenderData = $this->DmiSurrenderFormsDetails->sectionFormDetails($customer_id);
+		$this->set('surrenderData',$surrenderData);
+
+		// to show commodities and there selected sub-commodities
+		$sub_commodity_array = explode(',',$firmData['sub_commodity']);
+
+		$i=0;
+		foreach($sub_commodity_array as $sub_commodity_id)
+		{			
+			$fetch_commodity_id = $this->MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
+			$commodity_id[$i] = $fetch_commodity_id['category_code'];			
+			$sub_commodity_data[$i] =  $fetch_commodity_id;			
+			$i=$i+1;
+		}
+
+		$unique_commodity_id = array_unique($commodity_id);		
+		$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
+		$this->set('commodity_name_list',$commodity_name_list);		
+		$this->set('sub_commodity_data',$sub_commodity_data);
+				
+		$this->generateApplicationPdf('/Applicationformspdfs/applPdfSurrenderCa');	
+	}
+
+
+	// Surrender Application PDF for Printing Press
+	// applPdfSurrenderPp
+	// Created By: Akash
+	// Date: 08-12-2022
+
+	public function applPdfSurrenderPp(){
+
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiCustomers');
+		$this->loadModel('DmiDistricts');
+		$this->loadModel('DmiStates');
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiSurrenderFormsDetails');
+		
+		$customer_id = $this->Session->read('username');
+		$this->set('customer_id',$customer_id);
+		
+		//get nodal office of the applied PP
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$this->set('get_office',$get_office);
+		
+		$pdf_date = date('d-m-Y');
+		$this->set('pdf_date',$pdf_date);
+		
+		// data from DMI Firm Table
+		$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$this->set('firmData',$firmData);
+
+		// data from DMI Customer Table
+		$customerData = $this->DmiCustomers->getCustomerDetails($firmData['customer_primary_id']);
+		$this->set('customerData',$customerData);
+
+		// to show firm distric name form id	
+		$firm_district_name = $this->DmiDistricts->getDistrictNameById($firmData['district']);
+		$this->set('firm_district_name',$firm_district_name);
+		
+		// to show firm state name form id	
+		$firm_state_name = $this->DmiStates->getStateNameById($firmData['state']);
+		$this->set('firm_state_name',$firm_state_name);		
+		
+		//surrender details
+		$surrenderData = $this->DmiSurrenderFormsDetails->sectionFormDetails($customer_id);
+		$this->set('surrenderData',$surrenderData);
+
+		$this->generateApplicationPdf('/Applicationformspdfs/applPdfSurrenderPp');	
+		
+	}
+
+
+	// Surrender Application PDF for Lab
+	// applPdfSurrenderLab
+	// Created By: Akash
+	// Date: 08-12-2022
+
+	public function applPdfSurrenderLab(){
+
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiCustomers');
+		$this->loadModel('DmiDistricts');
+		$this->loadModel('DmiStates');
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiSurrenderFormsDetails');
+		
+		$customer_id = $this->Session->read('username');
+		$this->set('customer_id',$customer_id);
+		
+		//get nodal office of the applied PP
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$this->set('get_office',$get_office);
+		
+		$pdf_date = date('d-m-Y');
+		$this->set('pdf_date',$pdf_date);
+		
+		// data from DMI Firm Table
+		$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$this->set('firmData',$firmData);
+
+		// data from DMI Customer Table
+		$customerData = $this->DmiCustomers->getCustomerDetails($firmData['customer_primary_id']);
+		$this->set('customerData',$customerData);
+
+		// to show firm distric name form id	
+		$firm_district_name = $this->DmiDistricts->getDistrictNameById($firmData['district']);
+		$this->set('firm_district_name',$firm_district_name);
+		
+		// to show firm state name form id	
+		$firm_state_name = $this->DmiStates->getStateNameById($firmData['state']);
+		$this->set('firm_state_name',$firm_state_name);		
+		
+		//surrender details
+		$surrenderData = $this->DmiSurrenderFormsDetails->sectionFormDetails($customer_id);
+		$this->set('surrenderData',$surrenderData);
+
+		// to show commodities and there selected sub-commodities
+		$sub_commodity_array = explode(',',$firmData['sub_commodity']);
+
+		$i=0;
+		foreach($sub_commodity_array as $sub_commodity_id)
+		{			
+			$fetch_commodity_id = $this->MCommodity->find('all',array('conditions'=>array('commodity_code IS'=>$sub_commodity_id)))->first();
+			$commodity_id[$i] = $fetch_commodity_id['category_code'];			
+			$sub_commodity_data[$i] =  $fetch_commodity_id;			
+			$i=$i+1;
+		}
+
+		$unique_commodity_id = array_unique($commodity_id);		
+		$commodity_name_list = $this->MCommodityCategory->find('all',array('conditions'=>array('category_code IN'=>$unique_commodity_id, 'display'=>'Y')))->toArray();
+		$this->set('commodity_name_list',$commodity_name_list);		
+		$this->set('sub_commodity_data',$sub_commodity_data);
+		
+		$this->generateApplicationPdf('/Applicationformspdfs/applPdfSurrenderLab');	
+		
+	}
 	
 }	
 ?>

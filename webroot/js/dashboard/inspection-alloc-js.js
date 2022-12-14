@@ -19,7 +19,7 @@ $(".close").click(function(){
 			var customer_id = $("#alloc_customer_id").val();
 			var io_user_id = $("#io_users_list").val();
 			var ro_scheduled_date = $("#ro_scheduled_date").val();
-			
+			alert(ro_scheduled_date);
 			if(ro_scheduled_date != ''){
 				$.ajax({
 						type: "POST",

@@ -16,6 +16,9 @@ $(document).ready(function(){
     })
 });
 
+$(function () {
+    bsCustomFileInput.init();
+});
 
 var currcontroller = $("#currcontroller").val();
 

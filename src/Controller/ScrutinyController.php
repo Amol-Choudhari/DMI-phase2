@@ -413,7 +413,7 @@ class ScrutinyController extends AppController{
 		}
 		//End code for Edit/Delete options For RO on Communication with Applicant.
 
-		// Saved referredback comments in chemist flow, Done Aakash Thakare 30-09-2021
+		// Saved referredback comments in chemist flow, Done Akash [30-09-2021]
 		if(null!==($this->request->getData('che_ro_referred_back'))){
 
 			$result = $this->Communication->singleWindowReferredback($this->request->getData(),$allSectionDetails);
@@ -564,7 +564,7 @@ class ScrutinyController extends AppController{
 			//called this component to optimized code on 02-04-2018
 
 			$result = $this->Romoioapplicantcommunicationactions->ROScrutinizedATMOLevel($customer_id,$section_model,$section_form_details[0],$allSectionDetails);
-
+			
 			if($result == 1 && $oldapplication=='yes' && ($application_type==1 || $application_type==6)){//added appl type 6 cond. on 23-11-2021
 
 				$this->Romoioapplicantcommunicationactions->ROScrutinizedOldApplication($customer_id);
@@ -584,51 +584,24 @@ class ScrutinyController extends AppController{
 
 				//applied this condition for lab export, on 01-09-2017 by Amol
 				//if all Sections scrutinized then stay on same page and show forward to HO btn directly
-				if((($export_unit_status == 'yes' || $NablDate != null) && $firm_type == 3 ) 
-				 	|| ($firm_type == 3 && $export_unit_status == 'yes' && $application_type == 8)){  // # If Block Statement Updated for the Application Type 8 (ADP Flow)- Shankhpal [17/11/2022] #Reason : 
+				// # If Block Statement Updated for the Application Type 8 (ADP Flow)- Shankhpal [17/11/2022]
 
-					//this HO level allocation applied for lab export application
-					//on 02-09-2017 by Amol
-					$find_dy_ama_user = $this->DmiUserRoles->find('all',array('fields'=>'user_email_id','conditions'=>array('dy_ama'=>'yes','OR'=>array('super_admin IS NULL','super_admin'=>'no'))))->first();
-					$dy_ama_email_id = $find_dy_ama_user['user_email_id'];
+				if((($export_unit_status == 'yes' || $NablDate != null) && $firm_type == 3 ) || ($firm_type == 3 && $export_unit_status == 'yes' && $application_type == 8)){
 
-					$find_jt_ama_user = $this->DmiUserRoles->find('all',array('fields'=>'user_email_id','conditions'=>array('jt_ama'=>'yes','OR'=>array('super_admin IS NULL','super_admin'=>'no'))))->first();;
-					$jt_ama_email_id = $find_jt_ama_user['user_email_id'];
-
-
-					$find_ama_user = $this->DmiUserRoles->find('all',array('fields'=>'user_email_id','conditions'=>array('ama'=>'yes','OR'=>array('super_admin IS NULL','super_admin'=>'no'))))->first();;
-					$ama_email_id = $find_ama_user['user_email_id'];
-
-					$Dmi_ho_allocation = TableRegistry::getTableLocator()->get($Dmi_final_submit_tb['ho_level_allocation']);
-					$Dmi_all_applications_current_position = TableRegistry::getTableLocator()->get($Dmi_final_submit_tb['appl_current_pos']);
-
-					$Dmi_ho_allocation_entity = $Dmi_ho_allocation->newEntity(array(
-
-						'customer_id'=>$customer_id,
-						'dy_ama'=>$dy_ama_email_id,
-						'jt_ama'=>$jt_ama_email_id,
-						'ama'=>$ama_email_id,
-						'current_level'=>$dy_ama_email_id,
-						'created'=>date('Y-m-d H:i:s'),
-						'modified'=>date('Y-m-d H:i:s')
-
-					));
+					$this->Romoioapplicantcommunicationactions->ifApplicationIsExport($customer_id,$application_type);
 					
-					if($Dmi_ho_allocation->save($Dmi_ho_allocation_entity)){
-
-						//Update record in all applications current position table
-						//created and applied on 02-09-2017 by amol
-						$customer_id = $customer_id;
-						$user_email_id = $dy_ama_email_id;
-						$current_level = 'level_4';
-						$Dmi_all_applications_current_position->currentUserUpdate($customer_id,$user_email_id,$current_level);//call to custom function from model
-
-						#SMS: RO forwarded to HO
-						$this->DmiSmsEmailTemplates->sendMessage(20,$customer_id);
-					}
-
+					$this->DmiSmsEmailTemplates->sendMessage(20,$customer_id); #SMS: RO forwarded to HO
 					$this->Customfunctions->saveActionPoint('All Section Scrutinized', 'Success'); #Action
 					$message = $firm_type_text." - All sections scrutinized and forwarded to HO successfully";
+					$message_theme = "success";
+					$redirect_to = "../dashboard/home";
+
+				}elseif($application_type==9){
+
+					//For Surrender Application
+					$this->Romoioapplicantcommunicationactions->afterScrutinyForwardToRo($customer_id,$application_type,$grantDateCondition,$Dmi_allocation_table,$Dmi_appl_current_pos_table);
+					$this->Customfunctions->saveActionPoint('All Section Scrutinized and Sent to the RO', 'Success'); #Action
+					$message = $firm_type_text." - All sections scrutinized and forwarded to RO successfully";
 					$message_theme = "success";
 					$redirect_to = "../dashboard/home";
 

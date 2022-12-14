@@ -1,4 +1,7 @@
 
+$(function () {
+    bsCustomFileInput.init();
+});
 
 $.widget.bridge('uibutton', $.ui.button);
 

@@ -52,6 +52,8 @@
 			echo $this->Html->script('custom.validation.v.5');
 			echo $this->Html->script('table_filter');
 			echo $this->Html->script('jquery-confirm.min');
+			echo $this->Html->script('Validations/surrender_form_validations');
+
 
 			//DATATABLES SCRIPTS
 			echo $this->Html->script('jquery.dataTables.min');
@@ -159,6 +161,6 @@
 		<input type="hidden" id="bottom_layout_csrf_call" value="<?php echo json_encode($this->request->getParam('_csrfToken'))?>">
 		<!--This -> Layouts inline JS Call -->
 		<?php echo $this->Html->script('layouts/form_scrutiny_layout.js'); ?>
-		<?php echo $this->Html->script('layouts/admin_dashboard/admin_dashboard.js'); ?>	
+		<?php echo $this->Html->script('layouts/admin_dashboard'); ?>	
 	</body>
 </html>

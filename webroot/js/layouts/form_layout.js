@@ -15,3 +15,7 @@ $(function () {
   });
 
   var csrfToken = $('#bottom_layout_csrf_call').val();
+  
+  $(function () {
+    bsCustomFileInput.init();
+});

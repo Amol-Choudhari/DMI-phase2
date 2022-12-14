@@ -1,4 +1,4 @@
-  $.widget.bridge('uibutton', $.ui.button)
+$.widget.bridge('uibutton', $.ui.button)
 
 $('#calendar').datepicker({
 });
@@ -44,9 +44,3 @@ $(":submit").click(function() {
     $('.main_container').css('pointer-events','none');
     setTimeout(function(){ $('.main_container').css('pointer-events','visible'); },4000);
 });
-
-
-//to disable right click of all anchor tags// on 14-02-2018
-//$(document).bind("contextmenu",function(e){
-//return false;
-//});

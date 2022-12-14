@@ -169,7 +169,7 @@ class CommercialController extends AppController{
 				$this->set('existed_appl_details',$existed_appl_details);
 			}
 
-			$payment_trasaction_date = explode(' ',$payment_confirmation_query['transaction_date']);
+			$payment_trasaction_date = explode(' ',(string) $payment_confirmation_query['transaction_date']);
 
 			$action_value =null;
 

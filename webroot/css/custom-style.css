@@ -59,6 +59,8 @@
 .marginRM19{ margin-right  : -19px  !important; }
 .marginL20 { margin-left   :  20px  !important; }
 .margin5   { margin        :  5px; }
+.margin35  { margin-left   :  35px !important;}
+.marginL9 {margin-left: 9px;}
 
 /*COLORS*/
 
@@ -521,7 +523,7 @@ text-align:center;border-top:1px solid #ccc;;}
 }
 
 .card-body {
-    padding-bottom: 0rem !important;
+    padding-bottom: 1rem !important;
 }
 
 #comment_reply_box{
@@ -901,4 +903,11 @@ date: 04/11/2022
  }
  .scroll{
     overflow-x: scroll;
+ }
+
+ .bsc{border:1px solid cadetblue;}
+
+ .card-master{
+    background-color:#105fa6;
+    color:#fff;
  }
