@@ -102,7 +102,8 @@
                         </div>
                     </div>
                 </div>
-
+                
+                <!--For 15 Digit Applications-->
                 <?php if(!empty($appl_15_digit_pdfs) || !empty($cert_15_digit_pdfs)) { ?>
 
                     <div class="card bsc">
@@ -132,6 +133,7 @@
 
                 <?php } ?>
 
+                 <!--For E Code Applications-->
                 <?php if(!empty($appl_e_code_pdfs) || !empty($cert_e_code_pdfs)) { ?>
 
                     <div class="card bsc">
@@ -161,6 +163,7 @@
 
                 <?php } ?>
 
+                 <!--For ADP Applications-->
                 <?php if(!empty($appl_adp_pdfs_records) || !empty($appl_adp_grant_pdfs)) { ?>
 
                     <div class="card bsc">
@@ -189,11 +192,10 @@
                     </div>
 
                 <?php } ?>
-                </div>
+
             </div>
         </div>
     </section>
 </div>
-
 
 <?php echo $this->element('line_track'); ?>

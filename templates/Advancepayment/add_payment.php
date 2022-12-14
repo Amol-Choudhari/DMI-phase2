@@ -27,20 +27,16 @@
 	</section>
 </div>
 
-<?php if($status == 'saved'){ ?>
+<?php 
+	if($status == 'saved'){
+		echo $this->Html->script('advance_payment/add_payment/final_submit_button_display');
+	}
 
-	<?php echo $this->Html->script('advance_payment/add_payment/final_submit_button_display'); ?>
+	if($status == 'pending' || $status == 'replied' || $status == 'confirmed'){ 
+		echo $this->Html->script('advance_payment/add_payment/payment_status_validations');
+	} 
 
-<?php } ?>
-
-<?php if($status == 'pending' || $status == 'replied' || $status == 'confirmed'){ ?>
-
-	<?php echo $this->Html->script('advance_payment/add_payment/payment_status_validations'); ?>
-
-<?php } ?>
-
-<?php if ($status == 'not_confirmed' || $status == 'replied') { ?>
-
-	<?php echo $this->Html->script('advance_payment/add_payment/not_confirmed_payment_validation'); ?>
-
-<?php } ?>
+	if ($status == 'not_confirmed' || $status == 'replied') { 
+		echo $this->Html->script('advance_payment/add_payment/not_confirmed_payment_validation'); 
+	} 
+?>

@@ -56,7 +56,7 @@ class InspectionsController extends AppController{
 		$this->Session->write('application_type',$application_type);
 		$this->Session->delete('section_id');
 		$this->Session->delete('edit_directors_details_id');
-
+	
 		$this->redirect('/inspections/inspection-report');
 		
 	}
@@ -69,12 +69,12 @@ class InspectionsController extends AppController{
 	
 	//Change on 06/09/2018, This is the main function that manages the common IO report functionality like fill report, update report, commenting on report from both side, view report - By Pravin Bhakare		
 	public function inspectionReport(){
-		
+
 		// set variables to show popup messages from view file
-		
 		$message = '';
 		$message_theme = '';
 		$redirect_to = '';
+		
 		
 		$this->viewBuilder()->setLayout('form_siteinspection_layout');
 		$this->tablesEditDetailSessionDelete();
@@ -89,17 +89,19 @@ class InspectionsController extends AppController{
 
 		$customer_id = $this->Customfunctions->checkCustomerIdAvailable($this->Session->read('customer_id'));
 		$this->set('customer_id',$customer_id);
-		
+
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 					//print_r($grantDateCondition); exit;
 
 		$form_final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
-		
+
 		//Below the Not Empty condition is added to remove the offset error - Akash [26-10-2022]
-		if(!empty($form_final_submit_details['status']) != 'approved'){
-			$this->Session->write('application_mode','view');
+		if (!empty($form_final_submit_details)) {
+			if($form_final_submit_details['status'] != 'approved'){ 
+				$this->Session->write('application_mode','view');
+			}
 		}
-		
+
 		$user_email_id = $this->Session->read('username');
 		$user_as = $this->Session->read('user_as');
 		
