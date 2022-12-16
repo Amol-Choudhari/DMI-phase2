@@ -3160,5 +3160,101 @@ class ApplicationformspdfsController extends AppController{
 		
 	}
 	
+
+	public function showcauseApplPdf(){
+
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiCustomers');
+		$this->loadModel('DmiDistricts');
+		$this->loadModel('DmiStates');
+		$this->loadModel('MCommodity');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiShowcauseNoticePdfs');
+
+		$application_type = $this->Session->read('application_type');
+
+		$customer_id = $this->Session->read('firm_id');
+		$this->set('customer_id',$customer_id);
+		
+		//get nodal office of the applied PP
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
+		$this->set('get_office',$get_office);
+
+		$pdf_date = date('d-m-Y');
+		$this->set('pdf_date',$pdf_date);
+
+		// data from DMI Firm Table
+		$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
+		$this->set('firmData',$firmData);
+
+		// data from DMI Customer Table
+		$customerData = $this->DmiCustomers->getCustomerDetails($firmData['customer_primary_id']);
+		$this->set('customerData',$customerData);
+
+		// to show firm distric name form id	
+		$firm_district_name = $this->DmiDistricts->getDistrictNameById($firmData['district']);
+		$this->set('firm_district_name',$firm_district_name);
+		
+		// to show firm state name form id	
+		$firm_state_name = $this->DmiStates->getStateNameById($firmData['state']);
+		$this->set('firm_state_name',$firm_state_name);		
+		
+		$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
+		
+		$folderName = 'showcause_notice';
+		
+		$pdfPrefix = 'SCN-';
+	
+		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+	
+		//check applicant last record version to increment		
+		$list_id = $this->DmiShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+				
+		if(!empty($list_id)){
+			$max_id = $this->DmiShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();																	
+			$last_pdf_version 	=	$max_id['pdf_version'];
+		}else{	$last_pdf_version = 0;	}
+
+		$current_pdf_version = $last_pdf_version+1; //increment last version by 1
+	
+	
+		//taking complete file name in session, which will be use in esign controller to esign the file.
+		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
+		
+		//creating filename and file path to save				
+		$file_path = '/writereaddata/DMI/temp/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+		
+		$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
+		
+		//move esigned file from temp folder to files folder
+		$file_name = $rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+		$source = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/temp/';
+		$destination = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/'.$folderName.'/';
+			
+		//calling custome function to move file
+		if($this->moveFile($file_name,$source,$destination)==1){
+				
+			//changed file path from temp to files
+			$file_path = '/writereaddata/DMI/'.$folderName.'/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+			
+			$Dmi_app_pdf_record_entity = $this->DmiShowcauseNoticePdfs->newEntity(array(
+			
+				'customer_id'=>$customer_id,
+				'pdf_file'=>$file_path,
+				'date'=>date('Y-m-d H:i:s'),
+				'pdf_version'=>$current_pdf_version,
+				'created'=>date('Y-m-d H:i:s'),
+				'modified'=>date('Y-m-d H:i:s')	
+			
+			));
+			
+			$this->DmiShowcauseNoticePdfs->save($Dmi_app_pdf_record_entity);
+			
+			$this->redirect('/customers/secondary-home');
+				
+		}
+	}
+
 }	
 ?>

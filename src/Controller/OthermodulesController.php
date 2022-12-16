@@ -1503,12 +1503,18 @@ class OthermodulesController extends AppController{
 
     public function misgradingActionsHome(){
 
+        $message = '';
+        $message_theme = '';
+        $redirect_to = '';
+
         $customer_id = $this->Session->read('firm_id');
-        
+        $this->set('customer_id',$customer_id);
+
         //Load Models
         $this->loadModel('DmiMisgradingCategories');
         $this->loadModel('DmiMisgradingLevels');
         $this->loadModel('DmiMisgradingActions');
+        $this->loadModel('DmiMisgradeActionHomeLogs');
 
         //Misgrading Category
         $misgradingCategories = $this->DmiMisgradingCategories->getMisgradingCategoriesList();
@@ -1521,6 +1527,26 @@ class OthermodulesController extends AppController{
         //Misgrading Actions
         $misgradingActions = $this->DmiMisgradingActions->getMisgradingActionList();
         $this->set('misgradingActions',$misgradingActions);
+
+        if ($this->request->is('post')) {
+            
+            //get the post value
+            $postData = $this->request->getData();
+            if($this->DmiMisgradeActionHomeLogs->saveMisgradeAction($postData) == 1){
+                $message = 'Saved';
+                $message_theme = 'success';
+                $redirect_to = '../othermodules/actionsOnMisgrading';
+            }else{
+                $message = 'Sorry, The entered Applicant Id is not Valid';
+                $message_theme = 'failed';
+                $redirect_to = '../othermodules/misgradingActionsHome'; 
+            }
+            
+        }
+
+        $this->set('message',$message);
+        $this->set('message_theme',$message_theme);
+        $this->set('redirect_to',$redirect_to);
     }
 
 

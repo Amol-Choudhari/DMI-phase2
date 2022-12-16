@@ -1241,7 +1241,7 @@
 				
 			//get flow wise tables
 			$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
-			$flow_wise_tables = $DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$this->Session->read('applTypeArray')),'order'=>'id ASC'))->toArray();
+			$flow_wise_tables = $DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IN'=>$applTypeArray/*$this->Session->read('applTypeArray')*/),'order'=>'id ASC'))->toArray();
 		
 			$i=0;
 			$appl_list_array = array();
