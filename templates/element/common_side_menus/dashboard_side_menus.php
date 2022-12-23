@@ -276,12 +276,12 @@
 								</ul>
 							</li>
 						</li>
-						<li class="nav-item has-treeview">
+						<!--<li class="nav-item has-treeview">
 							<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/surrendered" class="nav-link <?php echo $menu_add_menu; ?>">
 								<i class="nav-icon fas far fa-share"></i>
 								<p class="nav-icon-p">Surrendered Applications</p>
 							</a>
-						</li>
+						</li>-->
 						
 					<?php } if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' || 
 								$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||
@@ -326,9 +326,15 @@
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/actions_on_misgrading" class="bg-gray nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_firms_for_action" class="bg-gray nav-link">
 												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
-												<p class="nav-icon-p">Actions On Misgrading</p>
+												<p class="nav-icon-p">Misgrade Actions</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_firms_for_action" class="bg-gray nav-link">
+												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+												<p class="nav-icon-p">Suspension/Cancellation</p>
 											</a>
 										</li>
 									</li>

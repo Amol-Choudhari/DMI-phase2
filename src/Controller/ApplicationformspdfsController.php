@@ -3170,11 +3170,18 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('MCommodity');
 		$this->loadModel('MCommodityCategory');
 		$this->loadModel('DmiShowcauseNoticePdfs');
+		$this->loadModel('DmiRoOffices');
+		$this->loadModel('DmiUsers');
+		$this->loadModel('DmiUserRoles');
+
+
 
 		$application_type = $this->Session->read('application_type');
-
+		
 		$customer_id = $this->Session->read('firm_id');
 		$this->set('customer_id',$customer_id);
+		
+		$username = $this->Session->read('username');
 		
 		//get nodal office of the applied PP
 		$this->loadModel('DmiApplWithRoMappings');
@@ -3200,60 +3207,59 @@ class ApplicationformspdfsController extends AppController{
 		$firm_state_name = $this->DmiStates->getStateNameById($firmData['state']);
 		$this->set('firm_state_name',$firm_state_name);		
 		
-		$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
+		//Designation
+		$designation = $this->DmiUserRoles->getUserRoles($username);
+		$this->set('designation',$designation);
+
+		$all_data_pdf = $this->render('/Applicationformspdfs/showcauseApplPdf');
 		
-		$folderName = 'showcause_notice';
+		$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
 		
 		$pdfPrefix = 'SCN-';
 	
 		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
-	
 		//check applicant last record version to increment		
 		$list_id = $this->DmiShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-				
-		if(!empty($list_id)){
-			$max_id = $this->DmiShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();																	
-			$last_pdf_version 	=	$max_id['pdf_version'];
-		}else{	$last_pdf_version = 0;	}
 
+		if(!empty($list_id)){
+			$max_id = $this->DmiShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
+			$last_pdf_version 	=	$max_id['pdf_version'];
+		} else { 
+			$last_pdf_version = 0;	
+		}
+	
 		$current_pdf_version = $last_pdf_version+1; //increment last version by 1
-	
-	
+		
 		//taking complete file name in session, which will be use in esign controller to esign the file.
 		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
-		
-		//creating filename and file path to save				
+	
+		//creating filename and file path to save
 		$file_path = '/writereaddata/DMI/temp/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-		
+	
+		//creating filename and file path to save				
+		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';				
 		$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
+		$application_type = 1;
+		$pdfEntity = $this->DmiShowcauseNoticePdfs->newEntity(array(
+				
+			'customer_id'=>$customer_id,
+			'pdf_file'=>$file_path,
+			'date'=>date('Y-m-d H:i:s'),
+			'pdf_version'=>$current_pdf_version,
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s')	
 		
-		//move esigned file from temp folder to files folder
-		$file_name = $rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-		$source = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/temp/';
-		$destination = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/'.$folderName.'/';
-			
-		//calling custome function to move file
-		if($this->moveFile($file_name,$source,$destination)==1){
-				
-			//changed file path from temp to files
-			$file_path = '/writereaddata/DMI/'.$folderName.'/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-			
-			$Dmi_app_pdf_record_entity = $this->DmiShowcauseNoticePdfs->newEntity(array(
-			
-				'customer_id'=>$customer_id,
-				'pdf_file'=>$file_path,
-				'date'=>date('Y-m-d H:i:s'),
-				'pdf_version'=>$current_pdf_version,
-				'created'=>date('Y-m-d H:i:s'),
-				'modified'=>date('Y-m-d H:i:s')	
-			
-			));
-			
-			$this->DmiShowcauseNoticePdfs->save($Dmi_app_pdf_record_entity);
-			
-			$this->redirect('/customers/secondary-home');
-				
-		}
+		));
+						
+		$this->DmiShowcauseNoticePdfs->save($pdfEntity);
+		
+		$applicationType = $this->Mastertablecontent->applicationTypeById($application_type);
+		//to preview application
+		$this->callTcpdf($all_data_pdf,'I',$customer_id,$applicationType);//on 23-01-2020 with preview mode
+		$this->callTcpdf($all_data_pdf,'F',$customer_id,$applicationType);//on 23-01-2020 with save mode
+		$this->redirect('/dashboard/home');
+
+
 	}
 
 }	

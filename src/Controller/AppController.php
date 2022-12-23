@@ -305,36 +305,38 @@ class AppController extends Controller
 
         $msg_content = '
 			<html lang="en"><head>
-			<meta charset="utf-8">
-			<meta http-equiv="X-UA-Compatible" content="IE=edge">
-			<meta http-equiv="Content-Language" content="en">
-			<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-			<title>'.$msg_txt.'</title>
-			<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
-			<meta name="description" content="'.$msg_txt.'">
-			<meta name="msapplication-tap-highlight" content="no">
-			<link href="'.$homeUrl.'/favicon.ico" type="image/x-icon" rel="icon"><link href="'.$homeUrl.'/favicon.ico" type="image/x-icon" rel="shortcut icon"><meta charset="utf-8"><link rel="stylesheet" href="'.$homeUrl.'/css/adminlte.min.css"><link rel="stylesheet" href="'.$homeUrl.'/css/all.min.css"><style type="text/css">/* Chart.js */
-			@-webkit-keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}@keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}.chartjs-render-monitor{-webkit-animation:chartjs-render-animation 0.001s;animation:chartjs-render-animation 0.001s;}.error_div{background:#dccac8;height:100vh;display:flex;align-items:center;font-family:system-ui;}.card-header{text-transform:initial;background:#eb5d57;color:white;font-size:17px;}#error_icon{font-size:32px;color:#eb5d57;}.btn_continue{background:#eb5d57;}.font_gainsboro{color:#5c5c5c;}</style></head>
-			<body>
-				<link rel="stylesheet" href="'.$homeUrl.'/css/element/session_expired.css"><div class="container-fluid error_div">
-				<div class="card col-md-4 mx-auto p-0">
-					<div class="card-header">
-						'.$msg_title.'
+				<meta charset="utf-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta http-equiv="Content-Language" content="en">
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+				<title>'.$msg_txt.'</title>
+				<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+				<meta name="description" content="'.$msg_txt.'">
+				<meta name="msapplication-tap-highlight" content="no">
+				<link href="'.$homeUrl.'/favicon.ico" type="image/x-icon" rel="icon"><link href="'.$homeUrl.'/favicon.ico" type="image/x-icon" rel="shortcut icon"><meta charset="utf-8"><link rel="stylesheet" href="'.$homeUrl.'/css/adminlte.min.css"><link rel="stylesheet" href="'.$homeUrl.'/css/all.min.css"><style type="text/css">/* Chart.js */
+				@-webkit-keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}@keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}.chartjs-render-monitor{-webkit-animation:chartjs-render-animation 0.001s;animation:chartjs-render-animation 0.001s;}.error_div{background:#dccac8;height:100vh;display:flex;align-items:center;font-family:system-ui;}.card-header{text-transform:initial;background:#eb5d57;color:white;font-size:17px;}#error_icon{font-size:32px;color:#eb5d57;}.btn_continue{background:#eb5d57;}.font_gainsboro{color:#5c5c5c;}</style></head>
+				<body> 
+					<link rel="stylesheet" href="'.$homeUrl.'/css/element/session_expired.css">
+					<div class="container-fluid error_div">
+						<div class="card col-md-4 mx-auto p-0">
+							<div class="card-header">'.$msg_title.'</div>
+							<div class="card-body">
+								<table class="table table-borderless font-weight-bold font_gainsboro">
+									<tbody>
+										<tr>
+											<td rowspan="2" class="align-top"><i class="fa fa-'.$msg_icon.'" id="error_icon"></i></td>
+											<td>'.$msg_txt.'</td>
+										</tr>
+										<tr>
+											<td>Click "Continue" to redirect to the Homepage.</td>
+										</tr>
+									</tbody>
+								</table>
+								<a href="/DMI" class="btn btn_continue float-right text-white font-weight-bold">CONTINUE</a>
+							</div>
+						</div>
 					</div>
-					<div class="card-body">
-						<table class="table table-borderless font-weight-bold font_gainsboro">
-							<tbody><tr>
-								<td rowspan="2" class="align-top"><i class="fa fa-'.$msg_icon.'" id="error_icon"></i></td>
-								<td>'.$msg_txt.'</td>
-							</tr>
-							<tr>
-								<td>Click "Continue" to redirect to the Homepage.</td>
-							</tr>
-						</tbody></table>
-						<a href="/DMI" class="btn btn_continue float-right text-white font-weight-bold">CONTINUE</a></div>
-					</div>
-				</div>
-			</body>
+				</body>
 			</html>';
 
 		echo $msg_content;

@@ -29,6 +29,7 @@
 											<th>Applicant ID</th>
 											<th>Firm Name</th>
 											<th>Firm Contact</th>
+											<th>Commodity</th>
 											<th>Certification Type</th>
 											<th>Take Action</th>
 										</tr>
@@ -47,7 +48,13 @@
 														<?php echo "<span class='badge'>Email:</span>".base64_decode($eachdata['email']); ?>
 													</td>
 													<td><?php echo $eachdata['certificate_type']; ?></td>
-													<td><?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetch_action_id', $eachdata['id']),array('class'=>'fas fa-arrow-right','title'=>'Edit')); ?></td>
+													<td><?php echo $eachdata['category_name']; ?></td>
+													<td>
+														<?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForAction', $eachdata['id']),array('class'=>'fas fa-arrow-right','title'=>'Go To Action Home')); ?>
+														|
+														<?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForShowcause', $eachdata['id']),array('class'=>'fas fa-exclamation-circle','title'=>'Send Show Cause Notice')); ?>
+
+													</td>
 												</tr>
 											<?php $sr_no++; } 
 										?>

@@ -121,7 +121,11 @@
 						//like position/transfer roles RO to Dy ama or Dy ama to RO etc
 						($last_comment_by == $_SESSION['username'] && 
 						((($from_user=='dy_ama' || $from_user=='jt_ama' || $from_user=='ama') && $_SESSION['current_level']=='level_3')||
-						($from_user=='ro' && $_SESSION['current_level']=='level_4')))			
+						($from_user=='ro' && $_SESSION['current_level']=='level_4'))) ||
+
+						//applied on 22-12-2022 by Amol, to check valid Ro if last RO changed in between process
+						//to show commenting options
+						(!empty($check_valid_ro) && $to_user=='ro')						
 						){ ?> 
 
 						<?php if($check_user_role['ama'] == 'yes' || ($check_user_role['jt_ama'] == 'yes' && $ca_bevo_applicant == 'yes' && $_SESSION['application_type']==1)){ //added cond. on 22-11-2021 for appl. type = 1 ?>

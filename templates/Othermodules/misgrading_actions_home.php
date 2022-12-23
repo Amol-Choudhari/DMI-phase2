@@ -10,89 +10,155 @@
 					</ol>
 				</div>
 			</div>
-	  </div>
+	  	</div>
 	</div>
-  <section class="content form-middle ">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-12">
-          <?php echo $this->Form->create(null, array('id' => 'misgrading_action_home')); ?>
-            <div class="card card-danger">
-              <div class="card-header"><h3 class="card-title">Misgrading Actions</h3></div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-3">
-                    <div class="form-group">
-                      <label class="col-form-label">Applicant ID <span class="cRed">*</span></label>
-                      <?php echo $this->Form->control('customer_id', array('type'=>'text','id'=>'customer_id','value'=>$customer_id, 'class'=>'form-control', 'label'=>false,'readonly'=>true)); ?>
-                    </div>
-                  </div>
-                  <div class="col-3">
-                    <div class="form-group">
-                      <label class="col-form-label">Misgrading Category <span class="cRed">*</span></label>
-                      <?php echo $this->Form->control('misgrade_category', array('type'=>'select','empty'=>'-- Select Misgrading Category --','id'=>'misgrade_category', 'options'=>$misgradingCategories, 'label'=>false, 'class'=>'form-control')); ?>
-                      <span id="error_misgrade_category" class="error invalid-feedback"></span>
-                    </div>
-                  </div>
-                  <div class="col-3">
-                    <div class="form-group">
-                      <label class="col-form-label">Misgrading Level <span class="cRed">*</span></label>
-                      <?php echo $this->Form->control('misgrade_level', array('type'=>'select','empty'=>'-- Select Misgrading Level --','id'=>'misgrade_level', 'options'=>$misgradingLevels, 'label'=>false, 'class'=>'form-control')); ?>
-                      <span id="error_misgrade_level" class="error invalid-feedback"></span>
-                    </div>
-                  </div>
-                  <div class="col-3">
-                    <div class="form-group">
-                      <label class="col-form-label">Action To Be Taken <span class="cRed">*</span></label>
-                      <?php echo $this->Form->control('misgrade_action', array('type'=>'select','empty'=>'-- Select Misgrading Action --','id'=>'misgrade_action', 'options'=>$misgradingActions, 'label'=>false, 'class'=>'form-control')); ?>
-                      <span id="error_misgrade_action" class="error invalid-feedback"></span>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="form-group">
-                      <label class="col-form-label">Reason <span class="cRed">*</span></label>
-                      <?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'label'=>false, 'class'=>'form-control')); ?>
-                      <span id="error_reason" class="error invalid-feedback"></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <?php echo $this->Form->submit('Submit', array('name'=>'take_action','id'=>'take_action','label'=>false,'class'=>'float-left btn btn-success')); ?>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Launch demo modal</button>
-              </div>
-            </div>
-          <?php echo $this->Form->end(); ?>
-        </div>
-      </div>
-    </div>
-  </section>
+	<section class="content form-middle">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<?php echo $this->Form->create(null, array('id' => 'misgrading_action_home')); ?>
+						<div class="card card-danger">
+							<div class="card-header"><h3 class="card-title">Misgrading Actions</h3></div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-6">
+										<div class="card">
+											<div class="card-header"><h3 class="card-title">Firm Details</h3></div>
+											<div class="card-body">
+												<dl class="row">
+													<dt class="col-sm-4">Firm ID: </dt>
+													<dd class="col-sm-8"><?php echo $customer_id; ?></dd>
+													<dt class="col-sm-4">Firm Name: </dt>
+													<dd class="col-sm-8"><?php echo $firmDetails['firm_name']; ?></dd>
+													<dt class="col-sm-4">Category: </dt>
+													<dd class="col-sm-8"><?php echo $category; ?></dd>
+													<dt class="col-sm-4">Commodity</dt>
+													<dd class="col-sm-8"><?php echo implode(',', $sub_commodity_value); ?></dd>
+												</dl>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-3">
+										<div class="form-group">
+											<label class="col-form-label">Misgrading Category <span class="cRed">*</span></label>
+											<?php echo $this->Form->control('misgrade_category', array('type'=>'select','empty'=>'-- Select Misgrading Category --','id'=>'misgrade_category','value'=>$misCatId,'options'=>$misgradingCategories, 'label'=>false, 'class'=>'form-control')); ?>
+											<span id="error_misgrade_category" class="error invalid-feedback"></span>
+										</div>
+										<div class="form-group">
+											<label class="col-form-label">Action To Be Taken <span class="cRed">*</span></label>
+											<?php echo $this->Form->control('misgrade_action', array('type'=>'select','empty'=>'-- Select Misgrading Action --','id'=>'misgrade_action', 'value'=>$misActId,'options'=>$misgradingActions, 'label'=>false, 'class'=>'form-control')); ?>
+											<span id="error_misgrade_action" class="error invalid-feedback"></span>
+										</div>
+									</div>
+
+									<div class="col-3">
+										<div class="form-group">
+											<label class="col-form-label">Misgrading Level <span class="cRed">*</span></label>
+											<?php echo $this->Form->control('misgrade_level', array('type'=>'select','empty'=>'-- Select Misgrading Level --','id'=>'misgrade_level', 'value'=>$misLvlId,'options'=>$misgradingLevels, 'label'=>false, 'class'=>'form-control')); ?>
+											<span id="error_misgrade_level" class="error invalid-feedback"></span>
+										</div>
+										<div class="form-group">
+											<label class="col-form-label">Period <span class="cRed">*</span></label>
+											<?php echo $this->Form->control('time_period', array('type'=>'select','empty'=>'-- Select Period --','id'=>'time_period', 'value'=>$periodId,'options'=>$timePeriod, 'label'=>false, 'class'=>'form-control')); ?>
+											<span id="error_misgrade_action" class="error invalid-feedback"></span>
+										</div>
+									</div>
+									<div class="col-md-6" id="actions_div">
+										<div class="card">
+											<div class="card-header"><h3 class="card-title">Actions</h3></div>
+											<div class="card-body">
+												<dl class="row">
+													<dt class="col-sm-4">Firm ID: </dt>
+													<dd class="col-sm-8"><?php echo $customer_id; ?></dd>
+
+													<dt class="col-sm-4">Misgrade Category: </dt>
+													<dd class="col-sm-8"><?php echo $misCatName; ?> <br><label class="badge">(<?php echo $misCatDscp; ?>)</label></dd>
+
+													<dt class="col-sm-4">Misgrade Level: </dt>
+													<dd class="col-sm-8"><?php echo $misLvlName;?></dd>
+
+													<dt class="col-sm-4">Action: </dt>
+													<dd class="col-sm-8"><?php echo $misActName; ?></dd>
+
+													<dt class="col-sm-4">Period: </dt>
+													<dd class="col-sm-8"><?php echo $periodMonth; ?></dd>
+												</dl>
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="form-group">
+											<label class="col-form-label">Reason <span class="cRed">*</span></label>
+											<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
+											<span id="error_reason" class="error invalid-feedback"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer">
+								<?php 
+									if (!empty($status)){
+										if ($status == 'saved') {
+											echo $this->Form->submit('Update', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
+											echo $this->Form->control('Final Submit',array('type'=>'button','name'=>'final_submit','class'=>'btn btn-primary ml-2', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
+										} 
+									} else {
+										echo $this->Form->submit('Save', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
+									}
+								?>
+							</div>
+						</div>
+					<?php echo $this->Form->end(); ?>
+				</div>
+			</div>
+		</div>
+	</section>
 </div>
 
-
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="col-md-3 d-inline">Application PDF: </div>
-        <div class="col-md-4 d-inline"><a target="blank" href="../applicationformspdfs/showcauseApplPdf" >Preview</a></div><br>
-        <div class="clearfix"></div>
-        <?php echo $this->Form->control('declaration_check_box_wo_esign', array('type'=>'checkbox', 'id'=>'declaration_check_box_wo_esign', 'class'=>'modal-checkbox','label'=>$message_wo_esign, 'escape'=>false)); ?>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="okBtn_wo_esign" class="modal-button btn btn-success mt-2 float-right mr-2" name="final_submit"><i class="fa fa-check-circle"></i> Submit</button>
-      </div>
-    </div>
-  </div>
+<div class="modal fade" id="confirm_action" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body">
+				<div class="col-md-3 d-inline">Show Cause Notice PDF: </div>
+				<div class="col-md-4 d-inline"><a target="blank" href="../applicationformspdfs/showcauseApplPdf" >Preview</a></div><br>
+				<table class="mt-2">
+					<tbody>
+						<tr>
+							<td>Applicant ID : </td>
+							<td><?php echo $customer_id; ?></td>
+						</tr>
+						<tr>
+							<td>Category:</td>
+							<td><?php echo $misCatName;?> (<?php echo $misCatDscp; ?>)</td>
+						</tr>
+						<tr>
+							<td>Level :</td>
+							<td><?php echo $misLvlName; ?></td>
+						</tr>
+						<tr>
+							<td>Action :</td>
+							<td><?php echo $misActName; ?></td>
+						</tr>
+						<tr>
+							<td>Period : </td>
+							<td><?php echo $periodMonth; ?></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="clearfix"></div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-success" name="final_submit"><i class="fa fa-check-circle"></i> Submit</button>
+				<button class="btn btn-danger" data-dismiss="modal"><i class="far fa-times-circle"></i> Close</button>
+			</div>
+		</div>
+	</div>
 </div>
 
+<input type="hidden" id="status_id" value="<?php echo $status; ?>">
 <?php echo $this->Html->script('othermodules/misgrading_actions_home') ?>

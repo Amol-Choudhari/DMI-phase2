@@ -118,21 +118,17 @@ class CommonController extends AppController {
 
 			#Random Salt 
 			$randsalt = $this->Session->read('randSalt');
-
-			#change passsword data
-			$changepassdata = $this->request->getData();
-
+			
 			#username 
 			$username = $this->Session->read('username');
-
-			//get user type
+			
+			#get user type
 			$user_type = $this->Customfunctions->getUserType($username);
 
-			
 			if (empty($user_type)) {
 
-				$message_theme = 'failed';
 				$message = 'Sorry...User Id entered is not valid';
+				$message_theme = 'failed';
 				$redirect_to = 'change_password';
 
 			} else {
@@ -183,16 +179,12 @@ class CommonController extends AppController {
 					$message_theme = 'success';
 					$redirect_to = 'change_password';
 				}
-
 			}
 			
-			
-
 			// set variables to show popup messages from view file
 			$this->set('message_theme', $message_theme);
 			$this->set('message', $message);
 			$this->set('redirect_to', $redirect_to);
-
 
 			if ($message != null) {
 				$this->render('/element/message_boxes');
@@ -214,12 +206,13 @@ class CommonController extends AppController {
 		$this->authenticateUser();
 		$username = $this->Session->read('username');
 
-		//check the user type
+		#check the user type
 		$userType = $this->Customfunctions->getUserType($username);
 
 		#get the specific action log table
 		$getTable = $this->getSpecificTable();
 		$actionLogTable = $getTable['action_log_table'];
+
 		#load the model
 		$this->loadModel($actionLogTable);
 
@@ -252,12 +245,13 @@ class CommonController extends AppController {
 
 		$username = $this->getRequest()->getSession()->read('username');
 
-		//check the user type
+		#check the user type
 		$userType = $this->Customfunctions->getUserType($username);
 		
 		#get the specific log table
 		$getTable = $this->getSpecificTable();
 		$logsTable = $getTable['log_table'];
+
 		#load the model
 		$this->loadModel($logsTable);
 
@@ -292,12 +286,13 @@ class CommonController extends AppController {
 
 		if (!empty($username)) {
 
-			//check the user type
+			#check the user type
 			$userType = $this->Customfunctions->getUserType($username);
 
 			#get the specific log table
 			$getTable = $this->getSpecificTable();
 			$logsTable = $getTable['log_table'];
+
 			#load the model
 			$this->loadModel($logsTable);
 			
@@ -315,6 +310,7 @@ class CommonController extends AppController {
 				$fetch_last_id = $fetch_last_id_query['id'];
 
 				$UserLogsEntity = $this->$logsTable->newEntity(array('id' => $fetch_last_id,'time_out' => date('H:i:s')));
+				
 				$this->$logsTable->save($UserLogsEntity);
 				$this->Authentication->browserLoginStatus($username,null);
 				$this->Session->destroy();
@@ -357,7 +353,7 @@ class CommonController extends AppController {
 
 		} elseif ($userType == 'Secondary') {
 
-			$log_table = 'DmiCustomerLogs';						#user log table
+			$log_table = 'DmiCustomerLogs';					#user log table
 			$action_log_table = 'DmiFirmActionLogs'; 		#action log table
 			$password_table = 'DmiFirms';					#password saved table
 
@@ -368,7 +364,7 @@ class CommonController extends AppController {
 			$password_table = 'DmiUsers';					#password saved table
 		}
 
-		return $table = array('log_table' => $log_table, 'action_log_table' => $action_log_table,'password_table' => $password_table);
+		return array('log_table' => $log_table, 'action_log_table' => $action_log_table,'password_table' => $password_table);
 	}
 
 

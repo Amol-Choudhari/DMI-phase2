@@ -11,6 +11,10 @@ class DmiMisgradingLevelsTable extends Table{
 	public function getMisgradingLevelsList(){
 		return $this->find('list', array('keyField'=>'id','valueField' => 'misgrade_level_name', 'conditions' => array('OR' => array('delete_status IS NULL', 'delete_status =' => 'no')), 'order' => array('id')))->toArray();
 	}
+
+	public function getMisgradingLevel($id){
+		return $this->find('all')->where(['id' => $id,'OR' => [['delete_status IS NULL'], ['delete_status' => 'N']]])->first();
+	}
 }
 
 ?>

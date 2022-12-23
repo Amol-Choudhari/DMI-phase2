@@ -577,10 +577,8 @@ class UsersController extends AppController {
 	}
 
 
-	////////////////////////////////
-	//// USER MANAGEMENT METHODS ///
-	////////////////////////////////
-
+	///====================================================| USER MANAGEMENT METHODS |========================================================///
+	
 	// AUTHENTICATE USER
 	public function authenicateUser() {
 
@@ -2134,9 +2132,8 @@ class UsersController extends AppController {
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////REPLICA / 15 DIGIT / ECODE METHODS /////////////////////////////////////////////////////////////////////////
 
-
+	///====================================================| REPLICA * METHODS |========================================================///
 	// REPLICA ALLOTED LIST
 	// @AUTHOR : AKASH THAKRE
 	// DATE : 10-08-2021
@@ -2146,7 +2143,6 @@ class UsersController extends AppController {
 		$this->viewBuilder()->setLayout('admin_dashboard');
 		$this->Customfunctions->replicaAllotedListCall('replica');
 	}
-
 
 
 	// ALLOTED 15-DIGIT LIST
@@ -2160,7 +2156,6 @@ class UsersController extends AppController {
 	}
 
 
-
 	// ALLOTED E-CODE LIST
 	// @AUTHOR : AMOL CHOUDHARI
 	// DATE : 26-11-2021
@@ -2170,7 +2165,6 @@ class UsersController extends AppController {
 		$this->viewBuilder()->setLayout('admin_dashboard');
 		$this->Customfunctions->replicaAllotedListCall('ECode');
 	}
-
 
 
 	// REPLICA TRANSACTION
@@ -2271,7 +2265,6 @@ class UsersController extends AppController {
 		}
 
 	}
-
 
 
 }

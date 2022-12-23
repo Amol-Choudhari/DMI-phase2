@@ -1,4 +1,10 @@
 
+$('#actions_div').hide();
+
+var status_id = $('#status_id').val();
+if (status_id != null && status_id == 'saved') {
+    $('#actions_div').show();
+}
 
 $('#save').on('shown.bs.modal', function () {
     $('#myInput').trigger('focus')
@@ -6,7 +12,7 @@ $('#save').on('shown.bs.modal', function () {
 
 
 //call to login validations
-$('#take_action').click(function (e) {
+$('#save_action').click(function (e) {
   
     if (validation() == false) { 
         e.preventDefault();

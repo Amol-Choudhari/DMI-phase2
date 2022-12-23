@@ -1757,9 +1757,9 @@ class CustomfunctionsComponent extends Component {
 						$get_grant_month = date('m',strtotime($cert_grant_date));
 						
 						if ($get_grant_month > 9) {//if grant in oct,nov or dec then grant from 1st of next year
-							$renewa_dates_present ='';
+							$renewa_dates_present ='yes';//swapped '' to 'yes' on 22-12-2022
 						} else {
-							$renewa_dates_present ='yes';
+							$renewa_dates_present ='';//swapped 'yes' to '' on 22-12-2022
 						}
 						
 					} else {
@@ -1929,9 +1929,9 @@ class CustomfunctionsComponent extends Component {
 						$get_grant_month = date('m',strtotime($cert_grant_date));
 						
 						if ($get_grant_month > 9) {//if grant in oct,nov or dec then grant from 1st of next year
-							$renewa_dates_present ='';
+							$renewa_dates_present ='yes';//swapped '' to 'yes' on 22-12-2022
 						} else {
-							$renewa_dates_present ='yes';
+							$renewa_dates_present ='';//swapped 'yes' to '' on 22-12-2022
 						}
 						
 					} else {

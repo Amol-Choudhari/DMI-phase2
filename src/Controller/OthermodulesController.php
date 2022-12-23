@@ -1466,7 +1466,7 @@ class OthermodulesController extends AppController{
     // @AUTHOR : AKASH THAKRE
     // DATE : 09-12-2022
 
-    public function actionsOnMisgrading(){
+    public function listOfFirmsForAction(){
 
         //Load Models
         $this->loadModel('DmiApplWithRoMappings');
@@ -1478,24 +1478,34 @@ class OthermodulesController extends AppController{
         //get posted office id
         $postedOffice = $this->DmiUsers->getPostedOffId($username);
         
-        $underThisOffice =   $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type
+        $underThisOffice =   $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name
                                              FROM dmi_grant_certificates_pdfs AS dg 
                                              INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
                                              INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
+                                             INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
                                              INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
-                                             WHERE dd.office_id='$postedOffice'")->fetchAll('assoc');
+                                             WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
         
         $this->set('underThisOffice',$underThisOffice);
 
     }
 
     //for fetching the id to edit
-	public function fetchActionId($id) {
+	public function fetchIdForAction($id) {
 
         $this->loadModel('DmiGrantCertificatesPdfs');
         $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
 		$this->Session->write('firm_id',$firm_details['customer_id']);
 		$this->redirect(array('controller'=>'othermodules','action'=>'misgrading_actions_home'));
+	}
+
+    //for fetching the id to edit
+	public function fetchIdForShowcause($id) {
+
+        $this->loadModel('DmiGrantCertificatesPdfs');
+        $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
+		$this->Session->write('firm_id',$firm_details['customer_id']);
+		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
 	}
 
 
@@ -1515,41 +1525,186 @@ class OthermodulesController extends AppController{
         $this->loadModel('DmiMisgradingLevels');
         $this->loadModel('DmiMisgradingActions');
         $this->loadModel('DmiMisgradeActionHomeLogs');
+        $this->loadModel('DmiFirms');
+        $this->loadModel('MCommodityCategory');
+        $this->loadModel('MCommodity');
+        $this->loadModel('DmiMisgradeTimePeriod');
 
+        //Firm Details
+        $firmDetails = $this->DmiFirms->firmDetails($customer_id); 
+        $category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
+
+        $sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
+		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+		
         //Misgrading Category
         $misgradingCategories = $this->DmiMisgradingCategories->getMisgradingCategoriesList();
-        $this->set('misgradingCategories',$misgradingCategories);
 
         //Misgrading Levels 
         $misgradingLevels = $this->DmiMisgradingLevels->getMisgradingLevelsList();
-        $this->set('misgradingLevels',$misgradingLevels);
 
         //Misgrading Actions
         $misgradingActions = $this->DmiMisgradingActions->getMisgradingActionList();
-        $this->set('misgradingActions',$misgradingActions);
 
-        if ($this->request->is('post')) {
+        //Time Period
+        $timePeriod = $this->DmiMisgradeTimePeriod->getTimePeriodList();
+
+        //Status
+        $misgradeStatus = $this->DmiMisgradeActionHomeLogs->getInformation($customer_id);
+        
+        if (!empty($misgradeStatus)) {
+
+            //Misgrade Category Info
+            $misgrade_category = $this->DmiMisgradingCategories->getMisgradingCategory($misgradeStatus['misgrade_category']);
+            $misCatId   = $misgrade_category['id'];
+            $misCatName = $misgrade_category['misgrade_category_name'];
+            $misCatDscp = $misgrade_category['misgrade_category_dscp'];
+
+            //Misgrade Category Info
+            $misgrade_level = $this->DmiMisgradingLevels->getMisgradingLevel($misgradeStatus['misgrade_level']);
+            $misLvlId = $misgrade_level['id'];
+            $misLvlName = $misgrade_level['misgrade_level_name'];
+
+            //Misgrade Category Info
+            $misgrade_action = $this->DmiMisgradingActions->getMisgradingAction($misgradeStatus['misgrade_action']);
+            $misActId = $misgrade_action['id'];
+            $misActName = $misgrade_action['misgrade_action_name'];
+
+            //Misgrade Category Info
+            $time_period = $this->DmiMisgradeTimePeriod->getTimePeriod($misgradeStatus['time_period']);
+            $periodId = $time_period['time_period'];
+            $periodMonth = $time_period['month'];
+
+            $reason = $misgradeStatus['reason'];
+            $status = $misgradeStatus['status'];
+
+          
+        } else {
+            $misCatId = ''; $misCatName = ''; $misCatDscp = '';
+            $misLvlId = ''; $misActId = ''; $periodMonth = '';
+            $reason = '';   $status = ''; $misLvlName = '';
+            $misActName = ''; $periodId = '';
+        }
             
-            //get the post value
-            $postData = $this->request->getData();
+       
+
+        //get the post value
+        $postData = $this->request->getData();
+       
+        if (null !== $this->request->getData('save_action')) {
+
             if($this->DmiMisgradeActionHomeLogs->saveMisgradeAction($postData) == 1){
                 $message = 'Saved';
                 $message_theme = 'success';
-                $redirect_to = '../othermodules/actionsOnMisgrading';
+                $redirect_to = '../othermodules/misgradingActionsHome';
             }else{
                 $message = 'Sorry, The entered Applicant Id is not Valid';
                 $message_theme = 'failed';
                 $redirect_to = '../othermodules/misgradingActionsHome'; 
             }
             
+        } elseif (null !== $this->request->getData('final_submit')) {
+            
+            $final_submit_call_result =  $this->DmiMisgradeActionHomeLogs->applicationFinalSubmit($postData);
+
+            if ($final_submit_call_result == true) {
+
+                $this->Customfunctions->saveActionPoint('Application Final Submit', 'Success'); #Action
+                $message = $firm_type_text.' - Final submitted successfully ';
+                $message_theme = 'success';
+
+                //For Chemist i.e Apllication Type 4 then redirect to Chemist Home after Final Submit -> Akash [29-09-2021].
+                if ($application_type == 4) {
+                    $redirect_to = '../chemist/home';
+                } elseif ($authRegFirm=='yes') {
+                    $redirect_to = '../authprocessedoldapp/home';
+                } else {
+                    $redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
+                }
+
+            } else {
+                
+                $this->Customfunctions->saveActionPoint('Application Final Submit', 'Failed'); #Action
+                $message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
+                $message_theme = 'failed';
+                $redirect_to = '../application/application-for-certificate';
+            }
+        
         }
 
-        $this->set('message',$message);
-        $this->set('message_theme',$message_theme);
-        $this->set('redirect_to',$redirect_to);
+        
+        $this->set(compact('firmDetails','category','sub_commodity_value'));                             #Set the Firm Details
+        $this->set(compact('misgradingActions','misgradingLevels','misgradingCategories','timePeriod')); #Set the Dropdowns
+        $this->set(compact('misCatId','misCatName','misCatDscp','misLvlName','misActName'));             #Set the Saved Misgrade Category Values
+        $this->set(compact('misLvlId','misActId','periodMonth','reason','status','periodId'));                      #Set the Saved Values
+        $this->set(compact('message','message_theme','redirect_to'));                                    #Set the Message Variables
+
     }
 
 
+
+    public function showcauseHome(){
+
+        $message = '';
+        $message_theme = '';
+        $redirect_to = '';
+
+        $reason  = '';
+        $status = '';
+
+        //Load Model    
+        $this->loadModel('DmiFirms');
+        $this->loadModel('MCommodityCategory');
+        $this->loadModel('MCommodity');
+        $this->loadModel('DmiShowcauseLogs');
+        $this->loadModel('DmiShowcauseNoticePdfs');
+
+        $customer_id = $this->Session->read('firm_id');
+        $this->set('customer_id',$customer_id);
+
+         //Firm Details
+         $firmDetails = $this->DmiFirms->firmDetails($customer_id); 
+         $category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
+ 
+         $sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
+         $sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+        
+         $statusofscn = $this->DmiShowcauseLogs->getInformation($customer_id);
+
+         if (!empty($statusofscn)) {
+
+            $reason = $statusofscn['reason'];
+            $status = $statusofscn['status'];
+        } 
+
+        //post values
+        if ($this->request->is('post')) {
+
+            //get the post value
+            $postData = $this->request->getData();
+           
+            if (null !== $this->request->getData('save_action')) {
+
+                if($this->DmiShowcauseLogs->saveLog($postData) == 1){
+                    $message = 'Saved the details of Show Cause Notice Succesfully.';
+                    $message_theme = 'success';
+                    $redirect_to = '../othermodules/showcauseHome';
+                }else{
+                    $message = 'Sorry, The details could not bed saved. Try Again';
+                    $message_theme = 'failed';
+                    $redirect_to = '../othermodules/showcauseHome'; 
+                }
+
+            } elseif (null !== $this->request->getData('final_submit')) {
+
+            }
+        }
+
+
+        $this->set(compact('firmDetails','category','sub_commodity_value'));
+        $this->set(compact('reason','status'));
+        $this->set(compact('message','message_theme','redirect_to'));
+    }
 
 
 
