@@ -1352,10 +1352,16 @@ class CustomersController extends AppController {
         //To check if the application is surrendered  and set the custom message - Akash[06-12-2022]
         $isSurrender =  $this->Customfunctions->isApplicationSurrendered($customer_id);
         $this->set('isSurrender',$isSurrender);
-
+        
+        //Check if the Marked for the Action
         $this->loadModel('DmiSurrenderGrantCertificatePdfs');
         $surrender_grant_certificate = $this->DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
         $this->set('surrender_grant_certificate', $surrender_grant_certificate);
+
+        $this->loadModel('DmiMisgradeActionFinalSubmits');
+        $actionSubmitted = $this->DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
+        $this->set('actionSubmitted', $actionSubmitted);
+        
 
 		
     }

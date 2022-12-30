@@ -12,18 +12,19 @@
 			</div>
 	  	</div>
 	</div>
+	
 	<section class="content form-middle">
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-12">
 					<?php echo $this->Form->create(null, array('id' => 'misgrading_action_home')); ?>
 						<div class="card card-danger">
-							<div class="card-header"><h3 class="card-title">Misgrading Actions</h3></div>
+							<div class="card-header"><h3 class="card-title-new">Misgrading Actions</h3></div>
 							<div class="card-body">
 								<div class="row">
 									<div class="col-md-6">
 										<div class="card">
-											<div class="card-header"><h3 class="card-title">Firm Details</h3></div>
+											<div class="card-header bg-lightblue"><h3 class="card-title">Firm Details</h3></div>
 											<div class="card-body">
 												<dl class="row">
 													<dt class="col-sm-4">Firm ID: </dt>
@@ -66,7 +67,7 @@
 									</div>
 									<div class="col-md-6" id="actions_div">
 										<div class="card">
-											<div class="card-header"><h3 class="card-title">Actions</h3></div>
+											<div class="card-header bg-olive"><h3 class="card-title">Actions</h3></div>
 											<div class="card-body">
 												<dl class="row">
 													<dt class="col-sm-4">Firm ID: </dt>
@@ -96,16 +97,17 @@
 									</div>
 								</div>
 							</div>
-							<div class="card-footer">
+							<div class="card-footer cardFooterBackground">
 								<?php 
 									if (!empty($status)){
 										if ($status == 'saved') {
 											echo $this->Form->submit('Update', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
-											echo $this->Form->control('Final Submit',array('type'=>'button','name'=>'final_submit','class'=>'btn btn-primary ml-2', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
+											echo $this->Form->control('Final Submit',array('type'=>'button','name'=>'take_action','class'=>'btn btn-primary ml-2 float-left', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
 										} 
 									} else {
 										echo $this->Form->submit('Save', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 									}
+									echo $this->Html->link('Cancel', array('controller' => 'othermodules', 'action'=>'misgrading_home'),array('class'=>'add_btn btn btn-danger float-right'));
 								?>
 							</div>
 						</div>
@@ -153,7 +155,7 @@
 				<div class="clearfix"></div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-success" name="final_submit"><i class="fa fa-check-circle"></i> Submit</button>
+				<button tclass="btn btn-success" id="final_submit" ><i class="fa fa-check-circle"></i> Submit</button>
 				<button class="btn btn-danger" data-dismiss="modal"><i class="far fa-times-circle"></i> Close</button>
 			</div>
 		</div>
@@ -161,4 +163,5 @@
 </div>
 
 <input type="hidden" id="status_id" value="<?php echo $status; ?>">
+<input type="hidden" id="customer_id_value" value="<?php echo $customer_id; ?>">
 <?php echo $this->Html->script('othermodules/misgrading_actions_home') ?>

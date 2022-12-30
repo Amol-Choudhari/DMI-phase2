@@ -46,7 +46,13 @@
 				echo $this->Html->script('sha512.min');
 				echo $this->Html->script('no_back');
 				echo $this->Html->script('cwdialog');
-				echo $this->Html->script('ckeditor/ckeditor', array('inline' => false));
+				
+				// The CK EDITOR script is now applied conditionaly only - Akash [27-12-2022]
+				$get_action = $this->request->getParam('action');
+				if($get_action == 'addPage' || $get_action == 'editPage'){
+					echo $this->Html->script('ckeditor/ckeditor', array('inline' => false));
+				}
+
 				echo $this->Html->script('../chosen-select/chosen.jquery');
 				echo $this->Html->script('../multiselect/jquery.multiselect');
 				echo $this->Html->script('toastr.min');

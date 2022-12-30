@@ -22,6 +22,32 @@ $('#save_action').click(function (e) {
 });
 
 
+$("#final_submit").click(function(){
+
+    var customer_id = $("#customer_id_value").val();
+
+    $.ajax({
+        type: "POST",
+        url: "../othermodules/final_submit_actions",
+        data: {customer_id:customer_id},
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+        },
+        success: function(response){
+            response = response.match(/~([^']+)~/)[1];
+            if($.trim(response)=='done'){
+                $.alert({
+                    content:"The Action is Taken against the Applicant.",
+                    onClose: function(){
+                        location.reload();
+                    }
+                });
+            }
+        }
+    });
+});
+
+
 function validation(){
 
     var misgrade_category=$("#misgrade_category").val();

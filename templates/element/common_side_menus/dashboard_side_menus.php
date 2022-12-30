@@ -326,11 +326,11 @@
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_firms_for_action" class="bg-gray nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/misgrading_home" class="bg-gray nav-link">
 												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
-												<p class="nav-icon-p">Misgrade Actions</p>
+												<p class="nav-icon-p">Actions On Misgrade</p>
 											</a>
-										</li>
+										</li>	
 										<li class="nav-item">
 											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_firms_for_action" class="bg-gray nav-link">
 												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>

@@ -1,6 +1,7 @@
 $(document).ready(function(){
 
-    $('#all_users_list').DataTable();
+    $('.table').DataTable();
+   
 });
 
 

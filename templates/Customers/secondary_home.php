@@ -6,7 +6,7 @@
                     <div class="card-header" id="headingOne">
                         <h5 class="mb-0">
                             <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Applications
+                                Applications / Information
                             </button>
                         </h5>
                     </div>
@@ -18,6 +18,10 @@
 
                                 if (!empty($isSurrender)) {
                                     echo $this->element('customer_elements/dash_messages/surrender_appl_msg');
+                                }
+
+                                if (!empty($actionSubmitted)) {
+                                    echo $this->element('customer_elements/dash_messages/action_taken_msg');
                                 }
 
                                 if ($final_submit_status == 'no_final_submit') { 

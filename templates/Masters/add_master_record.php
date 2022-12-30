@@ -3,7 +3,7 @@
 	<div class="content-header">
   		<div class="container-fluid">
     		<div class="row mb-2">
-      			<div class="col-sm-6"><?php echo $this->Html->link('Back', array('controller' => 'masters', 'action'=>'list_master_records'),array('class'=>'add_btn btn btn-secondary')); ?></div>
+			<div class="col-sm-6"><label class="badge badge-primary">Add Master Records</label></div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?></li>
@@ -112,6 +112,7 @@
 							</div>
 							<div class="card-footer cardFooterBackground">
 								<?php echo $this->element('masters_management_elements/button_elements/add_submit_common_btn'); ?>
+								<?php echo $this->Html->link('Back', array('controller' => 'masters', 'action'=>'list_master_records'),array('class'=>'add_btn btn btn-secondary float-right')); ?>
 							</div>
 						</div>
 					<?php echo $this->Form->end(); ?>

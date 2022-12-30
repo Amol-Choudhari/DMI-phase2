@@ -3,7 +3,7 @@
 	<div class="content-header">
 		<div class="container-fluid">
 			<div class="row mb-2">
-				<div class="col-sm-6"><?php echo $this->Html->link('Back', array('controller' => 'masters', 'action'=>'masters_home'),array('class'=>'add_btn btn btn-secondary float-left')); ?></div>
+				<div class="col-sm-6"><label class="badge badge-primary">Extend Dates</label></div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?></li>
@@ -38,7 +38,8 @@
 								</div>
 							</div>
 							<div class="card-footer cardFooterBackground mt-2">
-								<?php echo $this->Form->submit('Update', array('name'=>'update', 'label'=>false,'class'=>'btn btn-success')); ?>
+								<?php echo $this->Form->submit('Update', array('name'=>'update', 'label'=>false,'class'=>'btn btn-success float-left')); ?>
+								<?php echo $this->Html->link('Back', array('controller' => 'masters', 'action'=>'masters_home'),array('class'=>'add_btn btn btn-secondary float-right')); ?>
 							</div>
 						</div>
 					<?php echo $this->Form->end(); ?>

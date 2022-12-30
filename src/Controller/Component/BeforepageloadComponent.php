@@ -523,6 +523,14 @@ class BeforepageloadComponent extends Component {
 			$isAppSurrender = 'no';
 		}
 
+		$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
+        $isActionTaken = $DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
+		if (!empty($isActionTaken)) {
+			$isActionTaken = 'yes';
+		}else{
+			$isActionTaken = 'no';
+		}
+		
 		$this->Controller->set('IsApproved',$IsApproved);
 		$this->Controller->set('show_renewal_btn',$show_renewal_btn);
 		$this->Controller->set('show_button', $show_button);
@@ -530,6 +538,8 @@ class BeforepageloadComponent extends Component {
 		$this->Controller->set('Is15DigitApproved',$Is15DigitApproved);
 		$this->Controller->set('IsECodeApproved',$IsECodeApproved);
 		$this->Controller->set('isAppSurrender',$isAppSurrender);
+		$this->Controller->set('isActionTaken', $isActionTaken);
+
 
 	}
 	

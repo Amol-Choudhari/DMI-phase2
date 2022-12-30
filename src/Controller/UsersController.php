@@ -979,11 +979,16 @@ class UsersController extends AppController {
 							$this->set('user_registered', $user_registered);
 							$this->set('htmlencodedemail', $htmlencodedemail);
 
+							//This Added to show the details of registered users - Akash[27-12-2022]
+							$userDetails = $this->DmiUsers->getDetailsByEmail($htmlencodedemail);
+							$officeDetails = $this->DmiRoOffices->getOfficeDetailsById($userDetails['posted_ro_office']);
+							$this->set(compact('userDetails','officeDetails'));
+							
 							//Added this call to save the user action log on 09-09-2022
 							$this->Customfunctions->saveActionPoint('New User Added','Success');
-							$message = 'You have successfully created new User. Please set roles';
-							$message_theme = 'success';
-							$redirect_to = 'add_user';
+							//$message = 'You have successfully created new User. Please set roles';
+							//$message_theme = 'success';
+							//$redirect_to = 'add_user';
 
 						} else {
 

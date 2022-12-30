@@ -3,7 +3,7 @@
 	<div class="content-header">
 		<div class="container-fluid">
 			<div class="row mb-2">
-				<div class="col-sm-6"><label class="badge info2 float-left">Add Menu</label></div>
+				<div class="col-sm-6"><label class="badge badge-primary float-left">Add Menu</label></div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?></a></li>
@@ -18,7 +18,7 @@
 	<section class="content form-middle">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-md-10">
+				<div class="col-md-12">
 					<?php echo $this->Form->create(null,array('class'=>'form-group','id'=>'add_menu')); ?>
 						<div class="card card-info">
 							<div class="card-header"><h3 class="card-title-new">Menu Details</h3></div>

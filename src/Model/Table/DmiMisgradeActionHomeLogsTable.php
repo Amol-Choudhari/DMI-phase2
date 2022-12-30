@@ -59,42 +59,45 @@ class DmiMisgradeActionHomeLogsTable extends Table{
 	}
 
 	public function applicationFinalSubmit($postData) {
+		
+			
+		$finalSubmitEntity = $this->newEntity(array('customer_id'=>$postData['customer_id'],
+													'misgrade_category'=>$postData['misgrade_category'],
+													'misgrade_level'=>$postData['misgrade_level'],
+													'misgrade_action'=>$postData['misgrade_action'],
+													'reason'=>htmlentities($postData['reason'], ENT_QUOTES),
+													'user_email'=>$_SESSION['username'],
+													'created'=>date('Y-m-d H:i:s'),
+													'modified'=>date('Y-m-d H:i:s'),
+													'status'=>'submitted',
+													'time_period'=>$postData['time_period']));
 
-		if (!empty($final_submit_entry_id)) {
+		if ($this->save($finalSubmitEntity)) {
 
-			$finalSubmitEntity = $this->newEntity(array('customer_id'=>$postData['customer_id'],
-														'misgrade_category'=>$postData['misgrade_category'],
-														'misgrade_level'=>$postData['misgrade_level'],
-														'misgrade_action'=>$postData['misgrade_action'],
-														'reason'=>htmlentities($postData['reason'], ENT_QUOTES),
-														'user_email'=>$_SESSION['username'],
-														'created'=>date('Y-m-d H:i:s'),
-														'modified'=>date('Y-m-d H:i:s'),
-														'status'=>'submitted',
-														'time_period'=>$postData['time_period']));
+			$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
 
-			if ($this->save($finalSubmitEntity)) {
+			$enitity = $DmiMisgradeActionFinalSubmits->newEntity(array(
 
-				$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
-				$enitity = $DmiMisgradeActionFinalSubmits->newEntity(array(
-
-					'customer_id'=>$postData['customer_id'],
-					'misgrade_category'=>$postData['misgrade_category'],
-					'misgrade_level'=>$postData['misgrade_level'],
-					'misgrade_action'=>$postData['misgrade_action'],
-					'status'=>'submitted_by_user',
-					'time_period'=>$_SESSION['username'],
-					'showcause'=>date('Y-m-d H:i:s'),
-					'is_suspended'=>date('Y-m-d H:i:s'),
-					'modified'=>'submitted',
-					'created'=>'submitted',
-					'applicant_response'=>'submitted',
-					'reason'=>'submitted',
-					'by_user'=>'submitted'
-				));
+				'customer_id'=>$postData['customer_id'],
+				'misgrade_category'=>$postData['misgrade_category'],
+				'misgrade_level'=>$postData['misgrade_level'],
+				'misgrade_action'=>$postData['misgrade_action'],
+				'status'=>'submitted',
+				'time_period'=>$postData['time_period'],
+				'showcause'=>null,
+				'is_suspended'=>null,
+				'created'=>date('Y-m-d H:i:s'),
+				'modified'=>date('Y-m-d H:i:s'),
+				'applicant_response'=>null,
+				'reason'=>$postData['reason'],
+				'by_user'=>$_SESSION['username']
+			));
 				
+			if($DmiMisgradeActionFinalSubmits->save($enitity)){
+				return true;
 			}
-		} 
+		}
+		
 	}
 	
 }

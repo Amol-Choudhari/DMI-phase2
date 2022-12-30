@@ -18,12 +18,12 @@
 				<div class="col-md-12">
 					<?php echo $this->Form->create(null, array('id' => 'showcause_home')); ?>
 						<div class="card card-primary">
-							<div class="card-header"><h3 class="card-title">Show Cause Notice</h3></div>
+							<div class="card-header"><h3 class="card-title-new">Show Cause Notice</h3></div>
 							<div class="card-body">
 								<div class="row">
 									<div class="col-md-6">
 										<div class="card">
-											<div class="card-header"><h3 class="card-title">Firm Details</h3></div>
+											<div class="card-header bg-olive"><h3 class="card-title">Firm Details</h3></div>
 											<div class="card-body">
 												<dl class="row">
 													<dt class="col-sm-4">Firm ID: </dt>
@@ -54,11 +54,12 @@
 									if (!empty($status)){
 										if ($status == 'saved') {
 											echo $this->Form->submit('Update', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
-											echo $this->Form->control('Send Notice',array('type'=>'button','name'=>'send_notice','class'=>'btn btn-primary ml-2', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
+											echo $this->Form->control('Send Notice',array('type'=>'button','name'=>'send_notice','class'=>'btn btn-primary ml-2 float-left', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
 										} 
 									} else {
 										echo $this->Form->submit('Save', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 									}
+									echo $this->Html->link('Cancel', array('controller' => 'othermodules', 'action'=>'misgrading_home'),array('class'=>'add_btn btn btn-danger float-right'));
 								?>
 							</div>
 						</div>

@@ -283,4 +283,16 @@ class DmiUsersTable extends Table{
 		return $this->find('all')->where(['id IS' => $id, 'status !=' => 'disactive'])->first();
 	}
 
+
+	// getEmailById
+	// Author : Akash Thakre
+	// Description : This function will find the decode User Email by the table ID input
+	// Date : 30-07-2022
+
+	public function getDetailsByEmail($email) {
+
+		$get_user_details = $this->find()->where(['email IS' => $email,'status !=' => 'disactive'])->first();
+		return $get_user_details;
+	}
+
 } ?>

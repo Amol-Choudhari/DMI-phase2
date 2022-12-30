@@ -3,7 +3,7 @@
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6"><label class="badge badge-primary">Master Records</label></div>
+                <div class="col-sm-6"><label class="badge badge-primary">List Master Records</label></div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action' => 'home')); ?></li>

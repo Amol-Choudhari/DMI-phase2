@@ -38,6 +38,30 @@ class DmiShowcauseLogsTable extends Table{
 
 
     }
+
+    public function sendNotice($postData){
+
+        $customer_id = $_SESSION['firm_id'];
+        $username = $_SESSION['username'];
+
+        $log_entity = $this->newEntity(array(
+
+			'customer_id'=>$customer_id,
+			'reason'=>htmlentities($postData['reason']),
+			'status'=>'submitted',
+			'date'=>date('Y-m-d H:i:s'),
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s'),
+            'by_user'=>$username
+
+        ));
+
+		 if($this->save($log_entity)){
+            return true;
+         }
+
+
+    }
 }
 
 

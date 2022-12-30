@@ -1466,11 +1466,8 @@ class OthermodulesController extends AppController{
     // @AUTHOR : AKASH THAKRE
     // DATE : 09-12-2022
 
-    public function listOfFirmsForAction(){
+    public function misgradingHome(){
 
-        //Load Models
-        $this->loadModel('DmiApplWithRoMappings');
-        $this->loadModel('DmiUsers');
         $conn = ConnectionManager::get('default');
 
         $username = $this->Session->read('username');
@@ -1478,15 +1475,34 @@ class OthermodulesController extends AppController{
         //get posted office id
         $postedOffice = $this->DmiUsers->getPostedOffId($username);
         
-        $underThisOffice =   $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name
-                                             FROM dmi_grant_certificates_pdfs AS dg 
-                                             INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
-                                             INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
-                                             INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
-                                             INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
-                                             WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
-        
+        $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name
+                                            FROM dmi_grant_certificates_pdfs AS dg 
+                                            INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
+                                            INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
+                                            INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
+                                            INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
+                                            WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
+       
+        $sentNotices = $conn->execute("SELECT DISTINCT on (dsl.customer_id) dsl.id,dsl.customer_id,df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name,dsl.date
+                                        FROM dmi_showcause_logs AS dsl 
+                                        INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dsl.customer_id
+                                        INNER JOIN dmi_firms AS df ON df.customer_id = dsl.customer_id
+                                        INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
+                                        INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
+                                        WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
+
+        $actionTaken = $conn->execute("SELECT DISTINCT on (dmafs.customer_id) dmafs.id,dmafs.customer_id,df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name,dmafs.created
+                                        FROM dmi_misgrade_action_final_submits AS dmafs 
+                                        INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dmafs.customer_id
+                                        INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id
+                                        INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
+                                        INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
+                                        WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
+
         $this->set('underThisOffice',$underThisOffice);
+        $this->set('sentNotices',$sentNotices);
+        $this->set('actionTaken',$actionTaken);
+
 
     }
 
@@ -1603,44 +1619,50 @@ class OthermodulesController extends AppController{
                 $redirect_to = '../othermodules/misgradingActionsHome'; 
             }
             
-        } elseif (null !== $this->request->getData('final_submit')) {
+        } /*elseif (null !== $this->request->getData('final_submit')) {
             
             $final_submit_call_result =  $this->DmiMisgradeActionHomeLogs->applicationFinalSubmit($postData);
 
             if ($final_submit_call_result == true) {
 
                 $this->Customfunctions->saveActionPoint('Application Final Submit', 'Success'); #Action
-                $message = $firm_type_text.' - Final submitted successfully ';
+                $message = 'Misgrading Action is Taken against the selected  Firm Successfully ';
                 $message_theme = 'success';
-
-                //For Chemist i.e Apllication Type 4 then redirect to Chemist Home after Final Submit -> Akash [29-09-2021].
-                if ($application_type == 4) {
-                    $redirect_to = '../chemist/home';
-                } elseif ($authRegFirm=='yes') {
-                    $redirect_to = '../authprocessedoldapp/home';
-                } else {
-                    $redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
-                }
+                $redirect_to = '../othermodules/list_of_firms_for_action'; 
 
             } else {
                 
                 $this->Customfunctions->saveActionPoint('Application Final Submit', 'Failed'); #Action
-                $message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
+                $message = 'Error Occured During Submitting!! ';
                 $message_theme = 'failed';
-                $redirect_to = '../application/application-for-certificate';
+                $redirect_to = '../application/misgradingActionsHome';
             }
         
-        }
+        }*/
 
         
         $this->set(compact('firmDetails','category','sub_commodity_value'));                             #Set the Firm Details
         $this->set(compact('misgradingActions','misgradingLevels','misgradingCategories','timePeriod')); #Set the Dropdowns
         $this->set(compact('misCatId','misCatName','misCatDscp','misLvlName','misActName'));             #Set the Saved Misgrade Category Values
-        $this->set(compact('misLvlId','misActId','periodMonth','reason','status','periodId'));                      #Set the Saved Values
+        $this->set(compact('misLvlId','misActId','periodMonth','reason','status','periodId'));           #Set the Saved Values
         $this->set(compact('message','message_theme','redirect_to'));                                    #Set the Message Variables
 
     }
 
+    public function finalSubmitActions(){
+
+        $this->autoRender = false;
+        //get ajax post data
+        $customer_id = $_POST['customer_id'];
+        $this->loadModel('DmiMisgradeActionHomeLogs');
+        $misgradeStatus = $this->DmiMisgradeActionHomeLogs->getInformation($customer_id);
+        $result =  $this->DmiMisgradeActionHomeLogs->applicationFinalSubmit($misgradeStatus); 
+        
+        if ($result == true) {
+            echo '~done~';
+        }
+        exit;
+    }
 
 
     public function showcauseHome(){
@@ -1697,6 +1719,10 @@ class OthermodulesController extends AppController{
 
             } elseif (null !== $this->request->getData('final_submit')) {
 
+                if($this->DmiShowcauseLogs->sendNotice($postData)){
+
+
+                }
             }
         }
 

@@ -174,7 +174,7 @@ class MastersController extends AppController {
 		} elseif ($masterId=='11') {
 			$this->masterTable = 'DmiSmsEmailTemplates';
 			$this->masterListTitle = 'List of All SMS/Email Templates';
-			$this->masterListHeader = 'DMI SMS EMAIL Templates';
+			$this->masterListHeader = 'Message Templates';
 			$this->masterAddTitle = 'Add New Template';
 			$this->masterEditTitle = 'Edit Template';
 			$this->fieldNameForCheck = 'template';
@@ -186,7 +186,7 @@ class MastersController extends AppController {
 			$this->masterListTitle = 'List of All PAO/DDO';
 			$this->masterAddTitle = 'Set New PAO/DDO';
 			$this->masterEditTitle = 'Edit PAO/DDO';
-			$this->masterListHeader = 'PAO/DDP';
+			$this->masterListHeader = 'PAO/DDO';
 			$this->masterTable = '';
 			$this->fieldNameForCheck = 'pao-ddo';
 

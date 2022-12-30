@@ -2010,6 +2010,8 @@ class AjaxFunctionsController extends AppController{
 			echo 'no';
 		}
 	}
+
+	
 	// check If Session Is Exists
 	// DESCRIPTION : FOR CHECKING THE SESSION IF SESSION IS YES , RETURN THE YES OR NO
 	// @AUTHOR : SHANKHPAL SHENDE
