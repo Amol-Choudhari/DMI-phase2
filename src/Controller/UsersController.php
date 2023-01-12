@@ -33,94 +33,6 @@ class UsersController extends AppController {
 
 	}
 
-
-	//FOR Trial
-
-	public function forTrial(){
-
-		//require 'vendor/autoload.php';
-		$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-		$spreadsheet = $reader->load("D:/new1.xlsx");
-		$sheetData =$spreadsheet->getSheet(0)->toArray();
-
-		$this->loadModel('DmiAllApplicationsCurrentPositions');
-		$this->loadModel('DmiRejectedApplLogs');
-
-		$i=1;
-
-		unset($sheetData[0]);
-		
-		foreach ($sheetData as $t) {
-			
-			//$get_details = $this->DmiAllApplicationsCurrentPositions->find('all',array('conditions'=>array('customer_id IS'=>trim($t[0])),'order'=>'id DESC'))->first();
-			$get_details = $this->DmiRejectedApplLogs->find('all',array('conditions'=>array('customer_id IS'=>trim($t[0])),'order'=>'id DESC'))->first();
-			pr($get_details['customer_id']);
-			if (empty($get_details)) {
-				
-			}
-
-			
-			$i++;
-		}
-
-		
-		exit;
-	}
-
-
-	public function getAllInfo(){
-
-		$this->loadModel('DmiAllApplicationsCurrentPositions');
-		$this->loadModel('DmiAllocations');
-		$this->loadModel('DmiFormTypes');
-
-		$this->viewBuilder()->setLayout('document_check_list_layout');
-
-		if ($this->request->is('post')) {
-
-			$cust = $this->request->getData();
-			$customer_id = $cust['customer_id']; 
-			$currPos = $this->DmiAllApplicationsCurrentPositions->find()->where(['customer_id'=>$customer_id])->first();
-			$firm_type = $this->Customfunctions->firmTypeText($customer_id);
-			$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
-			$oldornew = $this->Customfunctions->checkApplicationOldNew($customer_id);
-			$getOffice = $this->Customfunctions->getApplDistrictOffice($customer_id,2);
-			$checkCaBevo = $this->Customfunctions->checkCaBevo($customer_id);
-			$checkApplicantExportUnit = $this->Customfunctions->checkApplicantExportUnit($customer_id);
-			$getApplicationCurrentStatus = $this->Customfunctions->getApplicationCurrentStatus($customer_id,2);
-			$checkApplicantValidForRenewal = $this->Customfunctions->checkApplicantValidForRenewal($customer_id);
-			$isOldApplication = $this->Customfunctions->isOldApplication($customer_id,2);
-			$returnGrantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-			$getApplRegOfficeId = $this->Customfunctions->getApplRegOfficeId($customer_id,2);
-			$formDes = $this->DmiFormTypes->getFormDesc($form_type);
-
-
-			$dde = array('current_level' => $currPos['current_level'],
-			'current_user_email_id'=>base64_decode($currPos['current_user_email_id']),
-			'firm_type'=>$firm_type,
-			'form_type'=>$form_type,
-			'formDes'=>$formDes,
-			'oldornew'=>$oldornew,
-			'office'=>$getOffice,
-			'bevo'=>$checkCaBevo,
-			'export_unit'=>$checkApplicantExportUnit,
-			'current_status'=>$getApplicationCurrentStatus,
-			'valid_for_renewal'=>$checkApplicantValidForRenewal,
-			'isOldApplication'=>$isOldApplication,
-	   		'returnGrantDateCondition'=>$returnGrantDateCondition,
-			'getApplRegOfficeId'=>base64_decode($getApplRegOfficeId),
-			'cus'=>$customer_id); 
-			
-			$this->set('dde',$dde);
-			
-		}
-		
-	}
-
-
-
-
-
 	// CREATE CAPTCHA
 	public function createCaptcha() {
 		$this->autoRender = false;
@@ -336,7 +248,7 @@ class UsersController extends AppController {
 		} else {
 
 			$key_id = $_GET['$key'];
-			$user_id = base64_encode($this->Authentication->decrypt($_GET['$id']));
+			$user_id = $this->Authentication->decrypt($_GET['$id']);
 			$this->set('user_id', base64_decode($user_id));//for email encoding
 
 			//call function to check valid key
@@ -649,7 +561,7 @@ class UsersController extends AppController {
 					//Html Encoding data before saving
 					$htmlencodedfname = htmlentities($this->request->getData('f_name'), ENT_QUOTES);
 					$htmlencodedlname = htmlentities($this->request->getData('l_name'), ENT_QUOTES);
-					//$htmlencodedphone = htmlentities($this->request->getData('phone'), ENT_QUOTES);
+					$htmlencodedphone = htmlentities($this->request->getData('phone'), ENT_QUOTES);  // as per change request added by shankhpal shende on 11/01/2023
 					$htmlencodedlandline = htmlentities($this->request->getData('landline'), ENT_QUOTES);
 					//commented on 15-06-2018 by Amol, no provision to store aadhar
 					//$htmlencodedaadhar = htmlentities($this->request->getData('once_card_no'), ENT_QUOTES);
@@ -685,7 +597,7 @@ class UsersController extends AppController {
 						'id' => $user_id,
 						'f_name' => $htmlencodedfname,
 						'l_name' => $htmlencodedlname,
-						//'phone'=>$htmlencodedphone,
+						'phone'=>base64_encode($htmlencodedphone),  // added by shankhpal shende on 11/01/2023
 						'landline' => base64_encode($htmlencodedlandline),
 						//'once_card_no'=>$encrypted_aadhar, //commented on 15-06-2018 by Amol, no provision to store aadhar
 						'profile_pic' => $profile_pic //added on 06-05-2021 for profile pic

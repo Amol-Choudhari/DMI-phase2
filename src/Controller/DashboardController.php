@@ -2467,7 +2467,6 @@ class DashboardController extends AppController{
 		}
 	}
 	
-	public function allManuals(){}
 
 	//this function is added to set session for visiting tabs and sub tabs from pending status window
 	public function setSessionForStatusTabsClick(){

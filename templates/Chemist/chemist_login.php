@@ -97,7 +97,7 @@
 										<li>Captcha is case sensitive</li>
 										<li>Enter the details properly</li>
 										<li>Refresh captcha if not visible</li>
-										<li>Password related queries refer the <a target="_blank" href="/writereaddata/DMI/manuals/Applicant Manual to Reset Password.pdf">Manual</a></li>
+										<li>Password related queries refer the <a target="_blank" href="/writereaddata/DMI/manuals/applicant/Reset Password (Applicant).pdf">Manual</a></li>
 									</ul>
 								</div>
 							</div>

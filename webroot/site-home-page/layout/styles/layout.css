@@ -43,10 +43,10 @@ File: Layout CSS
 
 /* Page Intro
 --------------------------------------------------------------------------------------------------------------- */
-#pageintro{padding:180px 0;}
+#pageintro{padding:100px 0;}
 
 #pageintro article{display:block;  margin:0 auto;}
-#pageintro .heading{margin-bottom:20px; font-size:4rem;}
+#pageintro .heading{margin-bottom:20px; font-size:3rem;}
 #pageintro p{max-width:75%; margin:0 auto;}
 #pageintro footer{margin-top:50px;}
 
@@ -609,4 +609,20 @@ table a, #comments a{background-color:inherit;}
 			font-weight: 600;
 
 	}
+	/* added by shankhpal shende */
+	.home-banner{
+		background-position: center;
+		background-size: cover;
+		height: 430px;
+	}
+	#main1{
+		background-image: url('https://localhost/DMI/img/home-slider/banner2.jpg');
+	
+	}
+	#main2 {
+			background-image: url('https://localhost/DMI/img/home-slider/banner4.jpg');
+		}
+	#main3 {
+					background-image: url('https://localhost/DMI/img/home-slider/banner5.jpg');
+				}
 /* till here */

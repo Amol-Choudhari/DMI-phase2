@@ -204,6 +204,13 @@
 				</li>
 
 				<li class="nav-item">
+					<a href="<?php echo $this->request->getAttribute("webroot");?>common/all_manuals" class="nav-link">
+						<i class="nav-icon fas fa-address-book"></i>
+						<p class="nav-icon-p">User Manuals</p>
+					</a>
+				</li>
+
+				<li class="nav-item">
 					<a href="<?php echo $this->request->getAttribute("webroot");?>common/logout" class="nav-link">
 						<i class="nav-icon fas fa-power-off"></i>
 						<p class="nav-icon-p">Logout</p>

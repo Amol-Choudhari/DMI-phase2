@@ -230,7 +230,8 @@
 			
 			//added date function on 31-05-2021 by Amol to convert date format, as saving null
 			$created_date = $CustomersController->Customfunctions->changeDateFormat($forms_data['created']);
-			
+			$reffered_back_granted_on = $CustomersController->Customfunctions->changeDateFormat($forms_data['granted_on']); // added by shankhpal shende on 10/01/2023
+
 			if($reffered_back_to == 'Level3ToApplicant'){
 				
 				$form_status = 'referred_back';
@@ -302,7 +303,7 @@
 				'rr_comment_ul'=>$rr_comment_ul,
 				'old_cert_no'=>$forms_data['old_cert_no'],
 				'granted_e_code'=>$forms_data['granted_e_code'],
-				'granted_on'=>$forms_data['granted_on'],
+				'granted_on'=>$reffered_back_granted_on, // added by shankhpal shende on 10/01/2023
 				'old_cert_doc'=>$forms_data['old_cert_doc'],
 				'remark'=>$forms_data['remark'],
 				'already_granted'=>$forms_data['already_granted']

@@ -56,7 +56,7 @@
 								<div class="row">
 									<div class="col-md-4">
 										<label class="uneditable" for="field3"><span>Mobile No. <span class="cRed">*</span></span></label>
-										<?php echo $this->Form->control('phone', array('label'=>'', 'escape'=>false, 'id'=>'phone', 'class'=>'form-control','value'=>$user_data_value['phone'], 'readonly'=>true)); ?>
+										<?php echo $this->Form->control('phone', array('label'=>'', 'escape'=>false, 'id'=>'phone', 'class'=>'form-control','value'=>$user_data_value['phone'])); ?>
 										<span id="error_phone" class="error invalid-feedback"></span>
 									</div>
 									<div class="col-md-4">

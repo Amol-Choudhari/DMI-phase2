@@ -150,7 +150,7 @@
 												</div>
 											</div>
 											<div class="form-group row marginT25">
-												<label for="inputEmail3" class="col-sm-4 col-form-label">Phone No. <span class="cRed">*</span></label>
+												<label for="inputEmail3" class="col-sm-4 col-form-label">Phone No. </label>
 												<div class="custom-file col-sm-8">
 													<?php echo $this->form->control('lab_fax_no', array('type'=>'text', 'id'=>'lab_fax_no', 'escape'=>false, 'value'=>base64_decode($section_form_details[0]['lab_fax_no']), 'class'=>'form-control input-field', 'label'=>false, 'placeholder'=>'Please enter Phone No.')); ?>
 													<span id="error_lab_fax_no" class="error invalid-feedback"></span>

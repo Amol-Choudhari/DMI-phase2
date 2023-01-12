@@ -8,17 +8,9 @@
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item">
-									<?php if ($userType == 'User') { ?>
-										<?php echo $this->Html->link('Dashboard', array('controller' => 'dashboard', 'action'=>'home'));?>
-								  	<?php } elseif ($userType == 'Primary') { ?>
-										<?php echo $this->Html->link('Dashboard', array('controller' => 'customers', 'action'=>'primary_home'));?>
-								   	<?php } elseif ($userType == 'Chemist') { ?>
-										<?php echo $this->Html->link('Dashboard', array('controller' => 'chemist', 'action'=>'home'));?>
-								   	<?php } elseif ($userType == 'Secondary') { ?>
-										<?php echo $this->Html->link('Dashboard', array('controller' => 'customers', 'action'=>'secondary_home'));?>
-									<?php }?>
+									<?php echo $this->element('other_elements/common_breadcrumbs'); ?>
+									<li class="breadcrumb-item active">User Logs</li>
 								</li>
-						  		<li class="breadcrumb-item active">Log History</li>
 							</ol>
 					  	</div>
 					</div>

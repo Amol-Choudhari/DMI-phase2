@@ -10,17 +10,16 @@ class CustomerformsController extends AppController{
 		
 	var $name = 'Customerforms';
 	
-    public function initialize(): void
-    {
+    public function initialize(): void {
+
         parent::initialize();
-		   
-		// public $helpers = array('Form','Html','Time');
 		$this->viewBuilder()->setHelpers(['Form','Html']);
 		$this->loadComponent('Customfunctions');
 		$this->loadComponent('Authentication');
     }
 	
 	public function beforeFilter(EventInterface $event) {
+		
 		parent::beforeFilter($event);
 	
 		if ($this->Session->read('username') == null) {
@@ -81,28 +80,6 @@ class CustomerformsController extends AppController{
 			}
 		}
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// 	check to switch payment btn 																														//
-		/*	$check_final_submit_entry = $this->Dmi_final_submit->find('first',array('conditions'=>array('customer_id'=>$this->Session->read('username')))); 	//	
-		//																																						//
-		//	if (!empty($check_final_submit_entry)) 																												//
-		//	{																																					//
-		//																																						//
-		//	$switch_payment_btn = 'yes';																														//		
-		//																																						//
-		//	}else{																																				//			
-		//																																						//
-		//		$switch_payment_btn = 'no';																														//
-		//	}																																					//
-		//																																						//	
-		//	$this->set('switch_payment_btn',$switch_payment_btn);																								//
-		//																																						//
-		//																																						//
-		//	check application have export unit 																													//
-		//	$export_unit_status = $this->check_applicant_export_unit($this->Session->read('username'));															//	
-		//	$this->set('export_unit_status',$export_unit_status);																								//
-		*/																																						//
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	}
 
 	//Before Filter function End
@@ -116,7 +93,12 @@ class CustomerformsController extends AppController{
 		
 
 	public function addedFirms(){
-		
+
+		// set variables to show popup messages from view file
+		$message_theme = '';
+		$message = '';
+		$redirect_to = '';
+
         // SET MENU NAME FOR CURRENT ACTIVE MENU IN SIDEBAR
         $this->set('current_menu', 'menu_firm');
 
@@ -171,46 +153,23 @@ class CustomerformsController extends AppController{
 
 		$this->set('sponsored_cas',$sponsored_cas);
 
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//	added on 01-06-2017 by Amol 																			//	
-		//	to decrypt aadhar number before showing on frontend 													//
-		//																											//
-		//	commented  on 23-03-2018 to avoid mandatory for aadhar 													//		
-		/*	$decrypted_aadhar = $this->decrypt($added_firm_field['once_card_no']); 									//	
-		//																											//
-		//	$decrypted_aadhar = $this->get_masked_value($decrypted_aadhar,'aadhar');//applied on 12-10-2017 by Amol //
-		//	$this->set('decrypted_aadhar',$decrypted_aadhar); 														//	
-		*/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		
 		//taking id of multiple sub commodities	to show names in list	
-		
 		$sub_comm_id = explode(',',(string) $added_firm_field['sub_commodity']); #For Deprecations
-	
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
-			
 		$this->set('sub_commodity_value',$sub_commodity_value);
 			
 			
 		//taking id of multiple Packaging Materials types to show names in list	
-		
 		$packaging_type_id = explode(',',(string) $added_firm_field['packaging_materials']); #For Deprecations
-		
 		$packaging_materials_value = $this->DmiPackingTypes->find('list',array('valueField'=>'packing_type', 'conditions'=>array('id IN'=>$packaging_type_id)))->toList();
-			
 		$this->set('packaging_materials_value',$packaging_materials_value);
 
 		//taking select values from id
-
 		$certification_type_value = $this->DmiCertificateTypes->find('all',array('fields'=>'certificate_type', 'conditions'=>array('id IS'=>$added_firm_field['certification_type'])))->first();
 		$this->set('certification_type_value',$certification_type_value);
 		
 		$commodity_value = $this->MCommodityCategory->find('all',array('fields'=>'category_name', 'conditions'=>array('category_code IS'=>$added_firm_field['commodity'],'display'=>'Y')))->first();
 		$this->set('commodity_value',$commodity_value);
-		
-		//$sub_commodity_value = $this->Dmi_sub_commodity->find('first',array('fields'=>'sub_comm_name', 'conditions'=>array('id'=>$added_firm_field['sub_commodity'])));
-		//$this->set('sub_commodity_value',$sub_commodity_value);
 		
 		$state_value = $this->DmiStates->find('all',array('fields'=>'state_name', 'conditions'=>array('id IS'=>$added_firm_field['state'],'OR'=>array('delete_status IS NULL','delete_status'=>'no'))))->first();
 		$this->set('state_value',$state_value);
@@ -237,10 +196,6 @@ class CustomerformsController extends AppController{
 		$old_app_renewal_dates = $this->DmiOldApplicationRenewalDates->find('all', array('conditions'=>array('customer_id IS'=>$firm_id)))->toArray();
 		$this->set('old_app_renewal_dates',$old_app_renewal_dates);
 		
-		// set variables to show popup messages from view file
-		$message_theme = '';
-		$message = '';
-		$redirect_to = '';
 		
 		if (null !== $this->request->getData('ok')) {
 			
@@ -254,33 +209,20 @@ class CustomerformsController extends AppController{
 			
 				//commented  on 23-03-2018 to avoid mandatory for aadhar
 				$htmlencoded_email = base64_encode(htmlentities($this->request->getData('email'), ENT_QUOTES));//for email encoding
+
+				// as per change request allow to update for mobile no field by shankhpal shende on 11/01/2023
+				$htmlencoded_mobile_no = base64_encode(htmlentities($this->request->getData('mobile_no'), ENT_QUOTES));//for email encoding
 				$htmlencoded_phone_no = htmlentities($this->request->getData('fax_no'), ENT_QUOTES);
 				
-				///////////////////////////////////////////////////////////////
-				//added on 01-06-2017 by Amol 								 //		
-				//to encrypt aadhar number before storing to DB and Session  //
-				//commented  on 23-03-2018 to avoid mandatory for aadhar     //
-				//$encrypted_aadhar = $this->encrypt($htmlencoded_aadhar_no);// 
-				///////////////////////////////////////////////////////////////	
-
 				$db_email_before_update = $this->DmiFirms->find('all', array('fields'=>'email', 'conditions'=>array('id IS'=>$firm_table_id)))->first();
 			
 				//below query & conditions added on 12-10-2017 by Amol
 				//To check if mobile,aadhar & email post in proper format, if not then save old value itself from DB
 				$added_firms = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$firm_id)))->first();
 				
-				if (preg_match("/^[X-X]{6}[0-9]{4}$/i", $this->request->getData('mobile_no'),$matches)==1) {						
+				if (preg_match("/^[X-X]{6}[0-9]{4}$/i", $this->request->getData('mobile_no'),$matches)==1) {
 					$htmlencoded_mobile_no = $added_firms['mobile_no'];
 				}
-
-				
-				/////////////////////////////////////////////////////////////////////////////////////////////////
-				/* //commented  on 23-03-2018 to avoid mandatory for aadhar 								   //			
-				// if (preg_match("/^[X-X]{8}[0-9]{4}$/i", $this->request->data['once_card_no'],$matches)==1)  //
-				// {																						   //
-				//	$encrypted_aadhar = $added_firms['once_card_no'];										   //		
-				// }*/																						   //
-				/////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 				//for email encoding
@@ -312,7 +254,7 @@ class CustomerformsController extends AppController{
 					'id'=>$firm_table_id,
 				//	'once_card_no'=>$encrypted_aadhar, //commented  on 23-03-2018 to avoid mandatory for aadhar
 					'email'=>$htmlencoded_email,
-				//	'mobile_no'=>$htmlencoded_mobile_no,
+					'mobile_no'=>$htmlencoded_mobile_no,
 					'fax_no'=>base64_encode($htmlencoded_phone_no), //This is added on 27-04-2021 for base64encoding by AKASH
 					'modified'=>date('Y-m-d H:i:s'),
 					'profile_pic'=>$profile_pic
@@ -322,7 +264,7 @@ class CustomerformsController extends AppController{
 				if ($this->DmiFirms->save($DmiFirmsEntitny)) {
 					
 					//Save the firm profile update logs history (Done by pravin 13/2/2018)
-					$DmiFirmsHistoryLogsEntitny = $this->DmiFirmHistoryLogs->newEntity(array(											
+					$DmiFirmsHistoryLogsEntitny = $this->DmiFirmHistoryLogs->newEntity(array(
 						'customer_primary_id'=>$added_firms['customer_primary_id'],
 						'customer_primary_once_no'=>$added_firms['customer_primary_once_no'],
 						'customer_id'=>$added_firms['customer_id'],
@@ -360,29 +302,28 @@ class CustomerformsController extends AppController{
 					
 					#SMS: Firm Updated
 					$this->DmiSmsEmailTemplates->sendMessage(4,$firm_id);
-				
-					//Added this call to save the user action log on 01-03-2022
-					$this->Customfunctions->saveActionPoint('Update Firm Details','Success');
+					$this->Customfunctions->saveActionPoint('Update Firm Details','Success'); #Action
 					$message = 'Firm details are updated '. $message;
 					$message_theme = 'success';
 					$redirect_to = 'added_firms';
 					
 				} else {
-					//Added this call to save the user action log on 01-03-2022
-					$this->Customfunctions->saveActionPoint('Update Firm Details','Failed');
+					
+					$this->Customfunctions->saveActionPoint('Update Firm Details','Failed'); #Action
 					$message = 'Sorry... Firm details are not updated';
 					$message_theme = 'failed';
 					$redirect_to = 'added_firms';
 				}
 					
 			} else {
-				//Added this call to save the user action log on 01-03-2022
-				$this->Customfunctions->saveActionPoint('Update Firm Details','Failed');
+				
+				$this->Customfunctions->saveActionPoint('Update Firm Details','Failed'); #Action
 				$message = 'This email id is already exist. Please provide another email id to update. Thankyou.';
 				$message_theme = 'failed';
 				$redirect_to = 'added_firms';
 			}
 		}
+
 		// set variables to show popup messages from view file
 		$this->set('message_theme',$message_theme);
 		$this->set('message',$message);
@@ -411,18 +352,10 @@ class CustomerformsController extends AppController{
 		$this->loadModel('DmiOldApplicationCertificateDetails');
 		$this->loadModel('DmiOldApplicationRenewalDates');
 		$this->loadModel('DmiFirmHistoryLogs');
-		
-		//$commodities = $this->Dmi_commodity->find('list',array('fields'=>'commodity_name','conditions'=>array('display'=>'Y')));
-		//$this->set('commodities',$commodities);
-		
+
 		//changes by shankhpal shende for oreder asc
 		$commodity_categories = $this->MCommodityCategory->find('list',array('valueField'=>'category_name','conditions'=>array('display'=>'Y'),'order'=>array('category_name asc')))->toArray();
-		
 		$this->set('commodity_categories',$commodity_categories);
-		
-		//$sub_commodities = $this->Dmi_sub_commodity->find('list',array('fields'=>'sub_comm_name', 'conditions'=>array('commodity_id'=>1)));
-		
-		//$this->set('sub_commodities',$sub_commodities);
 		
 		$certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
 		$this->set('certificate_type',$certificate_type);
@@ -557,34 +490,16 @@ class CustomerformsController extends AppController{
 						if ($split_new_generated_id[1] != 2) {
 
 							// Calculate total charges for selected sub commodities
-						
 							$selected_commodity = $this->request->getData('selected_commodity');
-							
-							//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//	/* $i=0; 																																		//
-							//	$total_charges = 0;																																//
-							//	foreach($selected_commodity as $sub_commodity_id){																								//
-							//																																					//
-							//		$sub_commodity_charge = $this->Dmi_sub_commodity->find('first',array('fields'=>'charge','conditions'=>array('id'=>$sub_commodity_id)));		//
-							//																																					//	
-							//		$total_charges = $total_charges + $sub_commodity_charge['Dmi_sub_commodity']['charge'];														//
-							//																																					//
-							//		$i=$i+1;																																	//	
-							//	} */																																			//		
-							//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-							//$total_charges = '10000'; // currently default 10000 for all.
-							
 							$commodity_value = $this->request->getData('commodity');
 							$sub_commodities_values = implode(',',$selected_commodity);
 							$packaging_materials_values = null;
 				
 						} else {
 							
-							//$commodity_value = $this->request->data['commodity'];	
 							$commodity_value = 1;	
 							$sub_commodities_values = $this->request->getData('selected_commodity');
-							$packaging_materials = $this->request->getData('packaging_materials');									
+							$packaging_materials = $this->request->getData('packaging_materials');
 							$packaging_materials_values = implode(',',$packaging_materials);
 							
 							//$total_charges = '10000'; // currently default 10000 for all.
@@ -612,24 +527,10 @@ class CustomerformsController extends AppController{
 						$htmlencoded_mobile_no = htmlentities($this->request->getData('mobile_no'), ENT_QUOTES);
 						$htmlencoded_fax_no = htmlentities($this->request->getData('fax_no'), ENT_QUOTES);
 						$htmlencoded_other_packaging_details = htmlentities($this->request->getData('other_packaging_details'), ENT_QUOTES);
-							
-						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						//taking charges from application charges table 																												//			
-						//added on 13-06-2017																																			//
-						//$get_charges = $this->Dmi_application_charge->find('first',array('conditions'=>array('certificate_type_id'=>$this->request->data['certification_type'])));	//
-						//$total_charges = $get_charges['Dmi_application_charge']['charge'];																							//
-						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 						//added on 09-08-2017 by Amol
 						$total_charges = htmlentities($this->request->getData('total_charge'), ENT_QUOTES);
-
-						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						//added on 01-06-2017 by Amol 																							//
-						//to encrypt aadhar number before storing to DB and Session 															//
-						//$encrypted_aadhar = $this->encrypt($htmlencoded_aadhar_no); //commented  on 23-03-2018 to avoid mandatory for aadhar  //
-						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 						//check drop down values
 						$table = 'DmiCertificateTypes';
@@ -666,7 +567,7 @@ class CustomerformsController extends AppController{
 								
 								$this->set('return_error_msg','Is press sponsored by CA option not selected');	
 								return null;	
-								exit;					
+								exit;
 							}
 							
 							if ($is_sponsored_press == 'yes') {
@@ -685,7 +586,7 @@ class CustomerformsController extends AppController{
 									}else{
 										$press_is_sponsored = "yes";
 									}
-								}									
+								}
 							}
 						}
 
@@ -913,8 +814,8 @@ class CustomerformsController extends AppController{
 							$secondary_registered = 'done';
 							$email = $this->request->getData('email');
 							
-							$this->set('secondary_registered',$secondary_registered);															
-							$this->set('customer_secondary_id',$customer_secondary_id);															
+							$this->set('secondary_registered',$secondary_registered);
+							$this->set('customer_secondary_id',$customer_secondary_id);
 							$this->set('email',$email);
 							
 							//This function is used to save Application with RO mapping record while new firm added.

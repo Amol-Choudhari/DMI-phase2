@@ -53,6 +53,12 @@ class CommonController extends AppController {
 
 		$this->set('is_already_granted', $is_already_granted);
 
+		$username = $this->Session->read('username');
+		$userType = $this->Customfunctions->getUserType($username);
+		$this->set('userType', $userType);
+
+
+
 	}
 
 
@@ -206,9 +212,6 @@ class CommonController extends AppController {
 		$this->authenticateUser();
 		$username = $this->Session->read('username');
 
-		#check the user type
-		$userType = $this->Customfunctions->getUserType($username);
-
 		#get the specific action log table
 		$getTable = $this->getSpecificTable();
 		$actionLogTable = $getTable['action_log_table'];
@@ -225,7 +228,6 @@ class CommonController extends AppController {
 		}
 
 		$this->set('get_user_actions', $get_user_actions);
-		$this->set('userType', $userType);
 
 	}
 
@@ -267,8 +269,6 @@ class CommonController extends AppController {
 		//to hide current session logout time.
 		$currentLogs[0]['time_out'] = null;
 		$this->set('currentLogs',$currentLogs);
-		$this->set('userType',$userType);
-
 	}
 
 
@@ -376,9 +376,9 @@ class CommonController extends AppController {
 
 	public function isBase64Encoded($data){
 		if (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $data)) {
-		return TRUE;
+			return TRUE;
 		} else {
-		return FALSE;
+			return FALSE;
 		}
 	}
 
@@ -432,8 +432,13 @@ class CommonController extends AppController {
 		} else {
 			echo 'Invalid username'; exit;
 		}
-		
+	
 	}
+
+	public function allManuals(){
+		$this->authenticateUser();
+	}
+
 
 }
 ?>

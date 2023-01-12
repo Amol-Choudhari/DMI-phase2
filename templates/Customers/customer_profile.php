@@ -125,7 +125,7 @@
 												<div class="form-group row">
 													<label class="col-sm-3 col-form-label">Mobile No. <span class="cRed">*</span></label>
 													<div class="col-sm-9">
-														<?php echo $this->Form->control('mobile', array('type'=>'tel', 'escape'=>false, 'id'=>'mobile', 'value'=>$customer_data['mobile'], 'label'=>false, 'class'=>'form-control input-field', 'readonly'=>true)); ?>
+														<?php echo $this->Form->control('mobile', array('type'=>'tel', 'escape'=>false, 'id'=>'mobile', 'value'=>$customer_data['mobile'], 'label'=>false, 'class'=>'form-control input-field')); ?>
 														<span id="error_mobile_no" class="error invalid-feedback"></span>
 													</div>
 												</div>

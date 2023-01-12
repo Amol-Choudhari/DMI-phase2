@@ -22,8 +22,12 @@
 		  </div>
 		</div>-->
 
-		<div class="carousel-item active">
-		  <img src="img/home-slider/banner2.jpg" alt="">
+		<div class="carousel-item active home-banner" id="main1">
+		  <!--
+				commented by shankhpal shende on 10/01/2023
+				background images are load from css file
+			<img src="" alt=""> -->
+
 		  <div class="carousel-caption">
 			<div id="pageintro" class="hoc clear" >
 				<article class="center" >
@@ -46,8 +50,12 @@
 		  </div>
 		</div>-->
 		
-		<div class="carousel-item">
-		   <img src="img/home-slider/banner4.jpg" alt="">
+		<div class="carousel-item home-banner" id="main2">
+		   <!--
+				commented by shankhpal shende on 10/01/2023
+				background images are load from css file
+			<img src="" alt=""> -->
+
 		  <div class="carousel-caption">
 			<div id="pageintro" class="hoc clear">
 				<article class="center">
@@ -58,8 +66,12 @@
 		  </div>
 		</div>
 		
-		<div class="carousel-item">
-		   <img src="img/home-slider/banner5.jpg" alt="">
+		<div class="carousel-item home-banner" id="main3">
+		   <!--
+				commented by shankhpal shende on 10/01/2023
+				background images are load from css file
+			<img src="" alt=""> -->
+
 		  <div class="carousel-caption">
 			<div id="pageintro" class="hoc clear">
 				<article class="center">

@@ -792,7 +792,7 @@
 		var postal_code=$("#postal_code").val();
 		var lab_email_id=$("#lab_email_id").val();
 		var lab_mobile_no=$("#lab_mobile_no").val();
-		var lab_fax_no=$("#lab_fax_no").val();
+		//var lab_fax_no=$("#lab_fax_no").val();
 		var is_lab_equipped=$("#is_lab_equipped").val();
 		var lab_equipped_docs=$("#lab_equipped_docs").val();
 		var chemist_detail_docs=$("#chemist_detail_docs").val();
@@ -917,7 +917,7 @@
 				$("#lab_mobile_no").click(function(){$("#error_lab_mobile_no").hide().text; $("#lab_mobile_no").removeClass("is-invalid");});	
 				value_return = 'false';
 			}
-			
+			/*
 			// Change Condition for validation and error message by pravin 11-07-2017
 			if(check_landline_number_validation(lab_fax_no).result == false){	
 				
@@ -925,7 +925,7 @@
 				$("#lab_fax_no").addClass("is-invalid");
 				$("#lab_fax_no").click(function(){$("#error_lab_fax_no").hide().text; $("#lab_fax_no").removeClass("is-invalid");});
 				value_return = 'false';
-			}
+			}*/
 		}
 		
 		//condition to work validations for BEVO fields

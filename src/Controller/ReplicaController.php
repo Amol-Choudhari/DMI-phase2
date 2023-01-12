@@ -1188,9 +1188,16 @@ class ReplicaController extends AppController {
 		$this->Session->write('overall_total_chrg',$overall_charges);
 		
 		//added by shankhpal shende on 19/08/2022 for implimenting QR code for replica EsignedChemist
-		$data = [$chemist_name,$firm_details['firm_name']];
+		//get nodal office of the applied CA
+		$this->loadModel('DmiApplWithRoMappings');
+		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($firm_details['customer_id']);
+		$region = $get_office['ro_office'];
+
+		$pdf_date = date('d-m-Y');
+
+		$data = [$chemist_name,$firm_details['customer_id'],$firm_details['firm_name'],$pdf_date,$region];
 		$result_for_qr = $this->Customfunctions->getQrCode($data,'CHM');
-		
+
 		$this->set('result_for_qr',$result_for_qr);
 		//end for QR code
 

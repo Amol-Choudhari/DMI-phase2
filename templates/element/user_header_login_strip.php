@@ -47,7 +47,7 @@
                     <li><a class="nav-link" href="<?php echo $this->getRequest()->getAttribute('webroot');?>users/user_profile"><i class="fas fa-address-book"></i> <span class="badge">View Profile</span></a></li>
                     <li><a class="nav-link" href="<?php echo $this->getRequest()->getAttribute('webroot');?>common/change_password"><i class="fas fa-key"></i> <span class="badge">Change Password</span></a></li>
                     <li><a class="nav-link" href="<?php echo $this->getRequest()->getAttribute('webroot');?>common/current_user_logs"><i class="fas fa-clock"></i> <span class="badge">Log History</span></a></li>
-					<li><a class="nav-link" href="<?php echo $this->getRequest()->getAttribute('webroot');?>dashboard/all_manuals"><i class="fas fa-address-book"></i> <span class="badge">User Manuals</span></a></li>
+					<li><a class="nav-link" href="<?php echo $this->getRequest()->getAttribute('webroot');?>common/all_manuals"><i class="fas fa-address-book"></i> <span class="badge">User Manuals</span></a></li>
                     <?php if ($current_user_division['role'] == 'Admin' || $current_user_division['role'] == 'Head Office') { ?>
                         <li><a class="nav-link" href="<?php echo $this->getRequest()->getAttribute('webroot');?>users/admin_logs"><i class="fas fa-clock"></i> <span class="badge">Admin Logs</span></a></li>
                     <?php } ?>
