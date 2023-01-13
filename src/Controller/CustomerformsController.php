@@ -265,6 +265,7 @@ class CustomerformsController extends AppController{
 					
 					//Save the firm profile update logs history (Done by pravin 13/2/2018)
 					$DmiFirmsHistoryLogsEntitny = $this->DmiFirmHistoryLogs->newEntity(array(
+
 						'customer_primary_id'=>$added_firms['customer_primary_id'],
 						'customer_primary_once_no'=>$added_firms['customer_primary_once_no'],
 						'customer_id'=>$added_firms['customer_id'],
@@ -288,7 +289,8 @@ class CustomerformsController extends AppController{
 						'is_already_granted'=>$added_firms['is_already_granted'],
 						'created'=>date('Y-m-d H:i:s'),
 						'modified'=>date('Y-m-d H:i:s'),
-						'profile_pic'=>$profile_pic
+						'profile_pic'=>$profile_pic,
+						'done_by'=>$_SESSION['username'] // as per change req. added by shankhpal shende on 12/01/2023
 					));
 					
 					$this->DmiFirmHistoryLogs->save($DmiFirmsHistoryLogsEntitny);

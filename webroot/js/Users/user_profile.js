@@ -1,3 +1,6 @@
+$("#phone").attr('maxlength', '10');
+
+
 $(document).ready(function(){
 
     bsCustomFileInput.init();

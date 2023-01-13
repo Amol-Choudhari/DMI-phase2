@@ -1105,7 +1105,9 @@ class CustomersController extends AppController {
                             'file' => $uploadedfile,
                             'created' => date('Y-m-d H:i:s'),
                             'modified' => date('Y-m-d H:i:s'),
-                            'profile_pic' => $profile_pic
+                            'profile_pic' => $profile_pic,
+                            'done_by'=>$this->Session->read('username') // as per change req. added by shankhpal shende on 12/01/2023
+
                         ));
 
                         $this->DmiCustomersHistoryLogs->save($DmiCustomersHistoryLogsEntity);
@@ -1355,13 +1357,24 @@ class CustomersController extends AppController {
         
         //Check if the Marked for the Action
         $this->loadModel('DmiSurrenderGrantCertificatePdfs');
-        $surrender_grant_certificate = $this->DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
+        $surrender_grant_certificate = $this->DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
         $this->set('surrender_grant_certificate', $surrender_grant_certificate);
 
         $this->loadModel('DmiMisgradeActionFinalSubmits');
-        $actionSubmitted = $this->DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
+        $actionSubmitted = $this->DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
         $this->set('actionSubmitted', $actionSubmitted);
-        
+
+        $this->loadModel('DmiShowcauseLogs');
+        $this->loadModel('DmiShowcauseNoticePdfs');
+
+        $conn = ConnectionManager::get('default');
+
+        $showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,dsl.date,dsl.end_date,dsnp.pdf_file 
+                                    FROM dmi_showcause_logs AS dsl
+                                    INNER JOIN dmi_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
+                                    WHERE dsl.customer_id='$customer_id' AND dsl.status='sent'")->fetch('assoc');
+       $this->set('showCauseNotice',$showCauseNotice);
+       
 
 		
     }

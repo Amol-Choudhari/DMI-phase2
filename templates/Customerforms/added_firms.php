@@ -249,8 +249,8 @@
 				                  <div class="form-group row">
 				                    <label for="inputEmail3" class="col-sm-3 col-form-label">Mobile No. <span class="cRed">*</span></label>
 				                    <div class="col-sm-9">
-				                      <?php echo $this->Form->control('mobile_no', array('type'=>'text', 'value'=>$added_firm['mobile_no'], 'id'=>'mobile_no', 'class'=>'form-control input-field', 'readonly'=>true, 'label'=>false)); ?>
-					                  <span id="error_mobile_no" class="error invalid-feedback"></span>
+										<?php echo $this->Form->control('mobile_no', array('type'=>'text', 'value'=>$added_firm['mobile_no'], 'id'=>'mobile_no', 'class'=>'form-control input-field', 'label'=>false)); ?>
+					                  	<span id="error_mobile_no" class="error invalid-feedback"></span>
 				                    </div>
 				                  </div>
 				                  <div class="form-group row">
