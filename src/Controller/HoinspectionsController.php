@@ -466,7 +466,8 @@ use App\Network\Response\Response;
 					//call custom function from Model with message id
 					//added this condition on 16-09-2019, if appln is CA BEVO
 					//then approved by JTAMA and send to DYAMA
-					if($ca_bevo_applicant == 'yes' && $application_type==1) { //added cond. on 22-11-2021 for appl. type = 1
+					//updated condition on 23-01-2023 for PP as per new order of 10-01-2023
+					if(($ca_bevo_applicant == 'yes' || $split_customer_id[1]==2) && $application_type==1) { //added cond. on 22-11-2021 for appl. type = 1
 
 						#SMS: JTAMA approved application
 						//$this->DmiSmsEmailTemplates->sendMessage(53,$customer_id);
@@ -623,7 +624,7 @@ use App\Network\Response\Response;
 				
 			//get records from grant certificate table
 			$fetch_all_granted_pdf = $this->$grant_cert_table->find('all',array('fields'=>array('customer_id','id','pdf_file','created','user_email_id'),'group'=>'customer_id,id,pdf_file,created','conditions'=>$condition,'order'=>'id DESC'))->toArray();
-			//pr($grant_cert_table); exit;
+			
 			$i=0;
 			$appl_array = array();
 			foreach($fetch_all_granted_pdf as $each_record)
@@ -641,7 +642,7 @@ use App\Network\Response\Response;
 					$this->loadModel('DmiApplWithRoMappings');
 					$find_office_id = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
 					$office_email_id = $find_office_id['ro_email_id'];
-
+					$office_type = $find_office_id['office_type'];
 					//get RO in-charge id to display all SO applications to RO
 					$ro_incharge = $this->Customfunctions->getApplRegOfficeId($customer_id,$appl_type_id);
 					
@@ -659,7 +660,7 @@ use App\Network\Response\Response;
 					
 					//get firm details table id
 					$this->loadModel('DmiFirms');
-					$get_firm_id = $this->DmiFirms->find('all',array('fields'=>'id','conditions'=>array('customer_id'=>$customer_id)))->first();
+					$get_firm_id = $this->DmiFirms->find('all',array('fields'=>array('id','firm_name'),'conditions'=>array('customer_id'=>$customer_id)))->first();
 					$f_id = $get_firm_id['id'];
 					
 					//get application form link
@@ -697,7 +698,7 @@ use App\Network\Response\Response;
 					
 					
 					
-					//set values to array to show in list with pdf links				
+					//set values to array to show in list with pdf links
 					$appl_array[$i]['cert_type'] = $cert_type.' - '.$form_type;
 					$appl_array[$i]['customer_id'] = $customer_id;
 					$appl_array[$i]['cert_pdf'] = $each_record['pdf_file'];
@@ -706,19 +707,45 @@ use App\Network\Response\Response;
 					$appl_array[$i]['grant_date'] = $each_record['created'];
 					$appl_array[$i]['appl_form'] = $appl_form;
 					$appl_array[$i]['report_form'] = $report_form;
-
+					$appl_array[$i]['firm_name'] = $get_firm_id['firm_name'];
+					
 					$appl_array[$i]['show_esign_btn'] = 'no';
 					if($each_record['user_email_id']==$office_email_id || $each_record['user_email_id']==$ro_incharge){
 
 						$appl_array[$i]['show_esign_btn'] = 'no';
-					}else{
-						$this->loadModel('DmiGrantProvCertificateLogs');
-						$getStatus = $this->DmiGrantProvCertificateLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
-						if(!empty($getStatus) && $getStatus['status']==null){							
-							$appl_array[$i]['show_esign_btn'] = 'yes';
-						}						
 					}
-					
+					//else part commented on 16-01-2023 to show esign button if status is null in prov grant table
+					//else{
+						$this->loadModel('DmiGrantProvCertificateLogs');
+						$getStatus = $this->DmiGrantProvCertificateLogs->find('all',array('fields'=>array('id','status'),'conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+						if(!empty($getStatus) && $getStatus['status']==null){
+							$appl_array[$i]['show_esign_btn'] = 'yes';
+						}
+					//}	
+						
+						$appl_array[$i]['status'] = $getStatus['status'];
+						//This condition block is added to provide message if the SO Office is not having the role of so_pp_grant - Akash [18-01-2023]
+						//updated below conditions on 24-01-2023 by Amol
+						//for PP application
+						if($cert_type == 'Printing Press' && $office_type =='SO' && $ro_incharge != $username){
+							
+							if($roles['so_grant_pp'] != 'yes'){
+								$appl_array[$i]['show_esign_btn'] = 'No Grant Role';
+							}
+						}
+						//for Laboratory application, SO can not grant Lab appln
+						if($cert_type == 'Laboratory' && $office_type =='SO' && $ro_incharge != $username){
+
+							$appl_array[$i]['show_esign_btn'] = 'No Grant Role';
+						}
+						//for CA application, SO can not grant BEVO appln
+						if($cert_type == 'CA' && $office_type =='SO' && $ro_incharge != $username){
+							
+							if($form_type=='E'){
+								$appl_array[$i]['show_esign_btn'] = 'No Grant Role';
+							}
+							
+						}
 					
 					$i=$i+1;
 					

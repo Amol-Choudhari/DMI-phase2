@@ -122,7 +122,7 @@
 							<?php } ?>
 						</div>
 					</div>
-    			</section>
+				</section>
 
 				<?php if ($application_type != 2) { echo $this->element('application_forms/progress_bar/forms_application_progress_bar'); } ?>
 				<?php echo $this->fetch('content'); ?>

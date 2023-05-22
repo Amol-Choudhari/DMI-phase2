@@ -116,7 +116,7 @@ class CustomfunctionsComponent extends Component {
 
 					//update new DY AMA id in HO allocation table for all application
 					$Dmi_ho_allocation->updateAll(array('dy_ama' => "$user_email_id"),array('1=1'));
-					$Dmi_ho_allocation->updateAll(array('current_level' => "$user_email_id"),array('current_level' => $current_dyama));
+					$Dmi_ho_allocation->updateAll(array('current_level' => "$user_email_id"),array('current_level IS' => $current_dyama));
 				}
 			}
 			
@@ -150,7 +150,7 @@ class CustomfunctionsComponent extends Component {
 
 					//update new JT AMA id in HO allocation table for all application
 					$Dmi_ho_allocation->updateAll(array('jt_ama' => "$user_email_id"),array('1=1'));
-					$Dmi_ho_allocation->updateAll(array('current_level' => "$user_email_id"),array('current_level' => $current_jtama));
+					$Dmi_ho_allocation->updateAll(array('current_level' => "$user_email_id"),array('current_level IS' => $current_jtama));
 				}
 			}
 			
@@ -183,7 +183,7 @@ class CustomfunctionsComponent extends Component {
 
 					//update new AMA id in HO allocation table for all application
 					$Dmi_ho_allocation->updateAll(array('ama' => "$user_email_id"),array('1=1'));
-					$Dmi_ho_allocation->updateAll(array('current_level' => "$user_email_id"),array('current_level' => $current_ama));
+					$Dmi_ho_allocation->updateAll(array('current_level' => "$user_email_id"),array('current_level IS' => $current_ama));
 				}
 			}
 		}
@@ -267,8 +267,10 @@ class CustomfunctionsComponent extends Component {
 
 		$Dmi_allocation = TableRegistry::getTableLocator()->get($allocation_table);
 		$grantDateCondition = $this->returnGrantDateCondition($customer_id);
-		$secondPhaseLaunchDate = '07/06/2020';
-		$phaseOneApplication = $Dmi_allocation->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) <'=>$secondPhaseLaunchDate,$grantDateCondition)))->first();
+		//$secondPhaseLaunchDate = '07/06/2020';
+		//$phaseOneApplication = $Dmi_allocation->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'date(created) <'=>$secondPhaseLaunchDate,$grantDateCondition)))->first();
+		//commented above query and added blank array on 27-02-2023 by Amol, as this deciding office type with to date not useful now.
+		$phaseOneApplication = array();
 
 		//get district id from firm table
 		$dist_id = '';
@@ -375,7 +377,6 @@ class CustomfunctionsComponent extends Component {
 		}
 	}
 
-
 	// Get firm Heading
 	public function firmTypeText($customer_id) {
 
@@ -428,14 +429,22 @@ class CustomfunctionsComponent extends Component {
 
 			if ($this->checkApplicantExportUnit($customer_id) == 'yes') {
 
-				$form_type = 'F';
+				//condition added on 10-03-2023, as no BEVO application process with export option by Amol
+				if($this->checkCaBevo($customer_id)=='yes'){
+					$form_type = 'E';
+				}else{
+					$form_type = 'F';
+				}
 
 			} else {
 
-				$check_application_type = $Dmi_firm->find('all',array('fields'=>array('commodity','export_unit'),'conditions'=>array('customer_id IS'=>$customer_id)))->first();
+				//$check_application_type = $Dmi_firm->find('all',array('fields'=>array('commodity','export_unit'),'conditions'=>array('customer_id IS'=>$customer_id)))->first();
 				
 				//added id '11' on 05-09-2022 for Fat Spread updates after UAT
-				if ($check_application_type['commodity'] == 106 || $check_application_type['commodity'] == 11) {
+				//if ($check_application_type['commodity'] == 106 || $check_application_type['commodity'] == 11) {
+	 	
+				//commneted above code and called bevo check funstion directly on 10-03-2023 by Amol
+				if($this->checkCaBevo($customer_id)=='yes'){
 
 					$form_type = 'E';
 
@@ -1444,79 +1453,91 @@ class CustomfunctionsComponent extends Component {
 
 		$DmiRenewalFinalSubmits = TableRegistry::getTableLocator()->get('DmiRenewalFinalSubmits');
 		$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
-
-		if ($appl_type==null) {
-			$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
-		} else {
-			//get flow wise final submit table
-			$getfinalSubmiModel = $DmiFlowWiseTablesLists->getFlowWiseTableDetails($appl_type,'application_form');
-			$DmiFinalSubmits = TableRegistry::getTableLocator()->get($getfinalSubmiModel);
-		}
-
 		$application_status = null;
-		//check final submit table status
-		$final_submit_ids = $DmiFinalSubmits->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
-		if (!empty($final_submit_ids)) {
-			
-			$final_submit_last_details = $DmiFinalSubmits->find('all', array('conditions'=>array('id'=>max($final_submit_ids))))->first();
-			$final_submit_status = $final_submit_last_details['status'];
-			$final_submit_level = $final_submit_last_details['current_level'];
 
-			if ($final_submit_status=='pending' || $final_submit_status=='replied') {
+		#The Below Block is modified if the application is surrender - Akash[14-04-2023]
+		#FOR Surrender Flow 
+		$isSurrender = $this->isApplicationSurrendered($customer_id);
+		if(!empty($isSurrender)){
+			$application_status = 'Surrendered';
+		}else{
 
-				$application_status = 'In Progress';
-
-			} elseif ($final_submit_status=='referred_back') {
-
-				$application_status = 'Referred Back';
-
-			} elseif ($final_submit_status=='approved' && ($final_submit_level=='level_1' || $final_submit_level=='level_2')) {
-
-				$application_status = 'In Progress';
-
-			} else {//if approved status
-
-				//check if renewal due
-				$check_renewal_due = $this->checkApplicantValidForRenewal($customer_id);
+			if ($appl_type==null) {
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get('DmiFinalSubmits');
+			} else {
+				//get flow wise final submit table
+				$getfinalSubmiModel = $DmiFlowWiseTablesLists->getFlowWiseTableDetails($appl_type,'application_form');
+				$DmiFinalSubmits = TableRegistry::getTableLocator()->get($getfinalSubmiModel);
+			}
+	
+		
+			//check final submit table status
+			$final_submit_ids = $DmiFinalSubmits->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+		
+			if (!empty($final_submit_ids)) {
 				
-				if ($check_renewal_due == 'yes') {
-
-					//check Renewal final submit table status
-					$renewal_final_submit_ids = $DmiRenewalFinalSubmits->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+				$final_submit_last_details = $DmiFinalSubmits->find('all', array('conditions'=>array('id'=>max($final_submit_ids))))->first();
+				$final_submit_status = $final_submit_last_details['status'];
+				$final_submit_level = $final_submit_last_details['current_level'];
+	
+				if ($final_submit_status=='pending' || $final_submit_status=='replied') {
+	
+					$application_status = 'In Progress';
+	
+				} elseif ($final_submit_status=='referred_back') {
+	
+					$application_status = 'Referred Back';
+	
+				} elseif ($final_submit_status=='approved' && ($final_submit_level=='level_1' || $final_submit_level=='level_2')) {
+	
+					$application_status = 'In Progress';
+	
+				} else {//if approved status
+	
+					//check if renewal due
+					$check_renewal_due = $this->checkApplicantValidForRenewal($customer_id);
 					
-					if (!empty($renewal_final_submit_ids)) {
-
-						$renewal_final_submit_last_details = $DmiRenewalFinalSubmits->find('all', array('conditions'=>array('id'=>max($renewal_final_submit_ids))))->first();
-						$renewal_final_submit_status = $renewal_final_submit_last_details['status'];
-
-						if ($renewal_final_submit_status=='pending' || $renewal_final_submit_status=='replied') {
-
-							$application_status = 'Renewal In Progress';
-
-						} elseif ($renewal_final_submit_status=='referred_back') {
-
-							$application_status = 'Renewal Referred Back';
-
+					if ($check_renewal_due == 'yes') {
+	
+						//check Renewal final submit table status
+						$renewal_final_submit_ids = $DmiRenewalFinalSubmits->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+						
+						if (!empty($renewal_final_submit_ids)) {
+	
+							$renewal_final_submit_last_details = $DmiRenewalFinalSubmits->find('all', array('conditions'=>array('id'=>max($renewal_final_submit_ids))))->first();
+							$renewal_final_submit_status = $renewal_final_submit_last_details['status'];
+	
+							if ($renewal_final_submit_status=='pending' || $renewal_final_submit_status=='replied') {
+	
+								$application_status = 'Renewal In Progress';
+	
+							} elseif ($renewal_final_submit_status=='referred_back') {
+	
+								$application_status = 'Renewal Referred Back';
+	
+							} else {
+	
+								$application_status = 'Renewal Granted';
+							}
+							
 						} else {
-
-							$application_status = 'Renewal Granted';
+	
+							$application_status = 'Renewal Due';
 						}
 						
 					} else {
-
-						$application_status = 'Renewal Due';
+	
+						$application_status = 'Granted';
 					}
-					
-				} else {
-
-					$application_status = 'Granted';
 				}
+	
+			} else {
+	
+					$application_status = 'Not Applied yet';
 			}
-
-		} else {
-
-				$application_status = 'Not Applied yet';
+		
 		}
+		
 
 		return $application_status;
 
@@ -1594,6 +1615,24 @@ class CustomfunctionsComponent extends Component {
 			} else {
 
 				$show_renewal_btn = 'no';
+				
+				//code added on 25-01-2023 to show renewal button for specific condition applicant, on request
+				//required for PP appl, which was granted after date 01-04-2021, but before order implemetation in code.
+				if ($split_customer_id[1] == 2) {
+					
+					$last_grant_date = strtotime(str_replace('/','-',$grant_date));
+					$new_order_date = strtotime(str_replace('/','-',date('01-04-2021')));
+					$end_date = strtotime(str_replace('/','-',date('31-01-2023')));					
+					$renewalLastPending = $DmiRenewalFinalSubmits->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'pending'),'order'=>'id DESC'))->first();					
+					if(!empty($renewalLastPending)){//condition added on 10-03-2023
+						$renewalLastPending = strtotime(str_replace('/','-',$renewalLastPending['created']));
+					}					
+					
+					if (($last_grant_date > $new_order_date) && ($renewalLastPending < $last_grant_date) && ($get_current_date <= $end_date)) {
+						$show_renewal_btn = 'yes';
+					}				
+				}
+				
 			}
 
 		} else {
@@ -2108,22 +2147,21 @@ class CustomfunctionsComponent extends Component {
 		// $name = implode(array_slice($em, 0, count($em)-1), '@');
 		$name = implode('@', array_slice($em, 0, count($em)-1));
 		$len  = floor(strlen($name)/2);
-
 		$split_name = str_split($name, 1);
 
 		$i=0;
 		$j=0;
+
 		foreach($split_name as $each) {
 
-				if ($i % 2 == 0) {
-						$masked_value_array[$j] = str_replace($split_name[$i],'X', $each);
+			if ($i % 2 == 0) {
+				$masked_value_array[$j] = str_replace($split_name[$i],'X', $each);
+			} else {
+				$masked_value_array[$j] = $each;
+			}
 
-				} else {
-
-						$masked_value_array[$j] = $each;
-				}
-				$i=$i+1;
-				$j=$j+1;
+			$i=$i+1;
+			$j=$j+1;
 		}
 
 		$masked_value = implode('',$masked_value_array) . "@" . end($em);
@@ -2196,8 +2234,6 @@ class CustomfunctionsComponent extends Component {
 		$max_id_from_list = max($db_table_id_list);
 
 		if (filter_var($post_input_request, FILTER_VALIDATE_INT, array("options" => array("min_range"=>$min_id_from_list, "max_range"=>$max_id_from_list))) === false) {
-
-
 			$this->Controller->customAlertPage("One of selected drop down value is not proper");
 			exit;
 		} else {
@@ -2743,9 +2779,13 @@ class CustomfunctionsComponent extends Component {
 
 
 	// Return Grant Date Condition
-	public function returnGrantDateCondition($customer_id) {
+	public function returnGrantDateCondition($customer_id,$application_type=null) {//new argument added on 13-04-2023 "$application_type"
 
-		$application_type = $this->Session->read('application_type');
+		//condition added on 17-03-2023, to get application type from argument
+		if(empty($application_type)){
+			$application_type = $this->Session->read('application_type');
+		}
+		
 		$advancepayment = $this->Session->read('advancepayment');
 
 
@@ -2854,19 +2894,20 @@ class CustomfunctionsComponent extends Component {
 		$application_type = $this->Session->read('application_type');
 		$sections = array();
 
-		if ($application_type == 3 ) {
+		//commented on 13-04-2023 to manage updated changed flow.
+		/*if ($application_type == 3 ) {
 
 			$DmiChangeSelectedFields = TableRegistry::getTableLocator()->get('DmiChangeSelectedFields');
 			$selectedfields = $DmiChangeSelectedFields->selectedChangeFields();
 			$sections = $selectedfields[2];
 
-		} else {
+		} else {*/
 
 			foreach ($allSectionDetails as $section) {
 
 				$sections[] =  $section['section_id'];
 			}
-		}
+		/*}*/
 
 		sort($sections);
 
@@ -2904,8 +2945,9 @@ class CustomfunctionsComponent extends Component {
 
 		if ($appl_type == 3) {
 
-			$form_type = $this->checkApplicantFormType($customer_id);
-			$grantDateCondition = $this->returnGrantDateCondition($customer_id);
+			//commented on 13-04-2023 as per updates
+			//$form_type = $this->checkApplicantFormType($customer_id);
+			$grantDateCondition = $this->returnGrantDateCondition($customer_id,$appl_type);//added new parameter in call "$appl_type" on 13-04-2023
 			$selectedfields = $DmiChangeSelectedFields->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition)))->first();
 
 			if ($selectedfields != null) {
@@ -2913,9 +2955,11 @@ class CustomfunctionsComponent extends Component {
 			}
 
 			foreach ($selectedValues as $data) {
-
-				$changeField = $DmiChangeFieldLists->find('all',array('valueField'=>array('inspection'),'conditions'=>array('field_id IS'=>$data, 'form_type IS'=>$form_type)))->first();
+							//in conditions applied firm_type => 'common' on 13-04-2023
+				$changeField = $DmiChangeFieldLists->find('all',array('valueField'=>array('inspection'),'conditions'=>array('field_id IS'=>$data, 'form_type IS'=>'common')))->first();
 				
+																																											 
+	
 				if (!empty($changeField) && $changeField['inspection'] == 'yes') {
 					$inspection = 'yes';
 				}
@@ -3458,25 +3502,7 @@ class CustomfunctionsComponent extends Component {
 			$customer_id = $this->Session->read('username');
 		}
 
-		/*
-		if ($type =='CHM') {
-			
-			if(!empty($result[0])){
-
-				$tableRowData = $result[0];
-				$i=0;
-				$data1 = '';
-				$data2 = '';
-				$data3 = '';
-				foreach($tableRowData as $each){ 
-					$data1 .=  $each['commodity_name'].",";
-					$data2 .= $each['tbl_name'].",";
-					$data3 .= $each['printer_name'].",";
-				} 
-			}
-		}
-		*/
-
+	
 
 		$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
 				
@@ -3489,7 +3515,7 @@ class CustomfunctionsComponent extends Component {
 		}elseif($type=='ECode'){
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
 		}else{
-			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][0];
+			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][max(array_keys($result[2]))];
 		}
 
 		$qrimgname = rand();
@@ -3563,7 +3589,7 @@ class CustomfunctionsComponent extends Component {
 
 
 	//isApplicationRejected
-	//Description: Returns Yes or No based on the application status junked.
+	//Description: Returns Yes or No based on the application status surrender.
 	//@Author : Akash Thakre
 	//Date : 14-11-2022
 
@@ -3579,7 +3605,10 @@ class CustomfunctionsComponent extends Component {
 		return $isSurrender;
 	}
 
-
+	public function is_base64_encoded($data){
+		if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $data)) 
+		return false;
+    }
 
 
 }

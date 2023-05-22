@@ -170,6 +170,29 @@ class RomoioapplicantcommunicationactionsComponent extends Component {
 				$allFormsApproved = $this->Customfunctions->formStatusValue($allSectionDetails,$customer_id);
 
 				if($allFormsApproved == 2 ){
+					
+					//for specific flows where office type is RO and Stay on the window after Scrtiny to Grant
+					//condition added on 13-04-2023 by Amol, to avoid redirect after all section scrutinized
+					//FLOWS : Chemist , Surrender, Change
+					$office_type = $this->Customfunctions->getApplDistrictOffice($customer_id);
+					if($application_type==3 || $application_type==4 || $application_type==9){ 
+					
+						if ($office_type=='RO' && $application_type==3) {
+							$changeInspection = $this->Customfunctions->inspRequiredForChangeApp($customer_id,$application_type);
+							if ($changeInspection=='no') {
+								return 2;
+							}
+							
+						} elseif ($application_type==4) {
+							
+							$NewChemist = 'yes';
+							if ($NewChemist=='yes') {return 2;}
+							
+						} elseif ($office_type=='RO' && $application_type==9) {
+							return 2;
+						}
+						
+					}
 
 					if($oldapplication == 'yes' && empty($old_dates_verified) && $application_type==1){
 

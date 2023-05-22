@@ -204,7 +204,7 @@ class AdvancepaymentController extends AppController{
 				$this->DmiSmsEmailTemplates->sendMessage(62,$customer_id); #DDO
 				
 				$this->Customfunctions->saveActionPoint('Advance Payment(Save)', 'Success'); #Action
-				$message = 'Advance payment saved. After verification of payment details, the amount will be creadited on your account.';
+				$message = 'Advance payment saved. After verification of payment details, the amount will be credited on your account.';
 				$message_theme = 'success';
 				$redirect_to = 'add_payment';
 			}

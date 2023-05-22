@@ -516,11 +516,11 @@ class RolesController extends AppController{
 				'reports'=>$reports,
 				'dashboard'=>$dashboard,
 				'out_forward'=>$out_forward,
-				'RO'=>$RO,
-				'SO'=>$SO,
-				'RAL'=>$RAL,
-				'CAL'=>$CAL,
-				'HO'=>$HO,
+				'ro'=>$RO,
+				'so'=>$SO,
+				'ral'=>$RAL,
+				'cal'=>$CAL,
+				'ho'=>$HO,
 				'user_flag'=>$user_flag,
 				'created'=>date('Y-m-d H:i:s'),
 				'modified'=>date('Y-m-d H:i:s')
@@ -1170,10 +1170,23 @@ class RolesController extends AppController{
 				// Update set user role logs history
 				$this->loadModel('DmiUserRolesManagmentLogs');
 				$update_user_roles_details = $this->DmiUserRolesManagmentLogs->updateUserRoles($user_roles_details,$user_email_id);
-
-				$add_user_roles = $update_user_roles_details[0];
-				$remove_user_roles = $update_user_roles_details[1];
-				$action = $update_user_roles_details[2];
+				
+				//This below code block is added on - 25-01-2023
+				$add_user_roles = null;
+				$remove_user_roles = null;
+				$action = null;
+				
+				if(!empty($update_user_roles_details[0])){
+					$add_user_roles = $update_user_roles_details[0];
+				}
+				if(!empty($update_user_roles_details[1])){
+					$remove_user_roles = $update_user_roles_details[1];
+				}
+				if(!empty($update_user_roles_details[2])){
+					$action = $update_user_roles_details[2];
+				}
+				
+				
 
 				$user_roles_details =implode(',',$user_roles_details);
 
@@ -1235,11 +1248,11 @@ class RolesController extends AppController{
 					'reports'=>$reports,
 					'dashboard'=>$dashboard,
 					'out_forward'=>$out_forward,
-					'RO'=>$RO,
-					'SO'=>$SO,
-					'RAL'=>$RAL,
-					'CAL'=>$CAL,
-					'HO'=>$HO,
+					'ro'=>$RO,
+					'so'=>$SO,
+					'ral'=>$RAL,
+					'cal'=>$CAL,
+					'ho'=>$HO,
 					'user_flag'=>$user_flag,
 					'modified'=>date('Y-m-d H:i:s')
 

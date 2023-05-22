@@ -642,12 +642,12 @@ class DashboardController extends AppController{
 				$appl_list_array = array();
 			//first loop for each application/flow type
 				foreach($flow_wise_tables as $each_flow){
-
+						
 					//get flow/application type
 					$this->loadModel('DmiApplicationTypes');
 					$get_appl_type = $this->DmiApplicationTypes->find('all',array('conditions'=>array('id IS'=>$each_flow['application_type'])))->first();
 					$appl_type = $get_appl_type['application_type'];
-
+					 
 					$allocation_table = $each_flow['allocation'];
 					$allocationTable = strtolower(implode('_',array_filter(preg_split('/(?=[A-Z])/',$allocation_table))));
 					$this->loadModel($allocation_table);
@@ -687,7 +687,6 @@ class DashboardController extends AppController{
 								$creat_array='';//clear variable each time
 								$customer_id = $each_alloc['customer_id'];
 
-								$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 								//get_form_type
 								$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 								//get firm details
@@ -696,6 +695,7 @@ class DashboardController extends AppController{
 								$firm_table_id = $firm_details['id'];
 								$appl_type_id = $each_flow['application_type'];
 								$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+								$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id,$appl_type_id);//added new parameter in call "$appl_type_id" on 14-04-2023
 
 								//get Nodal officer details
 								$this->loadModel('DmiUsers');
@@ -718,7 +718,13 @@ class DashboardController extends AppController{
 									//commented below condition to show allocated appls also in allocation window, on 10-08-2022
 									//if($current_pos['current_level']=='level_3' && $current_pos['current_user_email_id']==$username){
 
-										$creat_array = true;
+										//application must not be with applicant while allocation
+										//added on 03-02-2023 by Amol
+										$finalSubmitStatus = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+										if($finalSubmitStatus['status'] != 'referred_back'){
+											$creat_array = true;
+										}
+										
 									//}
 
 								}
@@ -784,7 +790,6 @@ class DashboardController extends AppController{
 
 								if($inspection == 'yes'){
 
-									$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 									//get_form_type
 									$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 									//get firm details
@@ -793,6 +798,7 @@ class DashboardController extends AppController{
 									$firm_table_id = $firm_details['id'];
 									$appl_type_id = $each_flow['application_type'];
 									$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+									$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id,$appl_type_id);//added new parameter in call "$appl_type_id" on 14-04-2023
 
 									//get Nodal officer details
 									$this->loadModel('DmiUsers');
@@ -821,7 +827,12 @@ class DashboardController extends AppController{
 												//commented below condition to show allocated appls also in allocation window, on 10-08-2022
 												//if($current_pos['current_level']=='level_3' && $current_pos['current_user_email_id']==$username){
 
-													$creat_array = true;
+												//application must not be with applicant while allocation
+													//added on 03-02-2023 by Amol
+													$finalSubmitStatus = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+													if($finalSubmitStatus['status'] != 'referred_back'){
+														$creat_array = true;
+													}
 
 												//}
 
@@ -847,26 +858,28 @@ class DashboardController extends AppController{
 							}
 						}
 						elseif($sub_tab=='scrutiny_allocation_by_level4ro_tab'){
-
+						
 							$get_allocations = $this->$allocation_table->find('all',array('conditions' => array('level_4_ro IS'=>$username)))->toArray();
-
+						
 							foreach($get_allocations as $each_alloc){
 
 								$creat_array='';//clear variable each time
 								$customer_id = $each_alloc['customer_id'];
 
-								$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-
+								
 								//get_form_type
 								$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
 								//get appl current position user
 								$current_pos = $this->Customfunctions->getApplCurrentPos($appl_current_pos_table,$customer_id);
+							
 								//get firm details
 								$firm_details = $this->DmiFirms->firmDetails($customer_id);
 								$firm_name = $firm_details['firm_name'];
 								$firm_table_id = $firm_details['id'];
 								$appl_type_id = $each_flow['application_type'];
 								$appl_view_link = '../scrutiny/form_scrutiny_fetch_id/'.$firm_table_id.'/view/'.$appl_type_id;
+								$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id,$appl_type_id);//added new parameter in call "$appl_type_id" on 14-04-2023
+							
 
 								//get Nodal officer details
 								$this->loadModel('DmiUsers');
@@ -876,18 +889,23 @@ class DashboardController extends AppController{
 								}else{
 									$comm_with='Not Allocated';
 								}
-
+								
 								//check reports final submitted
 								$reports_submitted_status = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,'status'=>'approved','current_level'=>'level_2')))->first();
 								//check final submit status for level 3 & 4 and approved for each allocated id
 								$approved_status = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,'status'=>'approved','OR'=>array('current_level IN'=>array('level_3','level_4')))))->first();
-
+					
 								if(!empty($reports_submitted_status) && empty($approved_status)){
 
 									//commented below condition to show allocated appls also in allocation window, on 10-08-2022
 									//if($current_pos['current_level']=='level_4_ro' && $current_pos['current_user_email_id']==$username){
 
-										$creat_array = true;
+										//application must not be with applicant while allocation
+										//added on 03-02-2023 by Amol
+										$finalSubmitStatus = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+										if($finalSubmitStatus['status'] != 'referred_back'){
+											$creat_array = true;
+										}
 
 									//}
 								}
@@ -957,7 +975,12 @@ class DashboardController extends AppController{
 									//commented below condition to show allocated appls also in allocation window, on 10-08-2022
 									//if($current_pos['current_user_email_id']==$username && $current_pos['current_level']=='level_4'){
 
-										$creat_array = true;
+										//application must not be with applicant while allocation
+										//added on 03-02-2023 by Amol
+										$finalSubmitStatus = $this->$final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+										if($finalSubmitStatus['status'] != 'referred_back'){
+											$creat_array = true;
+										}
 
 									//}
 
@@ -1122,7 +1145,7 @@ class DashboardController extends AppController{
 
 					'customer_id'=>$customer_id,
 					'application_type'=>$appl_type_id['id'],
-					'created'=>$current_date,
+					'created'=>date('Y-m-d H:i:s'),
 					'user_id'=>$user_id,
 					'mo_office'=>$mo_office,
 					'mo_email_id'=>$mo_user_id,
@@ -1131,6 +1154,66 @@ class DashboardController extends AppController{
 				));
 
 				if($this->DmiMoAllocationLogs->save($allocation_logs_entity)){
+					//check if reallocating application and comments in Mo-RO comments table
+					//if found entry then enter new record from RO to MO comment, to manage reallocation
+					if($allocation_type=='1' || $allocation_type=='3' || $allocation_type=='5'){
+						
+						//for Nodal officer scrutiny
+						if($allocation_type=='1'){
+							$commentsTable = $flow_wise_tables['commenting_with_mo'];
+							$this->loadModel($commentsTable);
+							$dataArray = array(
+								'customer_id'=>$customer_id,
+								'comment_by'=>$username,
+								'comment_to'=>$mo_user_id,
+								'comment_date'=>date('Y-m-d H:i:s'),
+								'comment'=>'Reallocated for Scrutiny',
+								'created'=>date('Y-m-d H:i:s'),
+								'modified'=>date('Y-m-d H:i:s'),
+								'available_to'=>'mo'
+							);
+						
+						//for Level4 RO scrutiny
+						}else if($allocation_type=='3'){
+							$commentsTable = $flow_wise_tables['ro_so_comments'];
+							$this->loadModel($commentsTable);
+							$dataArray = array(
+								'customer_id'=>$customer_id,
+								'comment_by'=>$username,
+								'comment_to'=>$mo_user_id,
+								'comment_date'=>date('Y-m-d H:i:s'),
+								'comment'=>'Reallocated for Scrutiny',
+								'created'=>date('Y-m-d H:i:s'),
+								'modified'=>date('Y-m-d H:i:s'),
+								'from_user'=>'ro',
+								'to_user'=>'mo',
+							);
+						
+						//for HO level scrutiny
+						}else if($allocation_type=='5'){
+							$commentsTable = $flow_wise_tables['ho_comment_reply'];
+							$this->loadModel($commentsTable);
+							$dataArray = array(
+								'customer_id'=>$customer_id,
+								'comment_by'=>$username,
+								'comment_to'=>$mo_user_id,
+								'comment_date'=>date('Y-m-d H:i:s'),
+								'comment'=>'Reallocated for Scrutiny',
+								'created'=>date('Y-m-d H:i:s'),
+								'modified'=>date('Y-m-d H:i:s'),
+								'from_user'=>'dy_ama',
+								'to_user'=>'ho_mo_smo',
+							);
+						}
+						//check last comment record	
+						$checkRecord = $this->$commentsTable->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id desc'))->first();
+						if(!empty($checkRecord)){
+							$ro_mo_comments_entity = $this->$commentsTable->newEntity($dataArray);
+							$this->$commentsTable->save($ro_mo_comments_entity);
+						}
+						
+						
+					}
 					
 					#SMS: Allocation
 					$this->DmiSmsEmailTemplates->sendMessage($msg_id,$customer_id);
@@ -1232,7 +1315,7 @@ class DashboardController extends AppController{
 
 					'customer_id'=>$customer_id,
 					'application_type'=>$appl_type_id['id'],
-					'created'=>$current_date,
+					'created'=>date('Y-m-d H:i:s'),
 					'user_id'=>$user_id,
 					'io_office'=>$io_office,
 					'io_email_id'=>$io_user_id,
@@ -1633,7 +1716,7 @@ class DashboardController extends AppController{
 						$main_tab_count['rejected']= count($this->Commonlistingfunctions->fetchRecords($for_level,'rejected'));
 					 }
 
-	//print_r($main_tab_count);exit;
+
 					//for allocation
 					
 					if($for_status[0]=='allocation'){
@@ -2197,6 +2280,28 @@ class DashboardController extends AppController{
 		exit;
 
 	}
+	
+	
+	//ajax function to fetch TO Office, type wise on 30-01-2023 by Amol
+	//from application transfer module
+	public function getToOffice(){
+
+		$this->autoRender = false;
+		$this->loadModel('DmiRoOffices');
+
+		$office_id = $this->request->getData('from_office');
+		$getOffice_type = $this->DmiRoOffices->find('all',array('fields'=>'office_type','conditions'=>array('id IS'=>$office_id)))->first();
+		$office_type = $getOffice_type['office_type'];
+		
+		//using core joins due issue in cakephp 3.8 joins format
+		$conn = ConnectionManager::get('default');
+		$stmt = $conn->execute("select id,ro_office from dmi_ro_offices where office_type='$office_type' AND delete_status IS NULL");
+		$appl_list = $stmt ->fetchAll('assoc');
+
+		echo '~'.json_encode($appl_list).'~';
+		exit;
+
+	}
 
 
 	//this function called through ajax to get application status details
@@ -2467,6 +2572,7 @@ class DashboardController extends AppController{
 		}
 	}
 	
+	public function allManuals(){}
 
 	//this function is added to set session for visiting tabs and sub tabs from pending status window
 	public function setSessionForStatusTabsClick(){

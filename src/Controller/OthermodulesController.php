@@ -19,8 +19,11 @@ class OthermodulesController extends AppController{
 		$this->loadComponent('Createcaptcha');
 		$this->loadComponent('Customfunctions');
 		$this->loadComponent('Authentication');
+		$this->loadComponent('Communication');
 		$this->viewBuilder()->setHelpers(['Form','Html','Time']);
 		$this->viewBuilder()->setLayout('admin_dashboard');
+        $this->Session = $this->getRequest()->getSession();
+
 	}
 
 	//Before Filter
@@ -28,24 +31,23 @@ class OthermodulesController extends AppController{
 
 		parent::beforeFilter($event);
 
+
 		$username = $this->getRequest()->getSession()->read('username');
-
+     
 		if ($username == null){
-
 			$this->customAlertPage("Sorry You are not authorized to view this page..");
-			exit();
-
 		} else {
+            if (preg_match("/^[0-9]+\/[0-9]+\/[A-Z]+\/[0-9]+$/", $username, $matches) == 1) { 
 
-			$this->loadModel('DmiUsers');
-			//Check User
-			$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$this->Session->read('username'))))->first();
-
-			if (empty($check_user)) {
-				$this->customAlertPage("Sorry You are not authorized to view this page..");
-				exit();
-			}
-		}
+            } elseif (preg_match("/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/", $username,$matches)==1) {
+                
+                $this->loadModel('DmiUsers');
+                $check_user = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$this->Session->read('username'))))->first();
+                if (empty($check_user)) {
+                    $this->customAlertPage("Sorry You are not authorized to view this page..");
+                }
+            }
+        }
 	}
 
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
@@ -166,7 +168,9 @@ class OthermodulesController extends AppController{
 		//$grant_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id'=>$this->Session->read('customer_id'),'pdf_version'=>'2')))->first();
 
 		$grant_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$this->Session->read('customer_id'),'user_email_id IS NOT'=>'old_application'),'order'=>'id desc'))->first();
-		$grant_date = chop($grant_details['date'],'00:00:00');
+		//$grant_date = chop($grant_details['date'],'00:00:00');
+		$grant_date = explode(' ',$grant_details['date']);
+		$grant_date = $grant_date[0];	   
 		$this->Session->write('re_esign_grant_date',$grant_date);
 
 		//creating application type session
@@ -558,8 +562,7 @@ class OthermodulesController extends AppController{
             'appl_type'=>$appl_type,
             'created'=>date('Y-m-d H:i:s'),
             'modified'=>date('Y-m-d H:i:s'),
-
-        ));
+    ));
 
 
         if ($this->DmiWorkTransferLogs->save($DmiWorkTranferLogEntity)) {
@@ -942,16 +945,25 @@ class OthermodulesController extends AppController{
 			$for_firm = 'secondary';
 			$userOffice = $this->DmiUsers->find('all',array('fields'=>array('posted_ro_office'),'conditions'=>array('email IS'=>$userName)))->first();
 			$userPostedOffice = $userOffice['posted_ro_office'];
-
+            
+            $office_type = $this->DmiRoOffices->getOfficeDetails($userName);
 			$roDistricts = $this->DmiRoOffices->find('list',array('valueField'=>array('id'),'conditions'=>array('ro_email_id IS'=>$userName)))->toArray();
 
+            if ($office_type[1] == 'SO') {
+                $conditionA = array('so_id IN'=>$roDistricts);
+                $conditionB = array('so_id IN'=>$userPostedOffice); 
+            }else{
+                $conditionA = array('ro_id IN'=>$roDistricts);
+                $conditionB = array('ro_id IN'=>$userPostedOffice); 
+            }
+
 			if (!empty($roDistricts)) {
-				$districtlis = $this->DmiDistricts->find('list',array('valueField'=>array('id'),'conditions'=>array('ro_id IN'=>$roDistricts)))->toArray();
+				$districtlis = $this->DmiDistricts->find('list',array('valueField'=>array('id'),'conditions'=>$conditionA))->toArray();
 			} else {
-				$districtlis = $this->DmiDistricts->find('list',array('valueField'=>array('id'),'conditions'=>array('ro_id IN'=>$userPostedOffice)))->toArray();
+				$districtlis = $this->DmiDistricts->find('list',array('valueField'=>array('id'),'conditions'=>$conditionB))->toArray();
 			}
 
-
+          
 			foreach($districtlis as $each){
 
 				$firmDetails = $conn->execute("SELECT df.id,df.modified,df.customer_id, df.firm_name, df.email, dd.district_name, df.customer_primary_id, dc.email 
@@ -1196,7 +1208,6 @@ class OthermodulesController extends AppController{
 							if(!empty($is_firm_granted) && $is_firm_granted['user_email_id'] != 'old_application'){
 								//set button for re-esign
 								$this->set('btn_to_re_esign','yes');
-
 							}
 
 							//again to get updated firm details on screen when retrun false, hence set below
@@ -1224,8 +1235,6 @@ class OthermodulesController extends AppController{
 							}
 
 							$this->set('return_message',null);
-							//return null;
-
 						}
 					}
 
@@ -1384,7 +1393,6 @@ class OthermodulesController extends AppController{
 
                 
                 $officeDetails = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
-                //pr($officeDetails); exit;
                 $ro_id_from_district = $this->DmiDistricts->getRoIdFromDistrictId($firm_details['district']);
                 $ro_id_from_session = $this->DmiUsers->getPostedOffId($_SESSION['username']);
 
@@ -1459,12 +1467,13 @@ class OthermodulesController extends AppController{
 
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-                                                                /***###| SUSPENSION/CANCELLATION MODULE|###***/
+                                            /***###|Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports|###***/
 
-    // Suspension Home
-    // DESCRIPTION : Show applicant email details for new audit changes
-    // @AUTHOR : AKASH THAKRE
+    // Misgrading Home
+    // DESCRIPTION : 
+    // A/C  : AKASH THAKRE
     // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
     public function misgradingHome(){
 
@@ -1472,9 +1481,11 @@ class OthermodulesController extends AppController{
 
         $username = $this->Session->read('username');
 
+        $countForScn = '';
+
         //get posted office id
         $postedOffice = $this->DmiUsers->getPostedOffId($username);
-        
+       
         $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name
                                             FROM dmi_grant_certificates_pdfs AS dg 
                                             INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
@@ -1482,6 +1493,8 @@ class OthermodulesController extends AppController{
                                             INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
                                             INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
                                             WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
+
+                                            
        
         $sentNotices = $conn->execute("SELECT DISTINCT on (dsl.customer_id) dsl.id,dsl.customer_id,df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name,dsl.date
                                         FROM dmi_showcause_logs AS dsl 
@@ -1499,6 +1512,10 @@ class OthermodulesController extends AppController{
                                         INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
                                         WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
 
+        $this->loadModel('DmiShowcauseLogs');
+        $countForScn = $this->DmiShowcauseLogs->find()->where(['status' => 'sent','posted_ro_office'=> $postedOffice])->distinct('customer_id')->count();
+
+        $this->set('countForScn',$countForScn);
         $this->set('underThisOffice',$underThisOffice);
         $this->set('sentNotices',$sentNotices);
         $this->set('actionTaken',$actionTaken);
@@ -1506,8 +1523,13 @@ class OthermodulesController extends AppController{
 
     }
 
-    //for fetching the id to edit
-	public function fetchIdForAction($id) {
+    // Suspension Home
+    // DESCRIPTION : 
+    // AUTHOR : AKASH THAKRE
+    // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
+
+    public function fetchIdForAction($id) {
 
         $this->loadModel('DmiGrantCertificatesPdfs');
         $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
@@ -1515,17 +1537,38 @@ class OthermodulesController extends AppController{
 		$this->redirect(array('controller'=>'othermodules','action'=>'misgrading_actions_home'));
 	}
 
-    //for fetching the id to edit
+  
+    
+    // Suspension Home
+    // DESCRIPTION : 
+    // AUTHOR : AKASH THAKRE
+    // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
+
 	public function fetchIdForShowcause($id) {
 
         $this->loadModel('DmiGrantCertificatesPdfs');
         $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
 		$this->Session->write('firm_id',$firm_details['customer_id']);
+        $this->Session->write('whichUser','dmiuser');
+		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
+	}
+
+    public function fetchIdFromScnAppl($id) {
+
+        $this->loadModel('DmiShowcauseLogs');
+        $firm_details = $this->DmiShowcauseLogs->find('all',array('conditions'=>array('id'=>$id)))->first();
+		$this->Session->write('firm_id',$firm_details['customer_id']);
+        $this->Session->write('whichUser','applicant');
 		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
 	}
 
 
-    //For ActionsOnMisgradins
+
+    // DESCRIPTION : To show and redirect on the Misgrading Actions Home.
+    // AUTHOR : AKASH THAKRE
+    // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
     public function misgradingActionsHome(){
 
@@ -1649,6 +1692,13 @@ class OthermodulesController extends AppController{
 
     }
 
+
+    // Final Submit Actions
+    // DESCRIPTION : 
+    // AUTHOR : AKASH THAKRE
+    // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
+
     public function finalSubmitActions(){
 
         $this->autoRender = false;
@@ -1665,6 +1715,11 @@ class OthermodulesController extends AppController{
     }
 
 
+    // DESCRIPTION : To show the suspension / cancellation home
+    // AUTHOR : AKASH THAKRE
+    // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
+
     public function showcauseHome(){
 
         $message = '';
@@ -1673,6 +1728,16 @@ class OthermodulesController extends AppController{
 
         $reason  = '';
         $status = '';
+
+        $whichUser = $this->Session->read('whichUser');
+
+        if ($whichUser == 'applicant') {
+            $this->viewBuilder()->setLayout('secondary_customer');
+            $this->loadComponent('Beforepageload');
+            $this->Beforepageload->showButtonOnSecondaryHome();
+            $customer_last_login = $this->Customfunctions->customerLastLogin();
+		    $this->set('customer_last_login', $customer_last_login);
+        }
 
         //Load Model    
         $this->loadModel('DmiFirms');
@@ -1708,24 +1773,46 @@ class OthermodulesController extends AppController{
             if (null !== $this->request->getData('save_action')) {
 
                 if($this->DmiShowcauseLogs->saveLog($postData) == 1){
-                    $message = 'Saved the details of Show Cause Notice Succesfully.';
+                    $message = 'Saved the details for Show Cause Notice Succesfully.';
                     $message_theme = 'success';
                     $redirect_to = '../othermodules/showcauseHome';
                 }else{
-                    $message = 'Sorry, The details could not bed saved. Try Again';
+                    $message = 'Sorry, The details could not be saved. Try Again';
                     $message_theme = 'failed';
                     $redirect_to = '../othermodules/showcauseHome'; 
                 }
 
-            } elseif (null !== $this->request->getData('final_submit')) {
+            } elseif (null !== $this->request->getData('update_action')) {
 
-                if($this->DmiShowcauseLogs->sendNotice($postData)){
+                if($this->DmiShowcauseLogs->updateLog($postData) == 1){
+                    $message = 'Updated the details for Show Cause Notice Succesfully.';
+                    $message_theme = 'success';
+                    $redirect_to = '../othermodules/showcauseHome';
+                }else{
+                    $message = 'Sorry, The details could not be saved. Try Again';
+                    $message_theme = 'failed';
+                    $redirect_to = '../othermodules/showcauseHome'; 
+                }
+                
+            } elseif(null!==($this->request->getData('scn_ro_referred_back'))){
 
+                $result = $this->Communication->showcauseReferredback($this->request->getData());
 
+                if($result == 1){
+
+                    $this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Success'); #Action
+                    $message = "Comment on Showcause notice is saved successfully.";
+                    $message_theme = "success";
+                    $redirect_to = '../othermodules/othermodules';
+    
+                }elseif($result == 2){
+                    $this->Customfunctions->saveActionPoint('Reffered Back Comment Saved', 'Failed'); #Action
+                    $message = " Section, Sorry you can not save blank Reffered back";
+                    $message_theme = "failed";
+                    $redirect_to = '../scrutiny/form-scrutiny';
                 }
             }
         }
-
 
         $this->set(compact('firmDetails','category','sub_commodity_value'));
         $this->set(compact('reason','status'));
@@ -1734,7 +1821,32 @@ class OthermodulesController extends AppController{
 
 
 
+    // Description : To sent the final showcause notice to applicant.
+    // AUTHOR : Akash Thakre
+    // DATE : 09-12-2022
+    // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
+    public function finalSendNotice(){
+
+        $this->autoRender = false;
+        //get ajax post data
+        $customer_id = $_POST['customer_id'];
+        $this->loadModel('DmiShowcauseLogs');
+        $showCause = $this->DmiShowcauseLogs->getInformation($customer_id);
+        $result =  $this->DmiShowcauseLogs->sendFinalNotice($showCause); 
+
+        if ($result == true) {
+            echo '~done~';
+        }
+        exit;
+    }
+
+
+
+    //Description : To give the user an list of CAs to select for suspension of cancellation 
+    //Author : Akash Thakre
+    //Date : 24-04-2023
+    //For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
 
 

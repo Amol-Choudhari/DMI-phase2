@@ -128,7 +128,9 @@
 						(!empty($check_valid_ro) && $to_user=='ro')						
 						){ ?> 
 
-						<?php if($check_user_role['ama'] == 'yes' || ($check_user_role['jt_ama'] == 'yes' && $ca_bevo_applicant == 'yes' && $_SESSION['application_type']==1)){ //added cond. on 22-11-2021 for appl. type = 1 ?>
+						<?php 
+						//updated condition on 23-01-2023 for PP as per new order of 10-01-2023
+						if($check_user_role['ama'] == 'yes' || ($check_user_role['jt_ama'] == 'yes' && ($ca_bevo_applicant == 'yes' || $split_customer_id[1]==2) && $_SESSION['application_type']==1)){ //added cond. on 22-11-2021 for appl. type = 1 ?>
 
 							<div id="actionbox">
 								<div class="col-md-6 mt-2">
@@ -208,7 +210,8 @@
 									} elseif ($check_user_role['jt_ama'] == 'yes' && $_SESSION['current_level'] == 'level_4') {
 
 										//added below new condition on 16-09-2019 for CA BEVO appln approved by Jtama only
-										if (($check_user_role['jt_ama'] == 'yes' && $ca_bevo_applicant == 'yes' && $_SESSION['application_type']==1)) {//added cond. on 22-11-2021 for appl. type = 1
+										//updated condition on 23-01-2023 for PP as per new order of 10-01-2023
+										if (($check_user_role['jt_ama'] == 'yes' && ($ca_bevo_applicant == 'yes' || $split_customer_id[1]==2) && $_SESSION['application_type']==1)) {//added cond. on 22-11-2021 for appl. type = 1
 
 											$options=array('dy_ama'=>'HO Quality Control');
 
@@ -270,14 +273,17 @@
 							</div>
 
 							<div class="mt-2 row ml-1">
+								<?php 
+									echo $this->Form->submit('Send Comment', array('name'=>'send_comment', 'id'=>'send_comment_btn', 'label'=>false,'class'=>'btn btn-success'));
 
-								<?php echo $this->Form->submit('Send Comment', array('name'=>'send_comment', 'id'=>'send_comment_btn', 'label'=>false,'class'=>'btn btn-success')); ?>
-
-								<?php
 									if(!empty($check_valid_ro) && $_SESSION['current_level']=='level_3' && empty($check_ama_approval)){
 
-									echo $this->Form->submit('Comment to Applicant', array('name'=>'comment_to_applicant', 'id'=>'comment_to_applicant', 'label'=>false,'class'=>'btn btn-success'));
-									echo $this->Form->submit('Comment to IO', array('name'=>'comment_to_io', 'id'=>'comment_to_io', 'label'=>false,'class'=>'btn btn-success'));
+										echo $this->Form->submit('Comment to Applicant', array('name'=>'comment_to_applicant', 'id'=>'comment_to_applicant', 'label'=>false,'class'=>'btn btn-success'));
+										
+										//Below Condtion is added to hide the Comment To IO button if report not filed - Akash [01-02-2023]
+										if(!empty($report_pdf_path)){
+											echo $this->Form->submit('Comment to IO', array('name'=>'comment_to_io', 'id'=>'comment_to_io', 'label'=>false,'class'=>'btn btn-success'));
+										}
 									}
 								?>
 							</div>
@@ -291,7 +297,8 @@
 
 								if($check_user_role['ama'] == 'yes'||
 									//added below new condition on 16-09-2019 for CA BEVO appln approved by Jtama only
-									($check_user_role['jt_ama'] == 'yes' && $ca_bevo_applicant == 'yes' && $_SESSION['application_type']==1)){ //added cond. on 22-11-2021 for appl. type = 1
+									//updated condition on 23-01-2023 for PP as per new order of 10-01-2023
+									($check_user_role['jt_ama'] == 'yes' && ($ca_bevo_applicant == 'yes' || $split_customer_id[1]==2) && $_SESSION['application_type']==1)){ //added cond. on 22-11-2021 for appl. type = 1
 									?>
 									<!-- added this comment box for approval comment only on 05-05-2021 by Amol -->
 									<div class="col-sm-6">
@@ -354,5 +361,6 @@
 <input type="hidden" id="check_ama_approval" value="<?php echo $check_ama_approval; ?>">
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
 <input type="hidden" id="application_type_id" value="<?php echo $_SESSION['application_type']; ?>">
-
+<!-- add hidden field on 23-01-2023 for PP as per new order of 10-01-2023 -->
+<input type="hidden" id="split_cert_type" value="<?php echo $split_customer_id[1]; ?>">
 <?php echo $this->Html->script('hoinspection/ho_inspection'); ?>

@@ -19,7 +19,7 @@
 		<table width="100%" border="1">
 			<tr>
 				<td>
-					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('Y-m-d'); ?></h4>
+					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('d-m-y'); ?></h4>
 				</td>
 			</tr>
 		</table>
@@ -399,7 +399,10 @@
 							<tr>
 								<td style="padding:10px; vertical-align:top;">Date: <?php if(!empty($user_full_name[$i])){ echo $renewal_application_date[$i]; }else{ echo 'NA'; } ?></td>
 								<td style="padding:10px; vertical-align:top;">Date: <?php if(!empty($user_full_name[$i])){ echo $certificate_valid_upto[$i]; }else{ echo 'NA'; } ?></td>
-								<td style="padding:10px; vertical-align:top;">E-Signed By: <?php if(!empty($user_full_name[$i])){ echo $user_full_name[$i]; }else{ echo 'NA'; } ?></td>
+								<td style="padding:10px; vertical-align:top;">
+									<?php if ($_SESSION['current_level']=='pao'){ echo 'Verified By:'; }else{ echo 'E-Signed By:'; } ?>
+									<?php if(!empty($user_full_name[$i])){ echo $user_full_name[$i]; }else{ echo 'NA'; } ?>
+								</td>
 							</tr>	
 							
 							<?php }
@@ -459,17 +462,17 @@
 		
 		<table width="100%" border="1" >
 				<tr>
-					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Date of Application</b></th>
-					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Details of the changes recorded</b></th>
-					<th style="padding:10px;" width="40%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
+					<th style="padding:10px;" width="25%" cellspacing="50" align="left"><b>Date of Application</b></th>
+					<th style="padding:10px;" width="45%" cellspacing="50" align="left"><b>Details of the changes recorded</b></th>
+					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
 					
 				</tr>
 				
-				<tr>
-					<td style="padding:10px; vertical-align:top;">Date: <?php echo 'NA'; ?></td>
-					<td style="padding:10px; vertical-align:top;"><?php echo 'NA'; ?></td>
-					<td style="padding:10px; vertical-align:top;">E-Signed By: <?php echo 'NA'; ?></td>
-				</tr>
+				
+							
+				<!-- element call to show change updates added on 02-01-2023-->
+				<?php echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
+						
 		
 		</table>
 		

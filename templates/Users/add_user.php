@@ -15,11 +15,7 @@
 		</div>
 	</div>
 
-	<?php if (!empty($user_registered)) { ?>
-
-		<?php echo $this->element('users_elements/user_profile_element'); ?>
-
-	<?php } else { ?>
+	<?php if (!empty($user_registered)) { echo $this->element('users_elements/user_profile_element'); } else { ?>
 
 		<section class="content form-middle">
 			<div class="container-fluid">
@@ -148,7 +144,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="card-footer cardFooterBackground">
+								<div class="card-footer">
 									<?php echo $this->Form->control('Submit', array('type'=>'submit', 'name'=>'submit', 'label'=>false, 'class'=>'btn btn-success float-left submit_btn')); ?>
 									<?php echo $this->Html->link('Back', array('controller' => 'dashboard', 'action'=>'home'),array('class'=>'add_btn btn btn-secondary float-right')); ?>
 								</div>

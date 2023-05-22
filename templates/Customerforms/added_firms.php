@@ -25,7 +25,7 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="alert alert-info"><i class="icon fas fa-info"></i> Only Email id and Phone No. can be updated</div>
+					<?php if(!empty($isSurreder)) { ?> <div class="alert alert-info"><i class="icon fas fa-info"></i>Only Email id and Phone No. can be updated</div><?php } ?>
 						<?php echo $this->Form->create(null, array('type'=>'file', 'enctype'=>'multipart/form-data','id'=>'added_firm_form')); ?>
 							<div class="card card-success">
 
@@ -367,9 +367,13 @@
 				              </div>
 							<?php } ?>
 							<div class="form-horizontal">
-				                <div class="card-footer d-flex">
-				                	<?php echo $this->Form->submit('Update', array('name'=>'update', 'label'=>false,'class'=>'btn btn-primary updateButton')); ?>
-				                	<?php echo $this->Form->submit('Back', array('name'=>'ok', 'label'=>false,'class'=>'btn btn-default ml-2 backButton')); ?>
+				                <div class="card-footer">
+				                	<?php #the condition is added to check if the application is surrender - Akash [14-04-2023]
+										if (!empty($isSurreder)) {
+											echo $this->Form->submit('Update', array('name'=>'update', 'label'=>false,'class'=>'btn btn-primary updateButton float-left'));
+										} 
+				                 		echo $this->Form->submit('Back', array('name'=>'ok', 'label'=>false,'class'=>'btn btn-default ml-2 backButton float-right')); 
+								 	?>
 								</div>
 							</div>
 						</div>

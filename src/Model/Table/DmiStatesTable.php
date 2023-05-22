@@ -9,11 +9,11 @@ class DmiStatesTable extends Table{
 	
 	public $validate = array(
 		
-			'state_name'=>array(
-					'rule'=>array('maxLength',100),		
-					'allowEmpty'=>false,
-				),	
-		);
+		'state_name'=>array(
+			'rule'=>array('maxLength',100),		
+			'allowEmpty'=>false,
+		),	
+	);
 
 
 	//getDistrictNameById

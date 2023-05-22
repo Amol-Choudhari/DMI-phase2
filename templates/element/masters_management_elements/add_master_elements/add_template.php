@@ -33,39 +33,38 @@
 			</label>
 
 			<div id="dmi_roles" class="form-horizontal">
-					<div class="card-body">
-						<div class="boxformenus row color1">
-							<div class="col-md-3">
-								<!--Applicant-->
-								<?php echo $this->Form->control('applicant', array('type'=>'checkbox', 'id'=>'applicant','label'=>' Applicant', 'escape'=>false)); ?>
-								<!--MO/SMO (Scrutiny Officer)-->
-								<?php echo $this->Form->control('mo_smo', array('type'=>'checkbox', 'id'=>'mo_smo', 'label'=>' Scrutinizer', 'escape'=>false)); ?>
-								<!--IO (Inspection Officer)-->
-								<?php echo $this->Form->control('io', array('type'=>'checkbox', 'id'=>'io', 'label'=>' Inspection Officer', 'escape'=>false)); ?>
-							</div>
-							<div class="col-md-3">
-								<!--RO/SO (Nodal Officer)-->
-								<?php echo $this->Form->control('ro_so', array('type'=>'checkbox', 'id'=>'ro_so', 'label'=>' Nodal Officer', 'escape'=>false)); ?>
-								<!--Dy.AMA-->
-								<?php echo $this->Form->control('dy_ama', array('type'=>'checkbox', 'id'=>'dy_ama', 'label'=>' Dy.AMA', 'escape'=>false)); ?>
-								<!--Chemist User-->
-								<?php echo $this->Form->control('chemist_user', array('type'=>'checkbox', 'id'=>'chemist_user', 'label'=>' Chemist User', 'escape'=>false)); ?>
-							</div>
-							<div class="col-md-3">
-								<!--Jt.AMA-->
-								<?php echo $this->Form->control('jt_ama', array('type'=>'checkbox', 'id'=>'jt_ama', 'label'=>' Jt.AMA', 'escape'=>false)); ?>
-								<!--HO/MO/SMO-->
-								<?php echo $this->Form->control('ho_mo_smo', array('type'=>'checkbox', 'id'=>'ho_mo_smo', 'label'=>' Scrutiny(HO)', 'escape'=>false)); ?>
-								<!--RO-Incharge-->
-								<?php echo $this->Form->control('ro_incharge', array('type'=>'checkbox', 'id'=>'ro_incharge', 'label'=>' RO Incharge', 'escape'=>false)); ?>
-
-							</div>
-							<div class="col-md-3">
-								<!--AMA-->
-								<?php echo $this->Form->control('ama', array('type'=>'checkbox', 'id'=>'ama', 'label'=>' AMA', 'escape'=>false)); ?>
-								<!--DDO-->
-								<?php echo $this->Form->control('accounts', array('type'=>'checkbox', 'id'=>'accounts', 'label'=>' Accounts', 'escape'=>false)); ?>
-							</div>
+				<div class="card-body">
+					<div class="boxformenus row color1">
+						<div class="col-md-3">
+							<!--Applicant-->
+							<?php echo $this->Form->control('applicant', array('type'=>'checkbox', 'id'=>'applicant','label'=>' Applicant', 'escape'=>false)); ?>
+							<!--MO/SMO (Scrutiny Officer)-->
+							<?php echo $this->Form->control('mo_smo', array('type'=>'checkbox', 'id'=>'mo_smo', 'label'=>' Scrutinizer', 'escape'=>false)); ?>
+							<!--IO (Inspection Officer)-->
+							<?php echo $this->Form->control('io', array('type'=>'checkbox', 'id'=>'io', 'label'=>' Inspection Officer', 'escape'=>false)); ?>
+						</div>
+						<div class="col-md-3">
+							<!--RO/SO (Nodal Officer)-->
+							<?php echo $this->Form->control('ro_so', array('type'=>'checkbox', 'id'=>'ro_so', 'label'=>' Nodal Officer', 'escape'=>false)); ?>
+							<!--Dy.AMA-->
+							<?php echo $this->Form->control('dy_ama', array('type'=>'checkbox', 'id'=>'dy_ama', 'label'=>' Dy.AMA', 'escape'=>false)); ?>
+							<!--Chemist User-->
+							<?php echo $this->Form->control('chemist_user', array('type'=>'checkbox', 'id'=>'chemist_user', 'label'=>' Chemist User', 'escape'=>false)); ?>
+						</div>
+						<div class="col-md-3">
+							<!--Jt.AMA-->
+							<?php echo $this->Form->control('jt_ama', array('type'=>'checkbox', 'id'=>'jt_ama', 'label'=>' Jt.AMA', 'escape'=>false)); ?>
+							<!--HO/MO/SMO-->
+							<?php echo $this->Form->control('ho_mo_smo', array('type'=>'checkbox', 'id'=>'ho_mo_smo', 'label'=>' Scrutiny(HO)', 'escape'=>false)); ?>
+							<!--RO-Incharge-->
+							<?php echo $this->Form->control('ro_incharge', array('type'=>'checkbox', 'id'=>'ro_incharge', 'label'=>' RO Incharge', 'escape'=>false)); ?>
+						</div>
+						<div class="col-md-3">
+							<!--AMA-->
+							<?php echo $this->Form->control('ama', array('type'=>'checkbox', 'id'=>'ama', 'label'=>' AMA', 'escape'=>false)); ?>
+							<!--DDO-->
+							<?php echo $this->Form->control('accounts', array('type'=>'checkbox', 'id'=>'accounts', 'label'=>' Accounts', 'escape'=>false)); ?>
+						</div>
 					</div>
 				</div>
 			</div>

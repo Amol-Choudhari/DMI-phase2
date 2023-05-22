@@ -276,12 +276,12 @@
 								</ul>
 							</li>
 						</li>
-						<!--<li class="nav-item has-treeview">
-							<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/surrendered" class="nav-link <?php echo $menu_add_menu; ?>">
+						<li class="nav-item has-treeview">
+							<a href="<?php echo $this->request->getAttribute('webroot');?>hoinspections/redirectGrantedApplications/9" class="nav-link <?php echo $menu_add_menu; ?>">
 								<i class="nav-icon fas far fa-share"></i>
 								<p class="nav-icon-p">Surrendered Applications</p>
 							</a>
-						</li>-->
+						</li>
 						
 					<?php } if ($current_user_roles['ro_inspection'] == 'yes' || $current_user_roles['so_inspection']=='yes' || 
 								$current_user_roles['dy_ama'] == 'yes' || $current_user_roles['jt_ama'] == 'yes' ||

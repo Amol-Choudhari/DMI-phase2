@@ -34,7 +34,7 @@ class DmiSurrenderFormsDetailsTable extends Table{
 											'is_surrender_published_docs'=>"",
 											'is_cabook_submitted'=>"",
 											'is_cabook_submitted_docs'=>"",
-											'is_ca_have_replica	'=>"",
+											'is_ca_have_replica'=>"",
 											'is_replica_submitted'=>"",
 											'is_replica_submitted_docs'=>"",
 											'is_balance_printing_submitted'=>"",

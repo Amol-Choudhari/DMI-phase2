@@ -58,6 +58,7 @@ class EsignController extends AppController {
 		
 		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		$Dmi_flow_wise_tables = $Dmi_flow_wise_tables_list->find('all',array('conditions'=>array('id IS'=>$flow_type)))->first();
+		//print_r($Dmi_flow_wise_tables); exit;
 		$Dmi_esign_status_tb = TableRegistry::getTableLocator()->get($Dmi_flow_wise_tables['esign_status']);
 		
 		$current_level = $this->Session->read('current_level');
@@ -70,7 +71,7 @@ class EsignController extends AppController {
 		$pdf_file_name = $this->Session->read('pdf_file_name');	
 
 		//if response from ESP for esign request
-		//if($this->request->is('post')){
+		if($this->request->is('post')){
 			
 			//to get FORM base method response POST and convert into associative array
 			////updated on 31-05-2021 for Form Based Esign method by Amol
@@ -83,8 +84,8 @@ class EsignController extends AppController {
 			$this->loadModel('DmiTempEsignStatuses');
 			$this->DmiTempEsignStatuses->saveTempEsignRecord($customer_id,$pdf_file_name,$current_level,$flow_type);																			  
 			//calling to set response signature on existing pdf.
-			$esign_status = $this->sign_the_doc($getRespAssoArray,$pdf_file_name);
-		*/
+			$esign_status = $this->signTheDoc($getRespAssoArray,$pdf_file_name);
+			*/
 			$esign_status = 1;
 			if ($esign_status == 1) {
 
@@ -93,32 +94,32 @@ class EsignController extends AppController {
 				//calling final submit process now after signature appended in pdf.
 
 				$url_to_redirect = 	null;
-									
-					if ($Dmi_esign_status_tb->saveEsignStatus()==1) { 
+								
+				if ($Dmi_esign_status_tb->saveEsignStatus()==1) { 
+					
+					$split_customer_id = explode('/',$customer_id);
+					
+					if ($current_level == 'applicant') {
 						
-						$split_customer_id = explode('/',$customer_id);
+						$this->redirect(['controller' => 'application', 'action' => 'application_final_submit']);
+					
+					} elseif ($current_level == 'level_2') {
 						
-						if ($current_level == 'applicant') {
-							
-							$this->redirect(['controller' => 'application', 'action' => 'application_final_submit']);
+						$this->redirect(['controller' => 'inspections', 'action' => 'report_final_submit']);
+					
+					} elseif ($current_level == 'level_3') {						
 						
-						} elseif ($current_level == 'level_2') {
-							
-							$this->redirect(['controller' => 'inspections', 'action' => 'report_final_submit']);
-						
-						} elseif ($current_level == 'level_3') {						
-							
-							$this->redirect(['controller' => 'inspections', 'action' => 'final_grant_call']);							
-						
-						} elseif ($current_level == 'level_4') {	
+						$this->redirect(['controller' => 'inspections', 'action' => 'final_grant_call']);							
+					
+					} elseif ($current_level == 'level_4') {	
 
-							$this->redirect(['controller' => 'inspections', 'action' => 'final_grant_call']);
-						}
-						
-					} else {
-
-						//else proceed
+						$this->redirect(['controller' => 'inspections', 'action' => 'final_grant_call']);
 					}
+					
+				} else {
+
+					//else proceed
+				}
 					
 				//this echo is used to redirect from CDAC to our Agarmark url.
 				//after successfull OTP on CDAC				
@@ -127,10 +128,10 @@ class EsignController extends AppController {
 			//added this else part on 11-06-2019 by Amol to show esign failed message	
 			} else {
 				
-				$this->redirect('https://10.153.72.52/DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.78/DMI-SUR/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
-		//}
+		}
 		
 	}
 	
@@ -446,7 +447,7 @@ class EsignController extends AppController {
 		$txn_id = rand().time();
 		$asp_id = 'DMIC-001';
 		$document_hashed = hash_file('sha256',$doc_path);//create pdf hash		
-		$response_url = 'https://10.153.72.52/DMI/esign/'.$response_action;
+		$response_url = 'https://10.158.81.78/DMI-SUR/esign/'.$response_action;
 
 		if($current_level == 'level_2'){
 			$doc_info = 'Report Final Submit';
@@ -662,7 +663,7 @@ class EsignController extends AppController {
 	public function verifyCdacResponse($resp_array){
 		
 		//certificate file provided by CDAC
-		$get_cdac_cert = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/cdac_ssl_cert.pem');
+		/*$get_cdac_cert = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/cdac_ssl_cert.pem');
 		$split_string = explode('-----',$get_cdac_cert);//split string and get cert key string from it
 		$cert_key_string = $split_string[2];
 		 
@@ -676,14 +677,15 @@ class EsignController extends AppController {
 			return true;
 		}else{
 			return false;
-		}
+		}*/
 		return true;
 
 	}
 
-//created this function to show esign failed message redirect to home page
-//on 11-06-2019 by Amol	
+	//created this function to show esign failed message redirect to home page
+	//on 11-06-2019 by Amol	
 	public function esignIssue(){
+		/*
 		$message = '';
 		$redirect_to = '';
 		
@@ -693,6 +695,8 @@ class EsignController extends AppController {
 		
 		$this->set('message',$message);
 		$this->set('redirect_to',$redirect_to);
+		*/
+		$this->customAlertPage('Sorry.. Esign Failed, Please login again and try.');
 	}
 	
 	
@@ -730,7 +734,7 @@ class EsignController extends AppController {
 		$txn_id = rand().time();
 		$asp_id = 'DMIC-001';
 		$document_hashed = hash_file('sha256',$doc_path);//create pdf hash		
-		$response_url = 'https://10.153.72.52/DMI/esign/'.$response_action;
+		$response_url = 'https://10.158.81.78/DMI-SUR/esign/'.$response_action;
 
 		if($current_level == 'level_2'){
 			$doc_info = 'Report Final Submit';
@@ -814,14 +818,14 @@ public function renewalRequestReEsign(){
 			
 			//to get FORM base method response POST and convert into associative array
 			//updated on 31-05-2021 for Form Based Esign method by Amol
-		/*	$eSignResponse = simplexml_load_string($this->request->data['eSignResponse']);
+		/*	$eSignResponse = simplexml_load_string($this->request->getData('eSignResponse'));
 			$getRespInJson = json_encode($eSignResponse);
 			$getRespAssoArray = json_decode($getRespInJson,TRUE);
 																					  
 			//calling to set response signature on existing pdf.
-			$esign_status = $this->signTheDoc($getRespAssoArray,$pdf_file_name);
-		*/
-			$esign_status = 1;	
+			$esign_status = $this->signTheDoc($getRespAssoArray,$pdf_file_name);*/
+		
+			//	$esign_status = 1;		
 			//enter re-esign log in log table
 			$this->loadModel('DmiReEsignGrantLogs');
 			$customer_id = $this->Session->read('customer_id');
@@ -846,8 +850,8 @@ public function renewalRequestReEsign(){
 			$this->DmiApplAddedForReEsigns->updateAll(array('re_esign_status' => "Re_Esigned",'modified'=>"$date1"),array('customer_id IS' => $customer_id));
 			
 			
-			$main_domain_url = 'https://10.153.72.52/DMI/';
-			$url_to_redirect = 	$main_domain_url.'hoinspections/redirectGrantedApplications/1';
+			$main_domain_url = 'https://10.158.81.78/DMI-SUR/';
+			$url_to_redirect = 	$main_domain_url.'hoinspections/redirectGrantedApplications/1'; //default sending to new granted list
 			$this->Session->delete('pdf_file_name');
 			$this->Session->delete('re_esigning');
 			$this->Session->delete('re_esign_grant_date');
@@ -891,7 +895,7 @@ public function renewalRequestReEsign(){
 		//if response from ESP for esign request
 		if($this->request->is('post')){
 
-			$postData = $this->request->getData();
+			/*$postData = $this->request->getData();
 			
 			//to get FORM base method response POST and convert into associative array
 			////Form Based Esign method by Amol
@@ -909,7 +913,7 @@ public function renewalRequestReEsign(){
 					
 				//calling final submit process now after signature appended in pdf.
 
-				$main_domain_url = 'https://10.153.72.52/DMI/';
+				$main_domain_url = 'https://10.158.81.78/DMI-SUR/';
 				$url_to_redirect =	$main_domain_url.$_SESSION['replica_for'].'/after_replica_allotment_esigned';				
 					
 				//this echo is used to redirect from CDAC to our Agarmark url.
@@ -919,7 +923,7 @@ public function renewalRequestReEsign(){
 			//by Amol to show esign failed message	
 			}else{
 				
-				$this->redirect('https://10.153.72.52/DMI/esign/esign_issue');//for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.78/DMI-SUR/esign/esign_issue');//for Form Based Esign method by Amol
 			}
 			
 		}
@@ -1027,7 +1031,7 @@ public function renewalRequestReEsign(){
 				$this->Session->delete('current_level');
 				$this->Session->delete('ren_esign_process');
 				
-				$this->redirect('https://10.153.72.52/DMI/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
+				$this->redirect('https://10.158.81.78/DMI-SUR/esign/esign_issue');//updated on 31-05-2021 for Form Based Esign method by Amol
 			}
 			
 		}

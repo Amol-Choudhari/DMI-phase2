@@ -8,8 +8,8 @@
 		</div>
 		<ul class="nospace group row">
 		<li class="service col-md-2">
-			<article><a href="../DMI/users/login_user"><img class="img-fluid" src="img/other/login-img.jpg"></a>
-			  <h6 class="heading"><a href="../DMI/users/login_user"><?php echo $home_page_content[9]['title']; ?></a></h6>
+			<article><a href="../DMI-SUR/users/login_user"><img class="img-fluid" src="img/other/login-img.jpg"></a>
+			  <h6 class="heading"><a href="../DMI-SUR/users/login_user"><?php echo $home_page_content[9]['title']; ?></a></h6>
 			</article>
 		  </li>
 		  <li class="service col-md-2">

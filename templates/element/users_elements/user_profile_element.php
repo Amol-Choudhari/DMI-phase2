@@ -1,6 +1,6 @@
 <div class="alert alert-success">
     <label>Congratulations... You Have Created a New User With Email Id :   <span class="text-secondary"><?php echo base64_decode($userDetails['email']); ?></span></label><br/>
-    <a class="text-primary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>users/login_user">Please Click Here To Login By New Created User</a>
+    <!--<a class="text-primary" href="<?php //echo $this->getRequest()->getAttribute('webroot');?>users/login_user">Please Click Here To Login By New Created User</a>-->
 </div>
 <div class="col-md-8 form-middle">
     <div class="card card-widget widget-user shadow">

@@ -523,6 +523,7 @@ class BeforepageloadComponent extends Component {
 			$isAppSurrender = 'no';
 		}
 
+		#For Misgrade Actions
 		$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
         $isActionTaken = $DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
 		if (!empty($isActionTaken)) {
@@ -530,6 +531,7 @@ class BeforepageloadComponent extends Component {
 		}else{
 			$isActionTaken = 'no';
 		}
+		
 		
 		$this->Controller->set('IsApproved',$IsApproved);
 		$this->Controller->set('show_renewal_btn',$show_renewal_btn);

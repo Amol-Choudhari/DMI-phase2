@@ -1,5 +1,4 @@
 <?php
-
 namespace app\Model\Table;
 use Cake\ORM\Table;
 use App\Model\Model;
@@ -8,6 +7,7 @@ use App\Controller\CustomersController;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Cake\Filesystem\File;
+use Cake\Routing\Router;
 
 class DmiSmsEmailTemplatesTable extends Table{
 
@@ -40,17 +40,20 @@ class DmiSmsEmailTemplatesTable extends Table{
 
 
 	public function sendMessage($message_id, $customer_id) {
-
-
-		if (!isset($_SESSION['application_type'])){ $_SESSION['application_type']=null; }
+		
+		if (!isset($_SESSION['application_type'])){ 
+			$_SESSION['application_type']=null; 
+		}
 
 		$application_type = $_SESSION['application_type'];
 	
 		//This Session ID is Applied for the temporary Application Type is not present.
-		if ($application_type == null) {
-			$application_type = $_SESSION['application_type_temp'];
+		if(Router::getRequest()->getParam('controller') == 'Dashboard'){
+			if ($application_type == null) {
+				$application_type = $_SESSION['application_type_temp'];
+			}
 		}
-
+		
 		//Load Models
 		$DmiFlowWiseTablesLists = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		$DmiFinalSubmitTable = $DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
@@ -381,7 +384,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 
 			//replacing dynamic values in the email message
 			$email_message = $this->replaceDynamicValuesFromMessage($customer_id,$email_message);
-			
+
 			$b = array (
 				'SMS' => $sms_message, 
 				'MOBILE' => $destination_mob_nos_values,
@@ -392,7 +395,6 @@ class DmiSmsEmailTemplatesTable extends Table{
 			$fp = fopen('D:/tesq.txt',"a");
 			fwrite($fp, print_r($b, true));
 			fclose($fp);
-			
 
 			//To send SMS on list of mobile nos.
 			if (!empty($find_message_record['sms_message'])) {
@@ -408,7 +410,7 @@ class DmiSmsEmailTemplatesTable extends Table{
 				
 				$send=urlencode("AGMARK");
 				
-				$dest='9860641844';
+				$dest=$destination_mob_nos_values;
 				
 				$msg=urlencode($sms_message);
 
@@ -445,25 +447,13 @@ class DmiSmsEmailTemplatesTable extends Table{
 				// The URL session is executed and passed to the browser
 				$curl_output =curl_exec($ch);
 				//echo $curl_output;
-			
-				//code to send sms ends here
-
 				*/
-				//query to save SMS sending logs in DB // added on 11-10-2017
-				$DmiSentSmsLogsEntity = $DmiSentSmsLogs->newEntity(array(
-					'message_id'=>$message_id,
-					'destination_list'=>$log_dest_mob_nos_values,
-					'mid'=>null,
-					'sent_date'=>date('Y-m-d H:i:s'),
-					'message'=>$sms_message,
-					'created'=>date('Y-m-d H:i:s'),
-					'template_id'=>$template_id //added on 12-05-2021 by Amol
-				));
 
-				$DmiSentSmsLogs->save($DmiSentSmsLogsEntity);
+				//$DmiSentSmsLogs->saveLog($message_id,$log_dest_mob_nos_values,$sms_message,$template_id); //Saving the Log
+			
 			}
 
-			
+
 			//email format to send on mail with content from master
 			$email_format = 'Dear Sir/Madam' . "\r\n\r\n" .$email_message. "\r\n\r\n" .
 							'Thanks & Regards,' . "\r\n" .
@@ -476,26 +466,14 @@ class DmiSmsEmailTemplatesTable extends Table{
 			//To send Email on list of Email ids.
 			if (!empty($find_message_record['email_message'])) {
 
-				$to = "akashthakreer@gmail.com";
+				$to = $destination_email_ids_values;
 				$subject = $email_subject;
 				$txt = $email_format;
 				$headers = "From: dmiqc@nic.in";
 
 				//mail($to,$subject,$txt,$headers);
 
-				//query to save Email sending logs in DB // added on 11-10-2017
-				$DmiSentEmailLogsEntity = $DmiSentEmailLogs->newEntity(array(
-
-					'message_id'=>$message_id,
-					'destination_list'=>$destination_email_ids_values,
-					'sent_date'=>date('Y-m-d H:i:s'),
-					'message'=>$sms_message,
-					'created'=>date('Y-m-d H:i:s'),
-					'template_id'=>$template_id //added on 12-05-2021 by Amol
-
-				));
-
-				$DmiSentEmailLogs->save($DmiSentEmailLogsEntity);
+				//$DmiSentEmailLogs->saveLog($message_id,$destination_email_ids_values,$email_message,$template_id); //Saving the Log
 
 			}
 
@@ -786,15 +764,19 @@ class DmiSmsEmailTemplatesTable extends Table{
 	// Created By Pravin on 24-08-2017
 	public function getReplaceDynamicValues($replace_variable_value,$customer_id){
 
+	
 		if (!isset($_SESSION['application_type'])) { $_SESSION['application_type']=null; }
 
 		$application_type = $_SESSION['application_type'];
 
 		//This Session ID is Applied for the temporary Application Type is not present.
-		if ($application_type == null) {
-			$application_type = $_SESSION['application_type_temp'];
+		if(Router::getRequest()->getParam('controller') == 'Dashboard'){
+			if ($application_type == null) {
+				$application_type = $_SESSION['application_type_temp'];
+			}
 		}
-
+		
+	
 		//Load Models
 		$DmiApplicationTypes = TableRegistry::getTableLocator()->get('DmiApplicationTypes');
 		
@@ -1012,6 +994,10 @@ class DmiSmsEmailTemplatesTable extends Table{
 			
 			//[-- For Replica/E-Code/Fifteen --]
 			
+			$getUserType = $CustomersController->Customfunctions->getUserType($_SESSION['username']);
+			
+			#This Block is added to see if the varibles are for replica is valid or not - Akash[21-11-2022]
+
 			#CHEMIST
 			$get_chemist_name = $DmiChemistRegistrations->find('all',array('conditions'=>array('chemist_id IS'=>$_SESSION['chemistId'],'delete_status IS NULL'),'order'=>'id desc'))->first();
 					

@@ -117,14 +117,14 @@
 					<div class="clearfix"></div>
 
 				<!--	<form action="https://esignservice.cdac.in/esign2.1/2.1/form/signdoc" method="POST"> -->
-				<?php echo $this->Form->create(null,array('action'=>'https://10.153.72.52/DMI/esign/requestEsign','method'=>'POST'));?>
+				<?php echo $this->Form->create(null,array('action'=>'https://10.158.81.78/DMI-SUR/esign/requestEsign','method'=>'POST'));?>
 
 						<input type="hidden" id = "eSignRequest" name="eSignRequest" value=''/>
 						<input type="hidden" id = "aspTxnID" name="aspTxnID" value=""/>
 						<input type="hidden" id = "Content-Type" name="Content-Type" value="application/xml"/>
-						<input type="submit" name="submit" value="Esign" class="btn btn-success mt-2 float-right mr-2" id="esign_submit_btn">
+						<input type="submit" value="Esign" class="btn btn-success mt-2 float-right mr-2" id="esign_submit_btn">
 				  <!--</form>-->
-		<?php echo $this->Form->end(); ?>	   
+				<?php echo $this->Form->end(); ?>
 
 					<input type="checkbox" name="declaration_check_box" id="declaration_check_box" class="modal-checkbox" >
 					<label for="declaration_check_box"><?php echo $message; ?></label><br>

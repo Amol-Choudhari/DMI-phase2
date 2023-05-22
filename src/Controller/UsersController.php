@@ -204,7 +204,7 @@ class UsersController extends AppController {
 
 					} elseif ($forgot_password_result == 2) {
 
-						$message = 'Changed Password link Sent on ' . $emailforrecovery;
+						$message = 'Changed Password link Sent on ' . $this->Customfunctions->getMaskedValue($emailforrecovery, 'email');
 						$message_theme = 'success';
 						$redirect_to = 'forgot_password';
 					}
@@ -572,11 +572,14 @@ class UsersController extends AppController {
 
 					//below query & conditions added on 12-10-2017 by Amol To check if mobile,aadhar post in proper format, if not then save old value itself from DB
 					$user_data = $this->DmiUsers->find('all', array('conditions' => array('email IS' => $this->request->getSession()->read('username'))))->first();
-
+					
 					if (preg_match("/^[X-X]{6}[0-9]{4}$/i", $this->request->getData('phone'), $matches) == 1) {
+						
 						$htmlencodedphone = $user_data['phone'];
+					}else{
+						$htmlencodedphone = base64_encode($htmlencodedphone);
 					}
-
+					
 					//added on 06-05-2021 for profile pic
 					if ($this->request->getData('profile_pic')->getClientFilename() != null) {
 
@@ -597,7 +600,7 @@ class UsersController extends AppController {
 						'id' => $user_id,
 						'f_name' => $htmlencodedfname,
 						'l_name' => $htmlencodedlname,
-						'phone'=>base64_encode($htmlencodedphone),  // added by shankhpal shende on 11/01/2023
+						'phone'=>$htmlencodedphone,  // added by shankhpal shende on 11/01/2023
 						'landline' => base64_encode($htmlencodedlandline),
 						//'once_card_no'=>$encrypted_aadhar, //commented on 15-06-2018 by Amol, no provision to store aadhar
 						'profile_pic' => $profile_pic //added on 06-05-2021 for profile pic
@@ -615,11 +618,13 @@ class UsersController extends AppController {
 							'landline' => base64_encode($htmlencodedlandline),
 							'division' => $user_data['division'],
 							'role' => $user_data['role'],
-							//	'once_card_no'=>$encrypted_aadhar, //commented on 15-06-2018 by Amol, no provision to store aadhar
 							'password' => $user_data['password'],
 							'created_by_user' => $user_data['created_by_user'],
 							'posted_ro_office' => $user_data['posted_ro_office'],
-							'profile_pic' => $profile_pic //added on 06-05-2021 for profile pic
+							'profile_pic' => $profile_pic,
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
+							'done_by'=>$this->request->getSession()->read('username')
 						));
 
 						$this->DmiUserHistoryLogs->save($DmiUserHistoryLogsEntity);
@@ -898,10 +903,7 @@ class UsersController extends AppController {
 							
 							//Added this call to save the user action log on 09-09-2022
 							$this->Customfunctions->saveActionPoint('New User Added','Success');
-							//$message = 'You have successfully created new User. Please set roles';
-							//$message_theme = 'success';
-							//$redirect_to = 'add_user';
-
+						
 						} else {
 
 							$message = 'Sorry...Please check your fields again';
@@ -980,6 +982,13 @@ class UsersController extends AppController {
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiUserHistoryLogs');
 
+		// set variables to show popup messages from view file
+		$message = '';
+		$message_theme = '';
+		$redirect_to = '';
+
+		$username = $this->Session->read('username'); // added by shankhpal shende
+		
 		$user_table_id = $this->request->getSession()->read('user_table_id');
 
 		$user_details = $this->DmiUsers->find('all', array('conditions' => array('id IS' => $user_table_id)))->first();
@@ -991,7 +1000,7 @@ class UsersController extends AppController {
 		$user_details['email'] = $this->Customfunctions->getMaskedValue(base64_decode($user_details['email']), 'email');
 		$this->set('user_details', $user_details);
 
-		//for list of RO offices													//added 'office_type'=>'RO' condition on 27-07-2018
+		//for list of RO offices //added 'office_type'=>'RO' condition on 27-07-2018
 		$office_posted = $this->DmiRoOffices->find('list', array('keyField' => 'id', 'valueField' => 'ro_office', 'conditions' => array('office_type IN' => array('RO', 'SO'), 'OR' => array('delete_status IS NULL', 'delete_status' => 'no')), 'order' => 'ro_office'))->toArray();
 		$this->set('office_posted', $office_posted);
 
@@ -999,10 +1008,7 @@ class UsersController extends AppController {
 		$ral_office_posted = $this->DmiRoOffices->find('list', array('keyField' => 'id', 'valueField' => 'ro_office', 'conditions' => array('office_type' => 'RAL', 'OR' => array('delete_status IS NULL', 'delete_status' => 'no')), 'order' => 'ro_office'))->toArray();
 		$this->set('ral_office_posted', $ral_office_posted);
 
-		// set variables to show popup messages from view file
-		$message = '';
-		$message_theme = '';
-		$redirect_to = '';
+		
 
 		//added on 15-07-2017 by Amol to get & added LMIS user roles
 		$get_lmis_roles = $this->UserRole->find('list', array('keyField' => 'role_name', 'valueField' => 'role_name'))->toArray();
@@ -1033,17 +1039,13 @@ class UsersController extends AppController {
 			{
 
 				if (!$this->Customfunctions->validateUniquePostData($this->request->getData('phone'), 'mobile') == 1) {
-
 					$this->set('return_error_msg','Please enter proper Mobile no.');
 					return null;
-
 				}
 
 				if (!$this->Customfunctions->validateUniquePostData($this->request->getData('email'), 'email') == 1) {
-
 					$this->set('return_error_msg','Please enter proper Email id');
 					return null;
-
 				}
 
 
@@ -1051,6 +1053,7 @@ class UsersController extends AppController {
 				$Checkemailexist = $this->DmiUsers->find('all', array('fields' => 'email', 'conditions' => array('id !=' => $user_table_id, 'email' => $usersData['email'])))->first();
 
 				if ($Checkemailexist == null) {
+
 					//Html Encoding data before saving
 					$htmlencodedfname = htmlentities($this->request->getData('f_name'), ENT_QUOTES);
 					$htmlencodedlname = htmlentities($this->request->getData('l_name'), ENT_QUOTES);
@@ -1080,9 +1083,10 @@ class UsersController extends AppController {
 
 					//check LIMS role to avoid double Incharge in same office
 					if ($lmis_role == 'RO/SO OIC' || $lmis_role == 'Inward Officer' || $lmis_role == 'Lab Incharge' || $lmis_role == 'RAL/CAL OIC') {
-
-						//find similar user with same role_name
-						$find_user = $this->DmiUsers->find('all', array('conditions' => array('posted_ro_office IS' => $posted_ro_office, 'role IS' => $lmis_role, 'status' => 'active')))->first();
+						
+						//find similar user with same role_name #Modification -> Added the ID condition to check the same user is updating the profile - Akash[13-01-2023]
+						$find_user = $this->DmiUsers->find('all', array('conditions' => array('posted_ro_office IS' => $posted_ro_office, 'role IS' => $lmis_role, 'status' => 'active','id !=' =>$user_table_id )))->first();
+						
 						if (!empty($find_user)) {
 
 							if ($lmis_role == 'RO/SO OIC') {
@@ -1137,10 +1141,11 @@ class UsersController extends AppController {
 					}
 
 					$DmiUsersEntity = $this->DmiUsers->newEntity(array(
+
 						'id' => $user_table_id,
 						'f_name' => $htmlencodedfname,
 						'l_name' => $htmlencodedlname,
-						'email' => $htmlencodedemail,
+						//'email' => $htmlencodedemail,
 						'phone' => $htmlencodedphone,
 						'landline' => base64_encode($htmlencodedlandline),
 						'division' => $this->request->getData('division'),//(for DMI,LMIS & BOTH)
@@ -1149,13 +1154,15 @@ class UsersController extends AppController {
 						//	'password'=>'ad8a5ee8aed3dc05353f0d0ab7ea6083',
 						'created_by_user' => $this->request->getSession()->read('username'),
 						'posted_ro_office' => $posted_ro_office,
-						'profile_pic' => $profile_pic
+						'profile_pic' => $profile_pic,
+						'modified'=>date('Y-m-d H:i:s')
 					));
 
 					if ($this->DmiUsers->save($DmiUsersEntity)) {
 
 						//Save the user profile update logs history
 						$DmiUserHistoryLogsEntity = $this->DmiUserHistoryLogs->newEntity(array(
+
 							'f_name' => $htmlencodedfname,
 							'l_name' => $htmlencodedlname,
 							'email' => $htmlencodedemail,
@@ -1163,27 +1170,26 @@ class UsersController extends AppController {
 							'landline' => base64_encode($htmlencodedlandline),
 							'division' => $this->request->getData('division'),
 							'role' => $lmis_role,
-							//	'once_card_no'=>$encrypted_aadhar, //no provision to store aadhar
-							//	'password'=>'ad8a5ee8aed3dc05353f0d0ab7ea6083',
+							'created'=>date('Y-m-d H:i:s'),
+							'modified'=>date('Y-m-d H:i:s'),
 							'created_by_user' => $this->request->getSession()->read('username'),
 							'posted_ro_office' => $posted_ro_office,
-							'profile_pic' => $profile_pic
+							'profile_pic' => $profile_pic,
+							'done_by'=>$username  // as per change request add new field by shankhpal shende on 12/01/2023
 						));
 
 						$this->DmiUserHistoryLogs->save($DmiUserHistoryLogsEntity);
 
 						$this->set('htmlencodedemail', $htmlencodedemail);
 
-						//Added this call to save the user action log on 09-09-2022
-						$this->Customfunctions->saveActionPoint('Edit User','Success');
+						$this->Customfunctions->saveActionPoint('Edit User','Success'); #Action : Used Edited
 						$message = 'You have successfully updated the user details.';
 						$message_theme = 'success';
 						$redirect_to = 'edit_user';
 
 					} else {
 
-						//Added this call to save the user action log on 09-09-2022
-						$this->Customfunctions->saveActionPoint('Edit User','Failed');
+						$this->Customfunctions->saveActionPoint('Edit User','Failed'); #Action : Used Edited
 						$message = 'Sorry...Please check your fields again';
 						$message_theme = 'failed';
 						$redirect_to = 'edit_user';
@@ -1191,8 +1197,7 @@ class UsersController extends AppController {
 
 				} else {
 
-					//Added this call to save the user action log on 09-09-2022
-					$this->Customfunctions->saveActionPoint('Edit User','Failed');
+					$this->Customfunctions->saveActionPoint('Edit User','Failed'); #Action : Used Edited
 					$message = 'Sorry...This email_id already exist';
 					$message_theme = 'failed';
 					$redirect_to = 'edit_user';
@@ -1200,8 +1205,7 @@ class UsersController extends AppController {
 
 			} else {
 
-				//Added this call to save the user action log on 09-09-2022
-				$this->Customfunctions->saveActionPoint('Edit User','Failed');
+				$this->Customfunctions->saveActionPoint('Edit User','Failed'); #Action : Used Edited
 				$this->set('return_error_msg','Please check some fields are not entered');
 				return null;
 			}

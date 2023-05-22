@@ -905,7 +905,7 @@ class MastersController extends AppController {
 		$checkFieldName = $this->fieldNameForCheck;
 
 		//custom function to save master actions logs
-		$this->saveMasterActionLogs($masterId,null,$record_id);
+		$this->saveMasterActionLogs($masterId,$record_id,null);
 
 		if ($this->Randomfunctions->checkIfMasterValueUsed($record_id,$checkFieldName)==1) {
 
@@ -953,7 +953,7 @@ class MastersController extends AppController {
 		$checkFieldName = $this->fieldNameForCheck;
 		
 		//custom function to save master actions logs
-		$this->saveMasterActionLogs($masterId,$postData,$record_id);
+		$this->saveMasterActionLogs($masterId,$record_id,$postData);
 		
 		// For State
 		if ($masterId=='1') {
@@ -1467,8 +1467,8 @@ class MastersController extends AppController {
 			foreach ($allocation_list as $each_appl) {
 
 				//getting office short code from appl.
-				$appl_short_code = explode('/',(string) $each_appl['customer_id']); #For Deprecations
-				$appl_short_code = $appl_short_code[2];
+				$split_cust_id = explode('/',(string) $each_appl['customer_id']); #For Deprecations
+				$appl_short_code = $split_cust_id[2];
 
 				if ($appl_short_code == $short_code) {
 
@@ -1481,41 +1481,50 @@ class MastersController extends AppController {
 					
 					if(!($finalStatus['status']=='approved' && $finalStatus['current_level']=='level_3')){
 
-						if ($each_appl['level_3'] == $each_appl['current_level']) {//if application currently is with incharge
-
-							$data_array = array(
-								'id'=>$each_appl['id'],
-								'level_3'=>$incharge_email,
-								'current_level'=>$incharge_email,
-								'modified'=>date('Y-m-d H:i:s')
-							);
-
+						//condition applied on 31-01-2023 for lab appl.
+						if ($split_cust_id[1]==3 && $office_type=='SO') {
+							//do not reallocate lab application when office type is SO
+							//it will change RO incharge id from level_3 to SO incharge id
+							//and lab process only in RO flow
+						
 						} else {
+						
+							if ($each_appl['level_3'] == $each_appl['current_level']) {//if application currently is with incharge
 
-							$data_array = array(
-								'id'=>$each_appl['id'],
-								'level_3'=>$incharge_email,
-								'modified'=>date('Y-m-d H:i:s')
-							);
-						}
+								$data_array = array(
+									'id'=>$each_appl['id'],
+									'level_3'=>$incharge_email,
+									'current_level'=>$incharge_email,
+									'modified'=>date('Y-m-d H:i:s')
+								);
 
-						$allocation_modelEntity = $this->$allocation_model->newEntity($data_array);
+							} else {
 
-						if ($this->$allocation_model->save($allocation_modelEntity)) {
+								$data_array = array(
+									'id'=>$each_appl['id'],
+									'level_3'=>$incharge_email,
+									'modified'=>date('Y-m-d H:i:s')
+								);
+							}
 
-							//update RO ids in current position table, with RO Officer change
-							$this->$current_position_model->updateAll(array('current_user_email_id'=>"$incharge_email"),
-							array('customer_id'=>$customer_id,'current_level'=>'level_3','current_user_email_id'=>$each_appl['level_3']));
+							$allocation_modelEntity = $this->$allocation_model->newEntity($data_array);
 
-							//update RO on level_4_ro column for SO flow, only when RO office Updated
-							if ($office_type=='RO') {
+							if ($this->$allocation_model->save($allocation_modelEntity)) {
 
-								$this->$allocation_model->updateAll(array('level_4_ro'=>"$incharge_email"),
-								array('customer_id'=>$customer_id,'level_4_ro'=>$each_appl['level_3']));
-
-								//to update position on level 4 Ro
+								//update RO ids in current position table, with RO Officer change
 								$this->$current_position_model->updateAll(array('current_user_email_id'=>"$incharge_email"),
-								array('customer_id'=>$customer_id,'current_level'=>'level_4_ro','current_user_email_id'=>$each_appl['level_4_ro']));
+								array('customer_id'=>$customer_id,'current_level'=>'level_3','current_user_email_id'=>$each_appl['level_3']));
+
+								//update RO on level_4_ro column for SO flow, only when RO office Updated
+								if ($office_type=='RO') {
+
+									$this->$allocation_model->updateAll(array('level_4_ro'=>"$incharge_email"),
+									array('customer_id'=>$customer_id,'level_4_ro'=>$each_appl['level_3']));
+
+									//to update position on level 4 Ro
+									$this->$current_position_model->updateAll(array('current_user_email_id'=>"$incharge_email"),
+									array('customer_id'=>$customer_id,'current_level'=>'level_4_ro','current_user_email_id'=>$each_appl['level_4_ro']));
+								}
 							}
 						}
 					}
@@ -1862,7 +1871,7 @@ class MastersController extends AppController {
 
 	//to save master action logs for all masters commonly
 	//on 30-06-2021 by Amol
-	public function saveMasterActionLogs($masterId,$postData=null,$record_id) {
+	public function saveMasterActionLogs($masterId,$record_id,$postData=null) {
 	
 		//to save log if any master added or edited
 		

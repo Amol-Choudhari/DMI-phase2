@@ -91,7 +91,6 @@ class InspectionsController extends AppController{
 		$this->set('customer_id',$customer_id);
 
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-					//print_r($grantDateCondition); exit;
 
 		$form_final_submit_details = $this->Customfunctions->finalSubmitDetails($customer_id,'application_form');
 
@@ -135,7 +134,7 @@ class InspectionsController extends AppController{
 		$this->set('download_report_pdf',$download_report_pdf);
 		
 		//Added on 01-09-2017 check lab export unit 
-		$export_unit_status = $this->Customfunctions->checkApplicantExportUnit($customer_id);								
+		$export_unit_status = $this->Customfunctions->checkApplicantExportUnit($customer_id);
 		$this->set('export_unit_status',$export_unit_status);
 		
 		$office_type = $this->Customfunctions->getApplDistrictOffice($customer_id);
@@ -184,7 +183,7 @@ class InspectionsController extends AppController{
 		$firm_details = $firm_detail[0];
 		$this->set('firm_details',$firm_details);
 		
-		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');		
+		$Dmi_flow_wise_tables_list = TableRegistry::getTableLocator()->get('DmiFlowWiseTablesLists');
 		
 		$report_final_submit_table = $Dmi_flow_wise_tables_list->getFlowWiseTableDetails($application_type,'inspection_report');
 		$Dmi_report_final_submit_table = TableRegistry::getTableLocator()->get($report_final_submit_table);
@@ -224,7 +223,7 @@ class InspectionsController extends AppController{
 		$added_directors_details = $this->DmiAllDirectorsDetails->allDirectorsDetail($customer_id);	
 		$this->set('added_directors_details',$added_directors_details);
 					
-		$final_submit_status = $this->Customfunctions->finalSubmitDetails($customer_id,'inspection_report');			
+		$final_submit_status = $this->Customfunctions->finalSubmitDetails($customer_id,'inspection_report');
 		$this->set('final_submit_status',$final_submit_status);
 		
 		//added on 13-05-2021 by Amol, to be used in view side
@@ -235,13 +234,13 @@ class InspectionsController extends AppController{
 		}
 		
 		
-		/* $show_accept_forward_btn = $this->showReportBtnsStatus($customer_id,$application_type,$section_details,$allSectionDetails);			
+		/* $show_accept_forward_btn = $this->showReportBtnsStatus($customer_id,$application_type,$section_details,$allSectionDetails);
 		$this->set('show_accept_btn',$show_accept_forward_btn[0]);	
 		$this->set('show_forward_to_ho_btn',$show_accept_forward_btn[1]);	
 		$this->set('show_final_granted_btn',$show_accept_forward_btn[2]); */
 		
 		//Get current report section status value
-		$all_report_status = $this->DmiCommonSiteinspectionFlowDetails->reportSectionStatus($customer_id,$allSectionDetails);			
+		$all_report_status = $this->DmiCommonSiteinspectionFlowDetails->reportSectionStatus($customer_id,$allSectionDetails);
 		if($all_report_status == 'true') {  $show_final_report_btn = 'yes'; }else{ $show_final_report_btn = 'no'; }
 		$this->set('show_final_report_btn',$show_final_report_btn);	
 		
@@ -268,15 +267,15 @@ class InspectionsController extends AppController{
 		}
 		
 		$show_message = '';
-		$redirect_url = '../inspections/inspection-report';			
+		$redirect_url = '../inspections/inspection-report';
 		
-		//For edit referred_back						
+		//For edit referred_back
 		if(null!== ($this->request->getData('save_edited_reply'))){
 			
 			$id = $this->Session->read('edit_reply_to_ro_id');
 			$htmlencoded_edited_reply = htmlentities($this->request->getData('edited_reply'), ENT_QUOTES);
 			
-			if(!empty($this->request->getData('ir_comment_ul')->getClientFilename())){				
+			if(!empty($this->request->getData('ir_comment_ul')->getClientFilename())){
 			
 				$file_name = $this->request->getData('ir_comment_ul')->getClientFilename();
 				$file_size = $this->request->getData('ir_comment_ul')->getSize();
@@ -287,14 +286,14 @@ class InspectionsController extends AppController{
 	
 			}else{ $ir_comment_ul = $section_form_details[0]['ir_comment_ul']; }
 			
-			$section_model_Entity = $section_model->newEntity(array(				
+			$section_model_Entity = $section_model->newEntity(array(
 				'id'=>$id,
 				'io_reply'=>$htmlencoded_edited_reply,
 				'io_reply_date'=>date('Y-m-d H:i:s'),
 				'ir_comment_ul'=>$ir_comment_ul,
 			)); 
 			
-			if($section_model->save($section_model_Entity)){							
+			if($section_model->save($section_model_Entity)){
 				$this->Session->delete('edit_reply_to_ro_id');
 				$this->redirect('/inspections/inspection-report');	
 			}
@@ -305,7 +304,7 @@ class InspectionsController extends AppController{
 			$id = $this->Session->read('edit_referred_back_to_io_id');
 			$htmlencoded_edited_referred_back = htmlentities($this->request->getData('edited_referred_back'), ENT_QUOTES);
 			
-			if(!empty($this->request->getData('rb_comment_ul')->getClientFilename())){				
+			if(!empty($this->request->getData('rb_comment_ul')->getClientFilename())){
 			
 				$file_name = $this->request->getData('rb_comment_ul')->getClientFilename();
 				$file_size = $this->request->getData('rb_comment_ul')->getSize();
@@ -316,14 +315,14 @@ class InspectionsController extends AppController{
 	
 			}else{ $rb_comment_ul = $section_form_details[0]['rb_comment_ul']; }
 			
-			$section_model_Entity = $section_model->newEntity(array(				
+			$section_model_Entity = $section_model->newEntity(array(
 				'id'=>$id,
 				'referred_back_comment'=>$htmlencoded_edited_referred_back,
 				'referred_back_date'=>date('Y-m-d H:i:s'),
-				'rb_comment_ul'=>$rb_comment_ul,				
+				'rb_comment_ul'=>$rb_comment_ul,
 			));
 			
-			if($section_model->save($section_model_Entity)){					
+			if($section_model->save($section_model_Entity)){
 				$this->Session->delete('edit_referred_back_to_io_id');
 				$this->redirect('/inspections/inspection-report');
 			}
@@ -333,7 +332,7 @@ class InspectionsController extends AppController{
 			$result = $section_model->saveFormDetails($customer_id,$this->request->getData()); 
 			$result_message = $this->reportPopupMessage('save',$result,$section_details,$firm_type_text,$office_type);	
 			$show_message = 'yes';
-			if(empty($section_form_details[0]['created']) && count($allSectionDetails)!=$section_id){					
+			if(empty($section_form_details[0]['created']) && count($allSectionDetails)!=$section_id){
 				$this->Session->write('section_id',$section_id+1);
 			}
 			$redirect_url = '../inspections/inspection-report';	

@@ -2946,7 +2946,7 @@ class TCPDF {
 		$this->_destroy(true);
 		
 		//added on 28-12-2021 to hide tcpdf error and redirect to home page, if any error returned
-		echo "Something went wrong in the process. Please try again <a href='/DMI'>Click Here</a>";
+		echo "Something went wrong in the process. Please try again <a href='/DMI-SUR'>Click Here</a>";
 		exit;
 		
 		if (defined('K_TCPDF_THROW_EXCEPTION_ERROR') AND !K_TCPDF_THROW_EXCEPTION_ERROR) {

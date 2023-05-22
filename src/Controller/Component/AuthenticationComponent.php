@@ -254,14 +254,13 @@ class AuthenticationComponent extends Component {
 			//updated on 18-03-2019, email pattern changed
 			$txt = 	'Hello' .
 					"<html><body><br></body></html>".'Click the below link OR copy it to browser address bar:' .
-					"<html><body><br></body></html>" .$host_path.'/DMI/'.$controller.'/reset_password/'.$url.
+					"<html><body><br></body></html>" .$sendlink.
 					"<html><body><br></body></html>".'Above link will be active only for 24 hours. If expired, then try to set your password from forgot Password option on DMI portal'.
 					"<html><body><br></body></html>".'Thanks & Regards,' .
 					"<html><body><br></body></html>" .'Directorate of Marketing & Inspection,' .
 					"<html><body><br></body></html>" .'Ministry of Agriculture and Farmers Welfare,' .
 					"<html><body><br></body></html>" .'Government of India.';
 
-			$txt = $sendlink;
 			$headers = 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: dmiqc@nic.in";
 			

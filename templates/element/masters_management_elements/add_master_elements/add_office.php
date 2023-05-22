@@ -4,7 +4,6 @@
 			<div class="col-md-12">
 				<!--Added below variable to set the message for dupicate office or 15 digit code on 03-12-2021 by AKASH-->
 				<?php if (!empty($duplicate_code_msg)) { echo "<div class='alert alert-danger'>".$duplicate_code_msg."</div>"; } ?>
-				
 				<label class="badge badge-info">Office Type :</label>
 				<?php $options=array('RO'=>'RO','RAL'=>'RAL','SO'=>'SO');
 				$attributes=array('legend'=>false, 'value'=>'RO', 'id'=>'office_type');

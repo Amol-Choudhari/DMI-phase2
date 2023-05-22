@@ -99,7 +99,7 @@ class AppController extends Controller
 		// #5- 15-Digit-Code (FDC) / #6- Allotment of E-Code (EC) / #7- Advance Payment (AP)
 		// #8- Approval of Designated Person (ADP) / #9- Surrender of Certificate (SOC)
 		// #10- Routine Inspection (RTI) / #11 - Bi-annually Grading Report (BGR)
-		$this->Session->write('applTypeArray',array('1','2','3','4','5','6','8','9'));
+		$this->Session->write('applTypeArray',array('1','2','4','5','6','8','9'));
 
 		//added on 01-10-2021 by Amol
 		//if not in advance payment mode
@@ -156,42 +156,6 @@ class AppController extends Controller
 			$this->Session->write('paymentforchange','available');
 		}
 
-
-		//calling methods from model Dmi_user to find MO list and IO list of current loggedin RO
-		//These variables are set to use in Ro Window, to list status of multiple MO's and IO's
-		/*	if($this->Session->read('username') != null)
-			{
-				if(!empty($current_user_roles)){
-
-					if($current_user_roles[0]['ro_inspection']=='yes')
-					{	print_r($current_user_roles);exit;
-						// find current controller action name and it's used to create mo_list for new and renewal application
-						// Done by pravin 15-09-2017
-						$current_action = $this->request->getParam('action');
-						$mo_list = $this->DmiUsers->findMoList($current_action);
-						$this->set('mo_list',$mo_list);
-
-						$io_list = $this->DmiUsers->findIoList($current_action);//added this "$current_action" argument on 10-07-2018 by Amol
-						$this->set('io_list',$io_list);
-
-					}
-					else{
-
-					$mo_list = array();
-					$io_list = array();
-					}
-				}else{
-
-					$mo_list = array();
-					$io_list = array();
-				}
-
-			}else{
-
-				$mo_list = array();
-				$io_list = array();
-			}*/
-
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
 
@@ -206,7 +170,7 @@ class AppController extends Controller
 	//on 08-04-2021 by Amol
 	public function showRemainingLoginAttempts($table,$user_id){
 
-	 $this->loadModel($table);
+		$this->loadModel($table);
 		//check in DB logs table
 		if ($table == 'DmiUserLogs') {
 
@@ -216,10 +180,10 @@ class AppController extends Controller
 
 			$get_logs_records = $this->$table->find('all',array('conditions'=>array('customer_id IS'=>$user_id),'order'=>'id Desc'))->toArray();
 
-		} elseif ($table == 'DmiChemistLogs') {
+    	} elseif ($table == 'DmiChemistLogs') {
 
-			$get_logs_records = $this->$table->find('all',array('conditions'=>array('customer_id IS'=>$user_id),'order'=>'id Desc'))->toArray();
-		}
+      		$get_logs_records = $this->$table->find('all',array('conditions'=>array('customer_id IS'=>$user_id),'order'=>'id Desc'))->toArray();
+    	}
 
 		$i = 0;
 		foreach ($get_logs_records as $each) {
@@ -332,7 +296,7 @@ class AppController extends Controller
 										</tr>
 									</tbody>
 								</table>
-								<a href="/DMI" class="btn btn_continue float-right text-white font-weight-bold">CONTINUE</a>
+								<a href="/DMI-SUR" class="btn btn_continue float-right text-white font-weight-bold">CONTINUE</a>
 							</div>
 						</div>
 					</div>
@@ -341,6 +305,12 @@ class AppController extends Controller
 
 		echo $msg_content;
         exit;
+	}
+
+	//SessionDestroyAfterError
+	public function sessionDestroyAfterError(){
+		$this->Session->destroy();
+		$this->redirect('/');
 	}
 
 }

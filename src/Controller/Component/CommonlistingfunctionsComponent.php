@@ -24,61 +24,68 @@
 		
 		
 		//Get MO With Nodal Create Array Status Method
-		public function getMOWithNodalCreateArrayStatus($for_status,$customer_id,$final_submit_table,$DmiMoRoCommentsDetails,$each_alloc) {
+		public function getMOWithNodalCreateArrayStatus($for_status,$customer_id,$final_submit_table,$DmiMoRoCommentsDetails,$each_alloc,$appl_type_id=null) {//new argument added on 14-04-2023 "$appl_type_id"
 			
 			$DmiMoRoCommentsDetails = TableRegistry::getTableLocator()->get($DmiMoRoCommentsDetails);
 			$final_submit_table = TableRegistry::getTableLocator()->get($final_submit_table);
 			$creat_array = null;
 			$username = $this->Session->read('username');
 			
-			$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
+			$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id,$appl_type_id);//new argument added on 14-04-2023 "$appl_type_id"
 			
+			//Check if the Application is pending after grant.
+			$checkIfApplAfterGrant =  $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,'status'=>'pending'),'order'=>'id DESC'))->first();
+
 			//check final submit status for level 1 and approved for each allocated id
 			$level1_approved_status = $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,'status'=>'approved','current_level'=>'level_1'),'order'=>'id DESC'))->first();							
 			//check MO RO SO comments table status for each id
 			$mo_with_level3_comm = $DmiMoRoCommentsDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition),'order'=>'id DESC'))->first();	
 			
-			//for pending applications
-			if ($for_status == 'pending') {
-				
-				$this->Session->write('ro_with','mo');
-				
-				if (empty($mo_with_level3_comm) && empty($level1_approved_status)) {
-					$creat_array = $each_alloc['modified'];
-				}
-
-			//for referred back applications
-			} elseif ($for_status == 'ref_back') {
-				
-				$this->Session->write('ro_with','mo');
-				
-				if (!empty($mo_with_level3_comm)) {
+			#This if block is added because some application are showing in the Pending even after grant.
+			#This is applied to all block to avoid the application those are havent pending  - Akash [15-03-2023]
+			if (!empty($checkIfApplAfterGrant)) {
+			
+				//for pending applications
+				if ($for_status == 'pending') {
 					
-					if ($mo_with_level3_comm['available_to']=='ro' && empty($level1_approved_status)) {
-						$creat_array = $mo_with_level3_comm['modified'];
+					$this->Session->write('ro_with','mo');
+					
+					if (empty($mo_with_level3_comm) && empty($level1_approved_status)) {
+						$creat_array = $each_alloc['modified'];
 					}
-				}
-			
-			//for replied applications
-			} elseif ($for_status == 'replied') {
-				
-				$this->Session->write('ro_with','mo');
-				
-				if (!empty($mo_with_level3_comm)) {
 
-					if ($mo_with_level3_comm['available_to']=='mo' && empty($level1_approved_status)) {
-						$creat_array = $mo_with_level3_comm['modified'];
+				//for referred back applications
+				} elseif ($for_status == 'ref_back') {
+					
+					$this->Session->write('ro_with','mo');
+					
+					if (!empty($mo_with_level3_comm)) {
+						
+						if ($mo_with_level3_comm['available_to']=='ro' && empty($level1_approved_status)) {
+							$creat_array = $mo_with_level3_comm['modified'];
+						}
 					}
-				}
-			
-			//for approved applications	
-			} elseif ($for_status == 'approved') {
+				
+				//for replied applications
+				} elseif ($for_status == 'replied') {
+					
+					$this->Session->write('ro_with','mo');
+					
+					if (!empty($mo_with_level3_comm)) {
 
-				if (!empty($level1_approved_status)) {
-					$creat_array = $level1_approved_status['modified'];
+						if ($mo_with_level3_comm['available_to']=='mo' && empty($level1_approved_status)) {
+							$creat_array = $mo_with_level3_comm['modified'];
+						}
+					}
+				
+				//for approved applications	
+				} elseif ($for_status == 'approved') {
+
+					if (!empty($level1_approved_status)) {
+						$creat_array = $level1_approved_status['modified'];
+					}
 				}
 			}
-			
 			return $creat_array;
 		}
 		
@@ -224,17 +231,24 @@
 			$final_report_table = TableRegistry::getTableLocator()->get($final_report_table);
 			$creat_array = null;
 			$username = $this->Session->read('username');
-			$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
+			$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id,$appl_type_id);//added new parameter in call "$appl_type_id" on 14-04-2023
 			
-			//for pending reports
-			if($for_status == 'pending') {
-				$check_final_reported = $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved','OR'=>array('current_level IN'=>array('level_2','level_3')),$grantDateCondition)))->first();		
-				
-				if (empty($check_final_reported)) {
-					$creat_array = $each_alloc['modified'];
+			//Check if the Application is pending after grant.
+			$checkIfApplAfterGrant =  $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,'status'=>'pending'),'order'=>'id DESC'))->first();
+			
+			#This if block is added because some application are showing in the Pending even after grant.
+			#This is applied to all block to avoid the application those are havent pending  - Akash [16-03-2023]
+			if (!empty($checkIfApplAfterGrant)) {
+				//for pending reports
+				if($for_status == 'pending') { 
+					$check_final_reported = $final_submit_table->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'status'=>'approved','OR'=>array('current_level IN'=>array('level_2','level_3')),$grantDateCondition)))->first();		
+					
+					if (empty($check_final_reported)) {
+						$creat_array = $each_alloc['modified'];
+					}
 				}
 			}
-
+			
 			$check_last_status = $this->Controller->Customfunctions->finalSubmitDetails($customer_id,'inspection_report',$appl_type_id);
 			
 			if (!empty($check_last_status)) {
@@ -372,7 +386,8 @@
 			
 			if ($for_status == 'pending') {
 				
-				$stmt = $conn->execute("select al.*,cp.modified as tradate from $allocationTable as al 
+				//commented the code on 20-01-2023, as for level pending with scrutiny tab is hidden,but count was getting added in main tab.
+				/*$stmt = $conn->execute("select al.*,cp.modified as tradate from $allocationTable as al 
 										inner join (select fss.customer_id, fss.status , fss.current_level from $finalSubmitTable as fss
 										inner join (select max(id) id, customer_id from $finalSubmitTable group by customer_id) as fs on fs.customer_id = fss.customer_id and fs.id = fss.id) as fsr on fsr.customer_id = al.customer_id
 										LEFT  join (select mrc.customer_id,mrc.available_to from $moRoCommentsDetailsTable as mrc
@@ -381,7 +396,9 @@
 										inner join (select maxcpt.* from $applCurrentPosTable as maxcpt
 										inner join (select max(id) id, customer_id from $applCurrentPosTable group by customer_id) as mxcpt on mxcpt.customer_id = maxcpt.customer_id and mxcpt.id = maxcpt.id) as cp on cp.customer_id = al.customer_id
 										where cp.current_level != 'applicant' and al.level_3 = '$username' and al.level_1 IS NOT NULL and al.current_level = al.level_1 AND ((fsr.status != 'approved' AND fsr.current_level != 'level_1') OR (fsr.status != 'approved' AND fsr.current_level != 'level_3')) AND
-										cmt.customer_id IS NULL;");
+										cmt.customer_id IS NULL;");*/
+				//set blank array for default, as this tab is hidden ofr level 3
+				$stmt = array();
 										
 			} elseif ($for_status == 'ref_back' || $for_status == 'replied') {
 				
@@ -505,10 +522,10 @@
 			$applCurrentPosTable = strtolower(implode('_',array_filter(preg_split('/(?=[A-Z])/',$appl_current_pos_table))));
 			$creat_array = false;
 			$username = $this->Session->read('username');
-			
+
 			#This below condition block is modified.
 			# -> To allow the listing of the Surrender Flow the application_type = 9 is added to the block - Akash[05-12-2022]
-			if ($appl_type_id == 2 || $appl_type_id == 9) {
+			if ($appl_type_id == 2 || $appl_type_id == 3 || $appl_type_id == 9) {//added temp for all change flow to avoid level 2 check, on 14-04-2023
 				$level2 = null;
 			} else {
 				$level2 = "and al.level_2 IS NOT NULL";
@@ -516,8 +533,8 @@
 			
 			$conditions = null;
 			if ($for_status == 'pending') {
-
-				$conditions = "al.level_4_ro = '$username' and cp.current_user_email_id = '$username' $level2 AND hlct.customer_id IS NULL and rsct.customer_id IS NULL";
+				//added condition "NOT (fsr.status='approved' and fsr.current_level='level_3')" on 28-02-2023 by Amol, to hide granted appl from pending list RO-SO comm.
+				$conditions = "al.level_4_ro = '$username' and cp.current_user_email_id = '$username' $level2 AND hlct.customer_id IS NULL and rsct.customer_id IS NULL and NOT (fsr.status='approved' and fsr.current_level='level_3')";
 				$tradate = "cp.modified as tradate";
 			
 			} elseif ($for_status == 'ref_back') {
@@ -743,7 +760,7 @@
 
 				$all_report_status = 'true';
 			
-			//The below application type 9 is added - Akash[02-12-2022]
+			//The Below code is added for appl 9 : Surrender Flow to avoid the site inspection- Akash[02-12-2022]
 			}elseif($appl_type_id == 9){ 
 				$all_report_status = 'true';
 			}
@@ -1080,7 +1097,7 @@
 				
 				if($for_level=='level_1'){
 					if($sub_tab=='scrutiny_with_nodal_office'){
-						$creat_array = $this->getMOWithNodalCreateArrayStatus($for_status,$customer_id,$final_submit_table,$DmiMoRoCommentsDetails,$each_alloc);
+						$creat_array = $this->getMOWithNodalCreateArrayStatus($for_status,$customer_id,$final_submit_table,$DmiMoRoCommentsDetails,$each_alloc,$appl_type_id);//new argument added on 14-04-2023 "$appl_type_id"
 						$comm_with_email = $each_alloc['level_3'];
 					}
 					elseif($sub_tab=='scrutiny_with_reg_office'){

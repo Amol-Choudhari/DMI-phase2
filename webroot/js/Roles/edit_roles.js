@@ -132,7 +132,8 @@
 			}
 		});
 
-
+		var ama_set_role_detail = $('#ama_set_role_detail').val();
+		
 		$("#ama").change(function() {
 
 			if ($(this).prop('checked') == true) {

@@ -71,11 +71,11 @@ class ApplicationformspdfsController extends AppController{
 		//to check if any record is present in esign temp table for current customer.
 		//if present then remove that record, delete file from temp folder, and update record from main esign status table
 		//added on 02-10-2018 by Amol
-		$Dmi_temp_esign_status->checkTempEsignRecordExist($this->Session->read('username'),'applicant');			
+		$Dmi_temp_esign_status->checkTempEsignRecordExist($this->Session->read('username'),'applicant');
 				
-		$all_data_pdf = $this->render($pdf_view_path);				
+		$all_data_pdf = $this->render($pdf_view_path);
 		
-		$customer_id = $this->Session->read('username');				
+		$customer_id = $this->Session->read('username');
 		$split_customer_id = explode('/',(string) $customer_id); #For Deprecations
 		
 		//as per distributed folder structure, get folder name as per application to store pdf
@@ -85,29 +85,29 @@ class ApplicationformspdfsController extends AppController{
 		$pdfPrefix = null;
 		if($application_type==2){ 
 			$pdfPrefix = 'R-'; 
-		
 		}elseif($application_type==5){
 			$pdfPrefix = 'FDC-';
-		
 		}elseif($application_type==6){
 			$pdfPrefix = 'EC-';
 		}elseif($application_type==8){ //added by shankhpal shende on 15-11-2022
 			$pdfPrefix = 'ADP-';
+		}elseif ($application_type==9) { #For Surrender Application - Akash [14-04-2023]
+			$pdfPrefix = 'SOC-';
 		}
 
 	
-		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];				
+		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 	
 		//check applicant last record version to increment		
 		$list_id = $Dmi_app_pdf_record->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 				
 		if(!empty($list_id))
 		{
-			$max_id = $Dmi_app_pdf_record->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();																	
+			$max_id = $Dmi_app_pdf_record->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
 			$last_pdf_version 	=	$max_id['pdf_version'];
 
 		}
-		else{	$last_pdf_version = 0;	}				
+		else{	$last_pdf_version = 0;	}
 
 		$current_pdf_version = $last_pdf_version+1; //increment last version by 1
 	
@@ -119,7 +119,7 @@ class ApplicationformspdfsController extends AppController{
 		
 		if($this->Customfunctions->checkApplicationOldNew($customer_id)=='new' || $application_type !=1){
 			
-			//creating filename and file path to save				
+			//creating filename and file path to save
 			$file_path = '/writereaddata/DMI/temp/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
 			
 			$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
@@ -355,6 +355,8 @@ class ApplicationformspdfsController extends AppController{
   
 		}elseif($application_type==8){ //added by shankhpal shende on 15-11-2022
 			$pdfPrefix = 'ADP-';
+		}elseif($application_type==9){ #For Surrender Application -Akash [14-04-2023]
+			$pdfPrefix = 'SOC-';
 		}
 		
 		$rearranged_id = 'G-'.$pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
@@ -1755,7 +1757,7 @@ class ApplicationformspdfsController extends AppController{
 			$result_for_qr = $this->Customfunctions->getQrCode($data);
 			$this->set('result_for_qr',$result_for_qr);
 			
-			
+			#To check if the application is for Surrender Flow - Akash [14-04-2023]
 			$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
 			$this->set('isSurrender',$isSurrender);
 
@@ -1788,7 +1790,9 @@ class ApplicationformspdfsController extends AppController{
 		// Fetch grant date conditions get latest records.
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
 		
+		#To check if the application is for Surrender Flow - Akash [14-04-2023]
 		$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+	
 		$this->set('isSurrender',$isSurrender);
 
 
@@ -2018,7 +2022,8 @@ class ApplicationformspdfsController extends AppController{
 		
 		// Fetch grant date conditions get latest records.
 		$grantDateCondition = $this->Customfunctions->returnGrantDateCondition($customer_id);
-
+		
+		#To check if the application is for Surrender Flow - Akash [14-04-2023]
 		$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
 		$this->set('isSurrender',$isSurrender);
 
@@ -2340,20 +2345,17 @@ class ApplicationformspdfsController extends AppController{
 	//this function is created to generate pdf using tcpdf plugin
 	//This is called at place of Mpdf output function with required parameteres.
 	//on 23-01-2020 by Amol
-	public function callTcpdf($html,$mode,$customer_id,$pdf_for){
+	public function callTcpdf($html,$mode,$customer_id,$pdf_for,$file_path=null){
 	
 		$with_esign = $this->Session->read('with_esign');
 		$current_level = $this->Session->read('current_level');
 		$file_name = $this->Session->read('pdf_file_name');
-
+		
 		//get application type and current level from session
 		//added on 16-09-2021 by Amol
 		$appl_type = $this->Session->read('application_type');
 		$current_level = $this->Session->read('current_level');
-		
-		/* $view = new View($this, false);
-		$view->layout = null; */
-		
+	
 		//if application is for old or w/o esign then store pdf in files folder directly.
 		if($pdf_for == 'old' || $with_esign == 'no'){
 			
@@ -2362,7 +2364,10 @@ class ApplicationformspdfsController extends AppController{
 			$folderName = $this->Customfunctions->getFolderName($customer_id);
 		
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/applications/'.$folderName.'/'.$file_name;
-			
+		
+		#For SCN moved file directly to the Specific Folder - Akash[03-01-2022]
+		}elseif($pdf_for == 'showcause_notice'){
+			$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/showcause_notice/'.$file_name;
 		}else{
 			$file_path = $_SERVER["DOCUMENT_ROOT"].'/writereaddata/DMI/temp/'.$file_name;
 		}
@@ -2384,8 +2389,9 @@ class ApplicationformspdfsController extends AppController{
 		//added condition if renewal certificate and user is PAO/DDO
 		//then signature appearence not required
 		//on 16-09-2021 by Amol
-		if (!($appl_type==2 && $current_level=='pao')) {
-
+		#Updated : added the showcause_notice condtion for Shoe Cause Notices -> Akash[02-12-2022]
+		if (!($appl_type==2 && $current_level=='pao' && $pdf_for == 'showcause_notice')) {
+			
 			//only for save mode 'F' else no need in preview mode 'I'
 			if($mode == 'F' && $pdf_for != 'old' && $with_esign != 'no') {
 				//to set signature content block in pdf
@@ -2431,8 +2437,8 @@ class ApplicationformspdfsController extends AppController{
 		//added condition if renewal certificate and user is PAO/DDO
 		//then signature appearence not required
 		//on 16-09-2021 by Amol
-		if (!($appl_type==2 && $current_level=='pao')) {
-
+		if (!($appl_type==2 && $current_level=='pao' && $pdf_for="showcause_notice")) {
+		
 			//only for save mode 'F' else no need in preview mode 'I'
 			//to show esigned by block on pdf
 			if($mode == 'F' && $pdf_for != 'old' && $with_esign != 'no') {
@@ -3173,10 +3179,6 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiUserRoles');
-
-
-
-		$application_type = $this->Session->read('application_type');
 		
 		$customer_id = $this->Session->read('firm_id');
 		$this->set('customer_id',$customer_id);
@@ -3234,12 +3236,10 @@ class ApplicationformspdfsController extends AppController{
 		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
 	
 		//creating filename and file path to save
-		$file_path = '/writereaddata/DMI/temp/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
-	
-		//creating filename and file path to save				
-		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';				
-		$filename = $_SERVER["DOCUMENT_ROOT"].$file_path;
-		$application_type = 1;
+		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
+		
+		$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
+		
 		$pdfEntity = $this->DmiShowcauseNoticePdfs->newEntity(array(
 				
 			'customer_id'=>$customer_id,
@@ -3252,11 +3252,11 @@ class ApplicationformspdfsController extends AppController{
 		));
 						
 		$this->DmiShowcauseNoticePdfs->save($pdfEntity);
-		
-		$applicationType = $this->Mastertablecontent->applicationTypeById($application_type);
+
+		$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
+
 		//to preview application
-		$this->callTcpdf($all_data_pdf,'I',$customer_id,$applicationType);//on 23-01-2020 with preview mode
-		$this->callTcpdf($all_data_pdf,'F',$customer_id,$applicationType);//on 23-01-2020 with save mode
+		$this->callTcpdf($all_data_pdf,'F',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with save mode
 		$this->redirect('/dashboard/home');
 
 

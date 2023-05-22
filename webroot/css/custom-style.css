@@ -61,7 +61,7 @@
 .margin5   { margin        :  5px; }
 .margin35  { margin-left   :  35px !important;}
 .marginL9 {margin-left: 9px;}
-
+.mml6{  margin: 2;margin-left: 6;   }
 /*COLORS*/
 
 .cBrown { color : brown; }
@@ -904,10 +904,32 @@ date: 04/11/2022
  .scroll{
     overflow-x: scroll;
  }
+.bsc{border:1px solid cadetblue;}
 
- .bsc{border:1px solid cadetblue;}
-
- .card-master{
+.card-master{
     background-color:#105fa6;
     color:#fff;
  }
+ .status-in-progress {
+    color: green;
+  }
+  
+  .status-referred-back {
+    color: orange;
+  }
+  
+  .status-renewal-granted {
+    color: blue;
+  }
+
+  .status-renewal-due {
+    color: rgb(43, 77, 43);
+  }
+
+  .status-granted {
+    color: blue;
+  }
+
+  .status-not-applied {
+    color: yellow;
+  }

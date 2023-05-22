@@ -266,7 +266,7 @@
 																	echo $this->Form->control('smd_inspection', array('type'=>'checkbox', 'checked'=>false, 'label'=>'SMD In-Charge'));
 																} */ ?>
 
-																<?php  if ($each_role['site_inspection_pp']=='yes') {
+																<?php  if ($each_role['inspection_pp']=='yes') {
 																	echo $this->Form->control('site_inspection_pp', array('type'=>'checkbox', 'checked'=>true, 'label'=>' Site Inspection(P.P)','id'=>'site_inspection_pp'));
 																} else {
 																	echo $this->Form->control('site_inspection_pp', array('type'=>'checkbox', 'checked'=>false, 'label'=>' Site Inspection(P.P)','id'=>'site_inspection_pp'));
@@ -334,7 +334,7 @@
 																	echo $this->Form->control('sample_result_approval', array('type'=>'checkbox', 'checked'=>false,'label'=>' Approve Results'));
 																} ?>
 
-																<?php if ($each_role['RO']=='yes') {
+																<?php if ($each_role['ro']=='yes') {
 																	echo $this->Form->control('RO', array('type'=>'checkbox', 'checked'=>true,'label'=>' Regional Officer'));
 																} else {
 																	echo $this->Form->control('RO', array('type'=>'checkbox', 'checked'=>false,'label'=>' Regional Officer'));

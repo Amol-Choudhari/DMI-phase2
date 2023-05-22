@@ -1,8 +1,4 @@
-$(document).ready(function(){
-
-    $('.table').DataTable();
-   
-});
+$('.table').DataTable();
 
 
 $('.deactivate_button').click(function (e) { 

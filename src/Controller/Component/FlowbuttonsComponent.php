@@ -61,7 +61,7 @@ class FlowbuttonsComponent extends Component {
 		
 		if(!empty($showForwardBtn) && $all_report_status == 'true'){
 			
-			if($applicationType==1){
+			if($applicationType==1 || $applicationType==3){//added $applicationType==3 on 13-04-2023
 				
 				if($office_type == 'RO' && $hoInspectionExist=='yes' && empty($check_ho_allocation)){
 					
@@ -75,10 +75,23 @@ class FlowbuttonsComponent extends Component {
 						
 					}elseif($firm_type ==1 /*&& $ca_bevo_applicant=='yes'*/){//commented CA BEVO condition on 23-09-2021 by Amol, CA need to forward to RO (for approval or Grant)
 						
-						$ForwarBtn = 'RO';
+						//condition added on 01-02-2023 by Amol, 
+						//to hide forward button if appl is CA Non BEVO and SO office have multiple officer
+						if ($firm_type ==1 && $ca_bevo_applicant=='yes') {							
+							$ForwarBtn = 'RO';							
+						
+						} else {							
+							$username = $_SESSION['username'];
+							$officerCount = $this->Customfunctions->findOfficerCountInoffice($username);//get officer count in office
+							//if single officer in office then need forward, else can grant
+							if ($officerCount <= 1) {
+								$ForwarBtn = 'RO';
+							}
+						}
+						
 					}
 				}
-				
+
 			}elseif($applicationType==2){
 				
 				if($office_type == 'SO' && empty($check_allocation)){
@@ -94,14 +107,14 @@ class FlowbuttonsComponent extends Component {
 				}
 				
 			}elseif($applicationType==3){
-				
-				if($office_type == 'SO'){
+				//commented on 13-04-2023
+				/*if($office_type == 'SO'){
 					
 					if($firm_type ==2){
 						
 						$ForwarBtn = 'RO';
 					}
-				}
+				}*/
 			}elseif($applicationType == 5){//added on 18-11-2021 for 15 digit flow
 
 				if($office_type == 'SO'){
@@ -148,7 +161,7 @@ class FlowbuttonsComponent extends Component {
 		
 		if(!empty($showGrantBtn) && $all_report_status == 'true'){
 			
-			if($applicationType==1){
+			if($applicationType==1 || $applicationType==3){//added $applicationType == 3 on 13-04-2023
 				
 				if($office_type=='RO'){
 					
@@ -168,6 +181,19 @@ class FlowbuttonsComponent extends Component {
 						
 						$GrantBtn = 'yes';
 					}*/
+					//condition applied on 01-02-2023 by Amol,
+					//to show grant button if appl is CA Non BEVO and SO officer have multiple officer
+					if($firm_type ==1 && $ca_bevo_applicant!='yes'){
+						
+						$username = $_SESSION['username'];
+						$officerCount = $this->Customfunctions->findOfficerCountInoffice($username);//get officer count in office
+						
+						//if appl CA Non BEVO and Multiple officers in office then can grant without RO approval
+						if ($officerCount > 1) {
+							$GrantBtn = 'yes';
+						}
+						
+					}
 				}
 				
 			}elseif($applicationType==2){
@@ -183,7 +209,9 @@ class FlowbuttonsComponent extends Component {
 						$GrantBtn = 'yes';
 					}
 				}
-			}elseif($applicationType==3){
+			}
+			//commented on 05-04-2023
+			/*elseif($applicationType==3){
 				
 				if($office_type=='RO'){
 					
@@ -197,7 +225,7 @@ class FlowbuttonsComponent extends Component {
 					}
 				}
 				
-			}
+			}*/
 			
 			
 		}
@@ -379,6 +407,30 @@ class FlowbuttonsComponent extends Component {
 				}
 			
 			}
+
+			//This below Block of code is added to show the Final Grant Button after scrutiny for surrender flow - Akash[13-04-2023]
+			if($applicationType == 9 && $allSectionStatus == 2){
+				
+				$inspection = $this->Customfunctions->inspRequiredForChangeApp($customerId,$applicationType);
+				
+				if($office_type == 'SO'){
+					
+					if($inspection == 'no' && $firm_type ==1 ){
+						
+						$GrantBtn = 'yes';
+					}
+					
+				}if($office_type == 'RO'){
+					
+					if($inspection == 'no' && ($firm_type ==1 || $firm_type ==2 || $firm_type ==3)){
+						
+						$GrantBtn = 'yes';
+					}
+					
+				}
+			
+			}
+
 		}
 		return $GrantBtn;
 	}
@@ -418,7 +470,7 @@ class FlowbuttonsComponent extends Component {
 		
 		//if(empty($ho_allocation)){
 			
-			if($applicationType == 1){
+			if($applicationType == 1 || $applicationType == 3){//added appl type 3 condition on 13-04-2023 by Amol
 				
 				if($firm_type==2){
 					

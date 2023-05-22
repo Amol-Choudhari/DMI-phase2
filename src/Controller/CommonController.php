@@ -86,12 +86,12 @@ class CommonController extends AppController {
 
 				$this->viewBuilder()->setLayout('secondary_customer');
 
-			//checking chemist user id pattern ex. CHM/21/1003    
+			//checking chemist user id pattern ex. CHM/21/1003
 			} elseif (preg_match("/^[CHM]+\/[0-9]+\/[0-9]+$/", $this->Session->read('username'), $matches) == 1) {
 
 				$this->viewBuilder()->setLayout('chemist_home_layout');
 
-			// checking the if Email User 
+			// checking the if Email User
 			} elseif ($this->isBase64Encoded($this->Session->read('username'))==true) {
 
 				$this->viewBuilder()->setLayout('admin_dashboard');
@@ -303,12 +303,13 @@ class CommonController extends AppController {
 			}
 			
 			$list_id = $this->$logsTable->find('list', array('valueField' => 'id', 'conditions' => $condition))->toList();
-
+			
 			if (!empty($list_id)) {
 
 				$fetch_last_id_query = $this->$logsTable->find('all', array('fields' => 'id', 'conditions' => array('id' => max($list_id), 'remark' => 'Success')))->first();
+				
 				$fetch_last_id = $fetch_last_id_query['id'];
-
+				
 				$UserLogsEntity = $this->$logsTable->newEntity(array('id' => $fetch_last_id,'time_out' => date('H:i:s')));
 				
 				$this->$logsTable->save($UserLogsEntity);
