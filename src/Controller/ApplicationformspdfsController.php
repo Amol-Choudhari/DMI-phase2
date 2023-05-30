@@ -3175,11 +3175,20 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiStates');
 		$this->loadModel('MCommodity');
 		$this->loadModel('MCommodityCategory');
-		$this->loadModel('DmiShowcauseNoticePdfs');
+		$this->loadModel('DmiMmrShowcauseNoticePdfs');
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiUserRoles');
-		
+		$this->loadModel('DmiMmrFinalSubmits');
+		$this->loadModel('SampleInward');
+		$this->loadModel('MSampleType');
+		$this->loadModel('MGradeDesc');
+		$this->loadModel('DmiAllTblsDetails');
+		$this->loadModel('DmiMmrActionHomeLogs');
+		$this->loadModel('DmiMmrCategories');
+		$this->loadModel('SampleInwardDetails');
+		$this->loadModel('DmiMmrLevels');
+
 		$customer_id = $this->Session->read('firm_id');
 		$this->set('customer_id',$customer_id);
 		
@@ -3189,9 +3198,51 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiApplWithRoMappings');
 		$get_office = $this->DmiApplWithRoMappings->getOfficeDetails($customer_id);
 		$this->set('get_office',$get_office);
-
+		
+		// tbl DATA
+		$all_tbls_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->toArray();
+		$this->set('all_tbls_details',$all_tbls_details);
+				
+		$mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+	
+		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
+		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
+		
 		$pdf_date = date('d-m-Y');
 		$this->set('pdf_date',$pdf_date);
+
+		//Sample Code
+
+		$mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $_SESSION['sample_code']])->order('id DESC')->first();
+		$this->set('mmrlogs',$mmrlogs);
+
+		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $_SESSION['sample_code']])->first();
+		$this->set('sampleDetails',$sampleDetails);
+	
+		$commodity_name = $this->MCommodity->getCommodity($sampleDetails['commodity_code']);
+
+		$sample_type_code = $this->MSampleType->find()->where(['sample_type_code' => $sampleDetails['sample_type_code'],'display' => 'Y'])->first();
+
+		$grade_descrition = $this->MGradeDesc->find()->select(['grade_desc'])->where(['grade_code' => $sampleDetails['grade'],'display' => 'Y'])->first();
+		
+		$sample_inward_details = $this->SampleInwardDetails->find()->where(['org_sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
+
+
+		$sampleArray = [
+			'sample_code' => $sampleDetails['org_sample_code'],
+			'sample_type' => $sample_type_code['sample_type_desc'],
+			'commodity' => $commodity_name,
+			'grade_desc' => $grade_descrition['grade_desc'],
+			'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp'],
+			'smpl_drwl_dt' => $sample_inward_details['sample_inward_details'],
+			'replica_serial_no' => $sample_inward_details['replica_serial_no'],
+			'tbl' => $sample_inward_details['tbl'],
+			'pack_size' => $sample_inward_details['pack_size'],
+			'misgrade_level_name'=> $misgrade_level['misgrade_level_name']
+		];
+
+		$this->set('sampleArray',$sampleArray);
+
 
 		// data from DMI Firm Table
 		$firmData = $this->DmiFirms->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->first();
@@ -3221,10 +3272,10 @@ class ApplicationformspdfsController extends AppController{
 	
 		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 		//check applicant last record version to increment		
-		$list_id = $this->DmiShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+		$list_id = $this->DmiMmrShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 
 		if(!empty($list_id)){
-			$max_id = $this->DmiShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
+			$max_id = $this->DmiMmrShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
 			$last_pdf_version 	=	$max_id['pdf_version'];
 		} else { 
 			$last_pdf_version = 0;	
@@ -3240,7 +3291,7 @@ class ApplicationformspdfsController extends AppController{
 		
 		$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
 		
-		$pdfEntity = $this->DmiShowcauseNoticePdfs->newEntity(array(
+		$pdfEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
 				
 			'customer_id'=>$customer_id,
 			'pdf_file'=>$file_path,
@@ -3251,7 +3302,7 @@ class ApplicationformspdfsController extends AppController{
 		
 		));
 						
-		$this->DmiShowcauseNoticePdfs->save($pdfEntity);
+		$this->DmiMmrShowcauseNoticePdfs->save($pdfEntity);
 
 		$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
 

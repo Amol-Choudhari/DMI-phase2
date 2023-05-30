@@ -8,9 +8,9 @@ use App\Controller\CustomersController;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 
-class DmiShowcauseCommentsTable extends Table{
+class DmiMmrShowcauseCommentsTable extends Table{
 
-	var $name = "DmiShowcauseComments";
+	var $name = "DmiMmrShowcauseComments";
 
 	//For 
 	public function saveComment($customer_id,$comment_by,$comment_to,$comments,$reply_by,$reply_to,$reply_comment){

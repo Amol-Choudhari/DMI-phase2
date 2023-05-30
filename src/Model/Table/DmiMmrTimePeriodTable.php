@@ -4,9 +4,9 @@ use Cake\ORM\Table;
 use App\Model\Model;
 use Cake\ORM\TableRegistry;
 
-class DmiMisgradeTimePeriodTable extends Table{
+class DmiMmrTimePeriodTable extends Table{
 	
-	var $name = "DmiMisgradeTimePeriod";
+	var $name = "DmiMmrTimePeriod";
 	
 	public function getTimePeriodList() {
 		return $this->find('list', array('keyField'=>'time_period','valueField' => 'month', 'order' => array('time_period')))->toArray();

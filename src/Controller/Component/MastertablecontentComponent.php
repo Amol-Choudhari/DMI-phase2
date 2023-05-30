@@ -272,24 +272,24 @@ class MastertablecontentComponent extends Component {
 	//For Dmi Misgrade Categories -> Akash [12-12-2022]
 	public function allMisgradeCategories(){
 
-		$DmiMisgradingCategories = TableRegistry::getTableLocator()->get('DmiMisgradingCategories');
-		$all_misgrade_categories = $DmiMisgradingCategories->find('list', array('valueField' => 'misgrade_category_name', 'conditions' => array()))->toArray();
+		$DmiMmrCategories = TableRegistry::getTableLocator()->get('DmiMmrCategories');
+		$all_misgrade_categories = $DmiMmrCategories->find('list', array('valueField' => 'misgrade_category_name', 'conditions' => array()))->toArray();
 		return $all_misgrade_categories;
 	}
 
 	//For Dmi Misgrade Levels -> Akash [12-12-2022]
 	public function allMisgradeLevels(){
 
-		$DmiMisgradingLevels = TableRegistry::getTableLocator()->get('DmiMisgradingLevels');
-		$all_misgrade_levels = $DmiMisgradingLevels->find('list', array('valueField' => 'misgrade_level_name', 'conditions' => array()))->toArray();
+		$DmiMmrLevels = TableRegistry::getTableLocator()->get('DmiMmrLevels');
+		$all_misgrade_levels = $DmiMmrLevels->find('list', array('valueField' => 'misgrade_level_name', 'conditions' => array()))->toArray();
 		return $all_misgrade_levels;
 	}
 
 	//For Dmi Misgrade Actions -> Akash [12-12-2022]
 	public function allMisgradeActions(){
 
-		$DmiMisgradingActions = TableRegistry::getTableLocator()->get('DmiMisgradingActions');
-		$all_misgrade_actions = $DmiMisgradingActions->find('list', array('valueField' => 'misgrade_action_name', 'conditions' => array()))->toArray();
+		$DmiMmrActions = TableRegistry::getTableLocator()->get('DmiMmrActions');
+		$all_misgrade_actions = $DmiMmrActions->find('list', array('valueField' => 'misgrade_action_name', 'conditions' => array()))->toArray();
 		return $all_misgrade_actions;
 	}
 
@@ -1492,7 +1492,7 @@ class MastertablecontentComponent extends Component {
 	public function addEditMisgradeCategories($postData,$record_id=null){
 
 		$username = $this->Session->read('username');
-		$DmiMisgradingCategories = TableRegistry::getTableLocator()->get('DmiMisgradingCategories');
+		$DmiMmrCategories = TableRegistry::getTableLocator()->get('DmiMmrCategories');
 
 		//html encoding
 		$encodedCategoryName = htmlentities($postData['misgrade_category_name'], ENT_QUOTES);
@@ -1515,9 +1515,9 @@ class MastertablecontentComponent extends Component {
 								'user_email'=>$username);
 		}
 
-		$entity = $DmiMisgradingCategories->newEntity($data_array);
+		$entity = $DmiMmrCategories->newEntity($data_array);
 
-		if ($DmiMisgradingCategories->save($entity)) {
+		if ($DmiMmrCategories->save($entity)) {
 
 			return true;
 		}
@@ -1529,7 +1529,7 @@ class MastertablecontentComponent extends Component {
 	public function addEditMisgradeLevels($postData,$record_id=null){
 
 		$username = $this->Session->read('username');
-		$DmiMisgradingLevels = TableRegistry::getTableLocator()->get('DmiMisgradingLevels');
+		$DmiMmrLevels = TableRegistry::getTableLocator()->get('DmiMmrLevels');
 
 		//html encoding
 		$encodedLevelName = htmlentities($postData['misgrade_level_name'], ENT_QUOTES);
@@ -1552,9 +1552,9 @@ class MastertablecontentComponent extends Component {
 								'user_email'=>$username);
 		}
 
-		$entity = $DmiMisgradingLevels->newEntity($data_array);
+		$entity = $DmiMmrLevels->newEntity($data_array);
 
-		if ($DmiMisgradingLevels->save($entity)) {
+		if ($DmiMmrLevels->save($entity)) {
 
 			return true;
 		}
@@ -1566,7 +1566,7 @@ class MastertablecontentComponent extends Component {
 	public function addEditMisgradeActions($postData,$record_id=null){
 
 		$username = $this->Session->read('username');
-		$DmiMisgradingActions = TableRegistry::getTableLocator()->get('DmiMisgradingActions');
+		$DmiMmrActions = TableRegistry::getTableLocator()->get('DmiMmrActions');
 
 		//html encoding
 		$encodedActionName = htmlentities($postData['misgrade_action_name'], ENT_QUOTES);
@@ -1589,9 +1589,9 @@ class MastertablecontentComponent extends Component {
 								'user_email'=>$username);
 		}
 
-		$entity = $DmiMisgradingActions->newEntity($data_array);
+		$entity = $DmiMmrActions->newEntity($data_array);
 
-		if ($DmiMisgradingActions->save($entity)) {
+		if ($DmiMmrActions->save($entity)) {
 
 			return true;
 		}

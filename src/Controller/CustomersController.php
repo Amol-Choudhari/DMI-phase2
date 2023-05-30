@@ -1461,24 +1461,20 @@ class CustomersController extends AppController {
 			$this->set('isSurrender',$isSurrender);
 
 			//For Suspension
-			$this->loadModel('DmiMisgradeActionFinalSubmits');
-			$actionSubmitted = $this->DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
+			$this->loadModel('DmiMmrActionFinalSubmits');
+			$actionSubmitted = $this->DmiMmrActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
 			$this->set('actionSubmitted', $actionSubmitted);
 		
-
-			//For Showcause Notice
-			$this->loadModel('DmiShowcauseLogs');
-			$this->loadModel('DmiShowcauseNoticePdfs');
 
 			$conn = ConnectionManager::get('default');
 
 			$showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status
-										FROM dmi_showcause_logs AS dsl
-										INNER JOIN dmi_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
+										FROM dmi_mmr_showcause_logs AS dsl
+										INNER JOIN dmi_mmr_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
 										WHERE dsl.customer_id='$customer_id' AND dsl.status='sent'")->fetch('assoc');
 			$this->set('showCauseNotice',$showCauseNotice);
 			
-
+			$sample_details = $conn->execute("SELECT * FROM sample ")
 
 		
 	}

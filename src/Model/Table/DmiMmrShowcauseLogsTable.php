@@ -8,9 +8,9 @@ use App\Controller\CustomersController;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 
-class DmiShowcauseLogsTable extends Table{
+class DmiMmrShowcauseLogsTable extends Table{
 
-	var $name = "DmiShowcauseLogs";
+	var $name = "DmiMmrShowcauseLogs";
 
     // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
@@ -72,7 +72,7 @@ class DmiShowcauseLogsTable extends Table{
 	public function sendFinalNotice($postData){
 
 		$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
-		$DmiShowcauseComments = TableRegistry::getTableLocator()->get('DmiShowcauseComments');
+		$DmiMmrShowcauseComments = TableRegistry::getTableLocator()->get('DmiMmrShowcauseComments');
 		$customer_id = $_SESSION['firm_id'];
 		$username = $_SESSION['username'];
 		$date = date('Y-m-d H:i:s');
@@ -118,7 +118,7 @@ class DmiShowcauseLogsTable extends Table{
 				$is_latest = '';
 			}
 
-			$DmiShowcauseComments->saveComment($customer_id,$comment_by,$comment_to,$comments,$reply_by,$reply_to,$reply_comment);
+			$DmiMmrShowcauseComments->saveComment($customer_id,$comment_by,$comment_to,$comments,$reply_by,$reply_to,$reply_comment);
 			return true;
 		}
 	}

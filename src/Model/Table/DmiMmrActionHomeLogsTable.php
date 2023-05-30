@@ -4,15 +4,21 @@ use Cake\ORM\Table;
 use App\Model\Model;
 use Cake\ORM\TableRegistry;
 
-class DmiMisgradeActionHomeLogsTable extends Table{
+class DmiMmrActionHomeLogsTable extends Table{
 	
-	var $name = "DmiMisgradeActionHomeLogsTable";
+	var $name = "DmiMmrActionHomeLogsTable";
 	
 	public function getMisgradingActionList(){
 		return $this->find('list', array('keyField'=>'id','valueField' => 'misgrade_action_name', 'conditions' => array('OR' => array('delete_status IS NULL', 'delete_status =' => 'no')), 'order' => array('id')))->toArray();
 	}
 
 	public function saveMisgradeAction($postData){
+
+		if ($postData['time_period'] == null) {
+			$time_period = 0;
+		} else {
+			$time_period = $postData['time_period'];
+		}
 
 		$enity = $this->newEntity(array(
 
@@ -25,7 +31,7 @@ class DmiMisgradeActionHomeLogsTable extends Table{
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s'),
 			'status'=>'saved',
-			'time_period'=>$postData['time_period']
+			'time_period'=>$time_period
 		));
 
 		if ($this->save($enity)) {
@@ -74,9 +80,9 @@ class DmiMisgradeActionHomeLogsTable extends Table{
 
 		if ($this->save($finalSubmitEntity)) {
 
-			$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
+			$DmiMmrActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMmrActionFinalSubmits');
 
-			$enitity = $DmiMisgradeActionFinalSubmits->newEntity(array(
+			$enitity = $DmiMmrActionFinalSubmits->newEntity(array(
 
 				'customer_id'=>$postData['customer_id'],
 				'misgrade_category'=>$postData['misgrade_category'],
@@ -93,7 +99,7 @@ class DmiMisgradeActionHomeLogsTable extends Table{
 				'by_user'=>$_SESSION['username']
 			));
 				
-			if($DmiMisgradeActionFinalSubmits->save($enitity)){
+			if($DmiMmrActionFinalSubmits->save($enitity)){
 				return true;
 			}
 		}

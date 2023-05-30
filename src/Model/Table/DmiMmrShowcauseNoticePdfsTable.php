@@ -7,8 +7,8 @@ use App\Controller\CustomersController;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 
-class DmiShowcauseNoticePdfsTable extends Table{
+class DmiMmrShowcauseNoticePdfsTable extends Table{
 
-    var $name = "DmiShowcauseNoticePdfs";
+    var $name = "DmiMmrShowcauseNoticePdfs";
 }
 ?>

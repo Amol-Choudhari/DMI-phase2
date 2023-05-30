@@ -1486,18 +1486,17 @@ class OthermodulesController extends AppController{
         //get posted office id
         $postedOffice = $this->DmiUsers->getPostedOffId($username);
        
-        $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id, df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name
-                                            FROM dmi_grant_certificates_pdfs AS dg 
+        $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code, df.firm_name, df.email,df.mobile_no,mc.category_name
+                                            FROM dmi_mmr_final_submits AS dg 
                                             INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
                                             INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
                                             INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
-                                            INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
-                                            WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
+                                            WHERE dd.office_id='$postedOffice' ")->fetchAll('assoc');
 
                                             
        
         $sentNotices = $conn->execute("SELECT DISTINCT on (dsl.customer_id) dsl.id,dsl.customer_id,df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name,dsl.date
-                                        FROM dmi_showcause_logs AS dsl 
+                                        FROM dmi_mmr_showcause_logs AS dsl 
                                         INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dsl.customer_id
                                         INNER JOIN dmi_firms AS df ON df.customer_id = dsl.customer_id
                                         INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
@@ -1505,15 +1504,15 @@ class OthermodulesController extends AppController{
                                         WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
 
         $actionTaken = $conn->execute("SELECT DISTINCT on (dmafs.customer_id) dmafs.id,dmafs.customer_id,df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name,dmafs.created
-                                        FROM dmi_misgrade_action_final_submits AS dmafs 
+                                        FROM dmi_mmr_action_final_submits AS dmafs 
                                         INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dmafs.customer_id
                                         INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id
                                         INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
                                         INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
                                         WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
 
-        $this->loadModel('DmiShowcauseLogs');
-        $countForScn = $this->DmiShowcauseLogs->find()->where(['status' => 'sent','posted_ro_office'=> $postedOffice])->distinct('customer_id')->count();
+        $this->loadModel('DmiMmrShowcauseLogs');
+        $countForScn = $this->DmiMmrShowcauseLogs->find()->where(['status' => 'sent','posted_ro_office'=> $postedOffice])->distinct('customer_id')->count();
 
         $this->set('countForScn',$countForScn);
         $this->set('underThisOffice',$underThisOffice);
@@ -1529,11 +1528,11 @@ class OthermodulesController extends AppController{
     // DATE : 09-12-2022
     // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
-    public function fetchIdForAction($id) {
+    public function fetchIdForAction() {
 
-        $this->loadModel('DmiGrantCertificatesPdfs');
-        $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
-		$this->Session->write('firm_id',$firm_details['customer_id']);
+        $this->Session->write('table_id', $this->request->getQuery('id'));
+        $this->Session->write('firm_id', $this->request->getQuery('customer_id'));
+        $this->Session->write('sample_code', $this->request->getQuery('sample_code'));
 		$this->redirect(array('controller'=>'othermodules','action'=>'misgrading_actions_home'));
 	}
 
@@ -1545,19 +1544,21 @@ class OthermodulesController extends AppController{
     // DATE : 09-12-2022
     // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
-	public function fetchIdForShowcause($id) {
+	public function fetchIdForShowcause() {
+       
 
-        $this->loadModel('DmiGrantCertificatesPdfs');
-        $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
-		$this->Session->write('firm_id',$firm_details['customer_id']);
+      
+        $this->Session->write('table_id', $this->request->getQuery('id'));
+        $this->Session->write('firm_id', $this->request->getQuery('customer_id'));
+        $this->Session->write('sample_code', $this->request->getQuery('sample_code'));
         $this->Session->write('whichUser','dmiuser');
 		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
 	}
 
     public function fetchIdFromScnAppl($id) {
 
-        $this->loadModel('DmiShowcauseLogs');
-        $firm_details = $this->DmiShowcauseLogs->find('all',array('conditions'=>array('id'=>$id)))->first();
+        $this->loadModel('DmiMmrShowcauseLogs');
+        $firm_details = $this->DmiMmrShowcauseLogs->find('all',array('conditions'=>array('id'=>$id)))->first();
 		$this->Session->write('firm_id',$firm_details['customer_id']);
         $this->Session->write('whichUser','applicant');
 		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
@@ -1579,15 +1580,16 @@ class OthermodulesController extends AppController{
         $customer_id = $this->Session->read('firm_id');
         $this->set('customer_id',$customer_id);
 
+        $conn = ConnectionManager::get('default');
         //Load Models
-        $this->loadModel('DmiMisgradingCategories');
-        $this->loadModel('DmiMisgradingLevels');
-        $this->loadModel('DmiMisgradingActions');
-        $this->loadModel('DmiMisgradeActionHomeLogs');
+        $this->loadModel('DmiMmrCategories');
+        $this->loadModel('DmiMmrLevels');
+        $this->loadModel('DmiMmrActions');
+        $this->loadModel('DmiMmrActionHomeLogs');
         $this->loadModel('DmiFirms');
         $this->loadModel('MCommodityCategory');
         $this->loadModel('MCommodity');
-        $this->loadModel('DmiMisgradeTimePeriod');
+        $this->loadModel('DmiMmrTimePeriod');
 
         //Firm Details
         $firmDetails = $this->DmiFirms->firmDetails($customer_id); 
@@ -1597,40 +1599,59 @@ class OthermodulesController extends AppController{
 		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
 		
         //Misgrading Category
-        $misgradingCategories = $this->DmiMisgradingCategories->getMisgradingCategoriesList();
+        $misgradingCategories = $this->DmiMmrCategories->getMisgradingCategoriesList();
 
         //Misgrading Levels 
-        $misgradingLevels = $this->DmiMisgradingLevels->getMisgradingLevelsList();
+        $misgradingLevels = $this->DmiMmrLevels->getMisgradingLevelsList();
 
         //Misgrading Actions
-        $misgradingActions = $this->DmiMisgradingActions->getMisgradingActionList();
+        $misgradingActions = $this->DmiMmrActions->getMisgradingActionList();
 
         //Time Period
-        $timePeriod = $this->DmiMisgradeTimePeriod->getTimePeriodList();
+        $timePeriod = $this->DmiMmrTimePeriod->getTimePeriodList();
 
         //Status
-        $misgradeStatus = $this->DmiMisgradeActionHomeLogs->getInformation($customer_id);
-        
+        $misgradeStatus = $this->DmiMmrActionHomeLogs->getInformation($customer_id);
+
+        //Check if the firm have the commodity of ghee
+        $ifGheeComm = $conn->execute("SELECT *
+                                        FROM dmi_firms
+                                        WHERE customer_id = '$customer_id' 
+                                            AND ((sub_commodity LIKE '13' 
+                                            OR sub_commodity LIKE '13,%' 
+                                            OR sub_commodity LIKE '%,13,%' 
+                                            OR sub_commodity LIKE '%,13')) 
+                                            AND sub_commodity NOT LIKE '%13[0-9]%' 
+                                        AND delete_status IS NULL AND certification_type = '1'")->fetchAll('assoc');
+    
+        if (!empty($ifGheeComm)) {
+            $isCommodityGhee = 'yes';
+        }else{
+            $isCommodityGhee = 'no';
+        }
+
+
         if (!empty($misgradeStatus)) {
 
             //Misgrade Category Info
-            $misgrade_category = $this->DmiMisgradingCategories->getMisgradingCategory($misgradeStatus['misgrade_category']);
+            $misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($misgradeStatus['misgrade_category']);
             $misCatId   = $misgrade_category['id'];
             $misCatName = $misgrade_category['misgrade_category_name'];
             $misCatDscp = $misgrade_category['misgrade_category_dscp'];
 
             //Misgrade Category Info
-            $misgrade_level = $this->DmiMisgradingLevels->getMisgradingLevel($misgradeStatus['misgrade_level']);
+            $misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($misgradeStatus['misgrade_level']);
             $misLvlId = $misgrade_level['id'];
             $misLvlName = $misgrade_level['misgrade_level_name'];
 
             //Misgrade Category Info
-            $misgrade_action = $this->DmiMisgradingActions->getMisgradingAction($misgradeStatus['misgrade_action']);
+            $misgrade_action = $this->DmiMmrActions->getMisgradingAction($misgradeStatus['misgrade_action']);
             $misActId = $misgrade_action['id'];
             $misActName = $misgrade_action['misgrade_action_name'];
 
             //Misgrade Category Info
-            $time_period = $this->DmiMisgradeTimePeriod->getTimePeriod($misgradeStatus['time_period']);
+            $time_period = $this->DmiMmrTimePeriod->getTimePeriod($misgradeStatus['time_period']);
+           
             $periodId = $time_period['time_period'];
             $periodMonth = $time_period['month'];
 
@@ -1645,14 +1666,15 @@ class OthermodulesController extends AppController{
             $misActName = ''; $periodId = '';
         }
             
-       
+        
 
         //get the post value
         $postData = $this->request->getData();
        
         if (null !== $this->request->getData('save_action')) {
+            
+            if($this->DmiMmrActionHomeLogs->saveMisgradeAction($postData) == 1){
 
-            if($this->DmiMisgradeActionHomeLogs->saveMisgradeAction($postData) == 1){
                 $message = 'Saved';
                 $message_theme = 'success';
                 $redirect_to = '../othermodules/misgradingActionsHome';
@@ -1664,7 +1686,7 @@ class OthermodulesController extends AppController{
             
         } /*elseif (null !== $this->request->getData('final_submit')) {
             
-            $final_submit_call_result =  $this->DmiMisgradeActionHomeLogs->applicationFinalSubmit($postData);
+            $final_submit_call_result =  $this->DmiMmrActionHomeLogs->applicationFinalSubmit($postData);
 
             if ($final_submit_call_result == true) {
 
@@ -1683,7 +1705,7 @@ class OthermodulesController extends AppController{
         
         }*/
 
-        
+        $this->set('isCommodityGhee',$isCommodityGhee);
         $this->set(compact('firmDetails','category','sub_commodity_value'));                             #Set the Firm Details
         $this->set(compact('misgradingActions','misgradingLevels','misgradingCategories','timePeriod')); #Set the Dropdowns
         $this->set(compact('misCatId','misCatName','misCatDscp','misLvlName','misActName'));             #Set the Saved Misgrade Category Values
@@ -1704,9 +1726,9 @@ class OthermodulesController extends AppController{
         $this->autoRender = false;
         //get ajax post data
         $customer_id = $_POST['customer_id'];
-        $this->loadModel('DmiMisgradeActionHomeLogs');
-        $misgradeStatus = $this->DmiMisgradeActionHomeLogs->getInformation($customer_id);
-        $result =  $this->DmiMisgradeActionHomeLogs->applicationFinalSubmit($misgradeStatus); 
+        $this->loadModel('DmiMmrActionHomeLogs');
+        $misgradeStatus = $this->DmiMmrActionHomeLogs->getInformation($customer_id);
+        $result =  $this->DmiMmrActionHomeLogs->applicationFinalSubmit($misgradeStatus); 
         
         if ($result == true) {
             echo '~done~';
@@ -1731,6 +1753,13 @@ class OthermodulesController extends AppController{
 
         $whichUser = $this->Session->read('whichUser');
 
+        $customer_id = $this->Session->read('firm_id');
+        $this->set('customer_id',$customer_id);
+
+        $sample_code = $this->Session->read('sample_code');
+        $this->set('sample_code',$customer_id);
+
+
         if ($whichUser == 'applicant') {
             $this->viewBuilder()->setLayout('secondary_customer');
             $this->loadComponent('Beforepageload');
@@ -1743,12 +1772,12 @@ class OthermodulesController extends AppController{
         $this->loadModel('DmiFirms');
         $this->loadModel('MCommodityCategory');
         $this->loadModel('MCommodity');
-        $this->loadModel('DmiShowcauseLogs');
-        $this->loadModel('DmiShowcauseNoticePdfs');
+        $this->loadModel('DmiMmrShowcauseLogs');
+        $this->loadModel('DmiMmrShowcauseNoticePdfs');
+        $this->loadModel('DmiMmrActionHomeLogs');
 
-        $customer_id = $this->Session->read('firm_id');
-        $this->set('customer_id',$customer_id);
-
+       
+      
          //Firm Details
          $firmDetails = $this->DmiFirms->firmDetails($customer_id); 
          $category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
@@ -1756,13 +1785,48 @@ class OthermodulesController extends AppController{
          $sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
          $sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
         
-         $statusofscn = $this->DmiShowcauseLogs->getInformation($customer_id);
+         $statusofscn = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
 
          if (!empty($statusofscn)) {
 
             $reason = $statusofscn['reason'];
             $status = $statusofscn['status'];
         } 
+
+        $mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+       
+		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
+		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
+
+        $mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $_SESSION['sample_code']])->order('id DESC')->first();
+		$this->set('mmrlogs',$mmrlogs);
+
+		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $_SESSION['sample_code']])->first();
+		$this->set('sampleDetails',$sampleDetails);
+	
+		$commodity_name = $this->MCommodity->getCommodity($sampleDetails['commodity_code']);
+
+		$sample_type_code = $this->MSampleType->find()->where(['sample_type_code' => $sampleDetails['sample_type_code'],'display' => 'Y'])->first();
+
+		$grade_descrition = $this->MGradeDesc->find()->select(['grade_desc'])->where(['grade_code' => $sampleDetails['grade'],'display' => 'Y'])->first();
+		
+		$sample_inward_details = $this->SampleInwardDetails->find()->where(['org_sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
+
+
+		$sampleArray = [
+			'sample_code' => $sampleDetails['org_sample_code'],
+			'sample_type' => $sample_type_code['sample_type_desc'],
+			'commodity' => $commodity_name,
+			'grade_desc' => $grade_descrition['grade_desc'],
+			'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp'],
+			'smpl_drwl_dt' => $sample_inward_details['sample_inward_details'],
+			'replica_serial_no' => $sample_inward_details['replica_serial_no'],
+			'tbl' => $sample_inward_details['tbl'],
+			'pack_size' => $sample_inward_details['pack_size'],
+			'misgrade_level_name'=> $misgrade_level['misgrade_level_name']
+		];
+
+        pr($sampleArray); exit;
 
         //post values
         if ($this->request->is('post')) {
@@ -1772,7 +1836,7 @@ class OthermodulesController extends AppController{
            
             if (null !== $this->request->getData('save_action')) {
 
-                if($this->DmiShowcauseLogs->saveLog($postData) == 1){
+                if($this->DmiMmrShowcauseLogs->saveLog($postData) == 1){
                     $message = 'Saved the details for Show Cause Notice Succesfully.';
                     $message_theme = 'success';
                     $redirect_to = '../othermodules/showcauseHome';
@@ -1784,7 +1848,7 @@ class OthermodulesController extends AppController{
 
             } elseif (null !== $this->request->getData('update_action')) {
 
-                if($this->DmiShowcauseLogs->updateLog($postData) == 1){
+                if($this->DmiMmrShowcauseLogs->updateLog($postData) == 1){
                     $message = 'Updated the details for Show Cause Notice Succesfully.';
                     $message_theme = 'success';
                     $redirect_to = '../othermodules/showcauseHome';
@@ -1795,6 +1859,10 @@ class OthermodulesController extends AppController{
                 }
                 
             } elseif(null!==($this->request->getData('scn_ro_referred_back'))){
+                
+                $customer_id = $_SESSION['username'];
+                $comment_by = $_SESSION['username'];
+
 
                 $result = $this->Communication->showcauseReferredback($this->request->getData());
 
@@ -1831,9 +1899,9 @@ class OthermodulesController extends AppController{
         $this->autoRender = false;
         //get ajax post data
         $customer_id = $_POST['customer_id'];
-        $this->loadModel('DmiShowcauseLogs');
-        $showCause = $this->DmiShowcauseLogs->getInformation($customer_id);
-        $result =  $this->DmiShowcauseLogs->sendFinalNotice($showCause); 
+        $this->loadModel('DmiMmrShowcauseLogs');
+        $showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
+        $result =  $this->DmiMmrShowcauseLogs->sendFinalNotice($showCause); 
 
         if ($result == true) {
             echo '~done~';

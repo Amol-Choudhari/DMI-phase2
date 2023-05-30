@@ -524,8 +524,8 @@ class BeforepageloadComponent extends Component {
 		}
 
 		#For Misgrade Actions
-		$DmiMisgradeActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMisgradeActionFinalSubmits');
-        $isActionTaken = $DmiMisgradeActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
+		$DmiMmrActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMmrActionFinalSubmits');
+        $isActionTaken = $DmiMmrActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
 		if (!empty($isActionTaken)) {
 			$isActionTaken = 'yes';
 		}else{

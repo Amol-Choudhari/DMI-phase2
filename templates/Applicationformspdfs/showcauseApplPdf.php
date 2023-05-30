@@ -39,7 +39,7 @@
 	</tr>
 		
 	<tr>
-		<td><br>Subject: Issue of show cause notice on misgrading the sample [sample details].</td><br>
+		<td><br>Subject: Issue of show cause notice on misgrading the Sample <?php echo $sampleArray['sample_code'] ?>.</td><br>
 	</tr>
 
 	<tr>
@@ -48,7 +48,7 @@
 
 	<tr>
 		<td>
-			<br>Please refer to above cited subject in which [sample detail] graded under AGMARK found
+			<br>Please refer to above cited subject in which Sample Code : <?php echo $sampleArray['sample_code']; ?> Sample Type : <?php echo $sampleArray['sample_type']; ?> Commodity : <?php echo $sampleArray['commodity'] ?> graded under AGMARK found
 				misgraded. The said samples was analyzed and declared misgraded on account of not
 				confirming to the prescribed AGMARK standard from <?php echo $get_office['ro_office']; ?> region.
 		</td>
@@ -57,7 +57,6 @@
 
 <table width="100%" border="1">
 	<tr>
-		<td>S.No.</td>
 		<td>Name of the Commodity with details</td>
 		<td>Lat No./ Date of Packing</td>
 		<td>Grade Assigned by the Grading Chemist</td>
@@ -68,10 +67,22 @@
 		<td>Packing Material</td>
 	</tr>
 </table>
+<table width="100%" border="1">
+	<tr>
+		<td><?php echo $sampleArray['commodity']; ?></td>
+		<td><?php echo $sampleDetails['received_date']; ?></td>
+		<td><?php echo $sampleArray['grade_desc']; ?></td>
+		<td><?php echo $sampleArray['misgrade_category']; ?></td>
+		<td><?php echo $sampleArray['replica_serial_no']; ?></td>
+		<td><?php echo $sampleArray['tbl']; ?></td>
+		<td><?php echo $sampleArray['pack_size']; ?></td>
+		<td>N/A</td>
+	</tr>
+</table>
 
 <table  width="100%">
 	<tr>
-		<td>It is the ……………………… misgrading of category…………………….in calendar year <?php echo date('Y'); ?>. </td>
+		<td>It is the <b><?php echo $sampleArray['misgrade_level_name']; ?></b> misgrading of category <b><?php echo $sampleArray['misgrade_category']; ?></b> in calendar year <?php echo date('Y'); ?>. </td>
 	</tr>
 
 	<tr>

@@ -39,8 +39,8 @@
 											</div>
 										</div>
 									</div>
-
-									<div class="col-3">
+									
+									<div class="col-3 hide_det">
 										<div class="form-group">
 											<label class="col-form-label">Misgrading Category <span class="cRed">*</span></label>
 											<?php echo $this->Form->control('misgrade_category', array('type'=>'select','empty'=>'-- Select Misgrading Category --','id'=>'misgrade_category','value'=>$misCatId,'options'=>$misgradingCategories, 'label'=>false, 'class'=>'form-control')); ?>
@@ -52,19 +52,22 @@
 											<span id="error_misgrade_action" class="error invalid-feedback"></span>
 										</div>
 									</div>
+								
 
-									<div class="col-3">
+									<div class="col-3 hide_det">
 										<div class="form-group">
 											<label class="col-form-label">Misgrading Level <span class="cRed">*</span></label>
 											<?php echo $this->Form->control('misgrade_level', array('type'=>'select','empty'=>'-- Select Misgrading Level --','id'=>'misgrade_level', 'value'=>$misLvlId,'options'=>$misgradingLevels, 'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_misgrade_level" class="error invalid-feedback"></span>
 										</div>
-										<div class="form-group">
+										<div class="form-group" id="time_period_div">
 											<label class="col-form-label">Period <span class="cRed">*</span></label>
 											<?php echo $this->Form->control('time_period', array('type'=>'select','empty'=>'-- Select Period --','id'=>'time_period', 'value'=>$periodId,'options'=>$timePeriod, 'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_misgrade_action" class="error invalid-feedback"></span>
 										</div>
+										
 									</div>
+									
 									<div class="col-md-6" id="actions_div">
 										<div class="card">
 											<div class="card-header bg-olive"><h3 class="card-title">Actions</h3></div>
@@ -85,6 +88,7 @@
 													<dt class="col-sm-4">Period: </dt>
 													<dd class="col-sm-8"><?php echo $periodMonth; ?></dd>
 												</dl>
+												<button class="float-right" id="edit_action" ></i> Edit</button>
 											</div>
 										</div>
 									</div>
@@ -94,6 +98,12 @@
 											<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_reason" class="error invalid-feedback"></span>
 										</div>
+									</div>
+									<div class="col-6">
+										<p id="mis_cat_desc"></p>
+										<p id="mis_level_desc"></p>
+										<p id="mis_action_desc"></p>
+										<p id="mis_period_desc"></p>
 									</div>
 								</div>
 							</div>
@@ -155,7 +165,7 @@
 				<div class="clearfix"></div>
 			</div>
 			<div class="modal-footer">
-				<button tclass="btn btn-success" id="final_submit" ><i class="fa fa-check-circle"></i> Submit</button>
+				<button class="btn btn-success" id="final_submit" ><i class="fa fa-check-circle"></i> Submit</button>
 				<button class="btn btn-danger" data-dismiss="modal"><i class="far fa-times-circle"></i> Close</button>
 			</div>
 		</div>
@@ -164,4 +174,12 @@
 
 <input type="hidden" id="status_id" value="<?php echo $status; ?>">
 <input type="hidden" id="customer_id_value" value="<?php echo $customer_id; ?>">
-<?php echo $this->Html->script('othermodules/misgrading_actions_home') ?>
+<input type="hidden" id="is_ghee_comm" value="<?php echo $isCommodityGhee; ?>">
+<input type="hidden" id="misCatId_val" value="<?php echo $misCatId; ?>">
+<input type="hidden" id="misActId_val" value="<?php echo $misActId; ?>">
+<input type="hidden" id="misLvlId_val" value="<?php echo $misLvlId; ?>">
+<input type="hidden" id="periodId_val" value="<?php echo $periodId; ?>">
+<?php 
+	echo $this->Html->script('othermodules/dropdown_validations'); 
+	echo $this->Html->script('othermodules/misgrading_actions_home'); 
+?>
