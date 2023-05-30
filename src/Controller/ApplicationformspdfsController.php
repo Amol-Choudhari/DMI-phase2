@@ -14,6 +14,9 @@ use xmldsign;
 use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
+use Cake\Utility\Hash;
+use Cake\Utility\Text;
+use Cake\Http\Session;
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -3203,18 +3206,29 @@ class ApplicationformspdfsController extends AppController{
 		$all_tbls_details = $this->DmiAllTblsDetails->find('all',array('conditions'=>array('customer_id IS'=>$customer_id, 'OR'=>array('delete_status IS NULL','delete_status ='=>'no'))))->toArray();
 		$this->set('all_tbls_details',$all_tbls_details);
 				
-		$mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
-	
-		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
-		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
+		
 		
 		$pdf_date = date('d-m-Y');
 		$this->set('pdf_date',$pdf_date);
 
 		//Sample Code
 
-		$mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $_SESSION['sample_code']])->order('id DESC')->first();
-		$this->set('mmrlogs',$mmrlogs);
+
+		$mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+		
+		if(!empty($mmrcate)){
+			
+			$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
+			$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
+
+			$actionArray = [
+				'misgrade_level_name'=> $misgrade_level['misgrade_level_name'],
+				'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp']
+			];
+		} else {
+			$actionArray = null;
+		}
+	
 
 		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $_SESSION['sample_code']])->first();
 		$this->set('sampleDetails',$sampleDetails);
@@ -3233,15 +3247,14 @@ class ApplicationformspdfsController extends AppController{
 			'sample_type' => $sample_type_code['sample_type_desc'],
 			'commodity' => $commodity_name,
 			'grade_desc' => $grade_descrition['grade_desc'],
-			'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp'],
 			'smpl_drwl_dt' => $sample_inward_details['sample_inward_details'],
 			'replica_serial_no' => $sample_inward_details['replica_serial_no'],
 			'tbl' => $sample_inward_details['tbl'],
 			'pack_size' => $sample_inward_details['pack_size'],
-			'misgrade_level_name'=> $misgrade_level['misgrade_level_name']
 		];
 
 		$this->set('sampleArray',$sampleArray);
+		$this->set('actionArray',$actionArray);
 
 
 		// data from DMI Firm Table
@@ -3289,24 +3302,49 @@ class ApplicationformspdfsController extends AppController{
 		//creating filename and file path to save
 		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
 		
-		$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
-		
-		$pdfEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
-				
+
+		$pdf_array = [
 			'customer_id'=>$customer_id,
 			'pdf_file'=>$file_path,
 			'date'=>date('Y-m-d H:i:s'),
 			'pdf_version'=>$current_pdf_version,
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')	
+		];
+
 		
-		));
-						
-		$this->DmiMmrShowcauseNoticePdfs->save($pdfEntity);
+		// Get the session object
+		$session = new Session();
 
+		// Serialize the array
+		$serializedArray = serialize($pdf_array);
+
+		// Generate a unique key to store the serialized array in the session
+		$key = Text::uuid();
+
+		// Store the serialized array in the session
+		$session->write('PdfArray.' . $key, $serializedArray);
+
+		// To retrieve the array from the session, you can use the following code:
+
+		// Get the serialized array from the session
+		$serializedArray = $session->read('PdfArray.' . $key);
+
+		// Unserialize the array
+		$pdf_array = unserialize($serializedArray);
+
+		// Access the values in the array
+		$customer_id = Hash::get($pdf_array, 'customer_id');
+		$pdf_file = Hash::get($pdf_array, 'pdf_file');
+		$date = Hash::get($pdf_array, 'date');
+		$pdf_version = Hash::get($pdf_array, 'pdf_version');
+		$created = Hash::get($pdf_array, 'created');
+		$modified = Hash::get($pdf_array, 'modified');
+
+		
 		$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
-
 		//to preview application
+		$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
 		$this->callTcpdf($all_data_pdf,'F',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with save mode
 		$this->redirect('/dashboard/home');
 

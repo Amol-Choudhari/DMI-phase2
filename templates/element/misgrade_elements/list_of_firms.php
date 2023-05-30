@@ -27,17 +27,17 @@
                             <br>
                             <?php echo "<span class='badge'>Email:</span>".base64_decode($eachdata['email']); ?>
                         </td>
-                        <td><?php echo $eachdata['category_name']; ?></td>
+                        <td><?php echo $eachdata['commodity_name']; ?></td>
                         <td><?= $this->Html->link(
                                 '',
                                 ['controller' => 'Othermodules', 'action' => 'fetchIdForAction', '?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code']]],
-                                ['class' => 'fas fa-eye','title' => 'Take Action']
+                                ['class' => 'fas fad fa-exclamation-triangle','title' => 'Take Action']
                             ) ?>
                             |
                             <?= $this->Html->link(
                                 '', 
                                 ['controller' => 'othermodules', 'action'=>'fetchIdForShowcause','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code']]],
-                                ['class'=>'fas fa-exclamation-circle','title' => 'Send Showcause Notice Directly']
+                                ['class'=>'fas fa-file-export','title' => 'Send Showcause Notice Directly']
                             ); ?>
 
                         </td>

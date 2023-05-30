@@ -8,6 +8,8 @@ use App\Network\Email\Email;
 use App\Network\Request\Request;
 use App\Network\Response\Response;
 use Cake\Datasource\ConnectionManager;
+use Cake\Http\Session;
+use Cake\Utility\Hash;
 
 class OthermodulesController extends AppController{
 
@@ -1477,6 +1479,15 @@ class OthermodulesController extends AppController{
 
     public function misgradingHome(){
 
+        // Get the session object
+        $session = new Session();
+        // Assuming you have the $key value that corresponds to the array you want to remove
+        $key = '6bb07ac9-688a-4873-9f06-1227c39a539a';
+        // Delete the array from the session
+        $session->delete('PdfArray.' . $key);
+      
+
+
         $conn = ConnectionManager::get('default');
 
         $username = $this->Session->read('username');
@@ -1486,11 +1497,12 @@ class OthermodulesController extends AppController{
         //get posted office id
         $postedOffice = $this->DmiUsers->getPostedOffId($username);
        
-        $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code, df.firm_name, df.email,df.mobile_no,mc.category_name
+        $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code, df.firm_name, df.email,df.mobile_no,mc.commodity_name
                                             FROM dmi_mmr_final_submits AS dg 
                                             INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
                                             INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
-                                            INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
+                                            INNER JOIN sample_inward AS si ON si.org_sample_code = dg.sample_code
+                                            INNER JOIN m_commodity AS mc ON mc.commodity_code = si.commodity_code
                                             WHERE dd.office_id='$postedOffice' ")->fetchAll('assoc');
 
                                             
@@ -1744,6 +1756,7 @@ class OthermodulesController extends AppController{
 
     public function showcauseHome(){
 
+       
         $message = '';
         $message_theme = '';
         $redirect_to = '';
@@ -1751,6 +1764,7 @@ class OthermodulesController extends AppController{
         $reason  = '';
         $status = '';
 
+    
         $whichUser = $this->Session->read('whichUser');
 
         $customer_id = $this->Session->read('firm_id');
@@ -1775,6 +1789,11 @@ class OthermodulesController extends AppController{
         $this->loadModel('DmiMmrShowcauseLogs');
         $this->loadModel('DmiMmrShowcauseNoticePdfs');
         $this->loadModel('DmiMmrActionHomeLogs');
+        $this->loadModel('DmiMmrFinalSubmits');
+        $this->loadModel('SampleInward');
+        $this->loadModel('MSampleType');
+        $this->loadModel('MGradeDesc');
+        $this->loadModel('SampleInwardDetails');
 
        
       
@@ -1794,15 +1813,12 @@ class OthermodulesController extends AppController{
             $status = $statusofscn['status'];
         } 
 
-        $mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
        
-		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
-		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
 
-        $mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $_SESSION['sample_code']])->order('id DESC')->first();
+        $mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $sample_code])->order('id DESC')->first();
 		$this->set('mmrlogs',$mmrlogs);
 
-		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $_SESSION['sample_code']])->first();
+		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $sample_code])->first();
 		$this->set('sampleDetails',$sampleDetails);
 	
 		$commodity_name = $this->MCommodity->getCommodity($sampleDetails['commodity_code']);
@@ -1819,16 +1835,25 @@ class OthermodulesController extends AppController{
 			'sample_type' => $sample_type_code['sample_type_desc'],
 			'commodity' => $commodity_name,
 			'grade_desc' => $grade_descrition['grade_desc'],
-			'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp'],
 			'smpl_drwl_dt' => $sample_inward_details['sample_inward_details'],
 			'replica_serial_no' => $sample_inward_details['replica_serial_no'],
 			'tbl' => $sample_inward_details['tbl'],
-			'pack_size' => $sample_inward_details['pack_size'],
-			'misgrade_level_name'=> $misgrade_level['misgrade_level_name']
+			'pack_size' => $sample_inward_details['pack_size']
 		];
+      
+        $this->set('sampleArray',$sampleArray);
+  
+        $scn_pdf = $this->DmiMmrShowcauseNoticePdfs->find()->select(['pdf_file'])->where(['customer_id' => $customer_id])->order('id DESC')->first();
+        if (!empty($scn_pdf)) {
+            $scn_pdf_path = $scn_pdf['pdf_file'];
+        } else {
+            $scn_pdf_path=null;
+        }
 
-        pr($sampleArray); exit;
+        $this->set('scn_pdf_path',$scn_pdf_path);
 
+
+        
         //post values
         if ($this->request->is('post')) {
 
@@ -1903,6 +1928,39 @@ class OthermodulesController extends AppController{
         $this->loadModel('DmiMmrShowcauseLogs');
         $showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
         $result =  $this->DmiMmrShowcauseLogs->sendFinalNotice($showCause); 
+        
+         /// Get the session object
+         $session = new Session();
+
+         // Assuming you have the $key value that corresponds to the desired array
+         $key = '6bb07ac9-688a-4873-9f06-1227c39a539a';
+ 
+         // Read the serialized array from the session
+         $serializedArray = $session->read('PdfArray.' . $key);
+ 
+         // Unserialize the array
+         $pdf_array = unserialize($serializedArray);
+ 
+         $customer_id = Hash::get($pdf_array, 'customer_id');
+         $pdf_file = Hash::get($pdf_array, 'pdf_file');
+         $date = Hash::get($pdf_array, 'date');
+         $pdf_version = Hash::get($pdf_array, 'pdf_version');
+         $created = Hash::get($pdf_array, 'created');
+         $modified = Hash::get($pdf_array, 'modified');
+
+        //This is for the saving the PDF of showcaus in  the database
+        $this->loadModel('DmiMmrShowcauseNoticePdfs');
+        $pdfEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
+				
+            'customer_id' => $customer_id,
+			'pdf_file' => $pdf_file,
+            'date' => $date,
+            'pdf_version' => $pdf_version,
+            'created' => $created,
+            'modified' => $modified
+		));
+
+        $this->DmiMmrShowcauseNoticePdfs->save($pdfEntity);
 
         if ($result == true) {
             echo '~done~';

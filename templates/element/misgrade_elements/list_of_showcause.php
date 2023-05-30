@@ -11,7 +11,7 @@
                     <th>Commodity</th>
                     <th>Certification Type</th>
                     <th>Notice Sent On</th>
-                    <th>Action</th>
+                    <!--<th>Action</th>-->
                 </tr>
             </thead>
             <tbody>
@@ -31,7 +31,7 @@
                             <td><?php echo $eachdata['category_name']; ?></td>
                             <td><?php echo $eachdata['date']; ?></td>
                             <td>
-                                <?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForShowcause', $eachdata['id']),array('class'=>'fas fa-exclamation-circle','title'=>'View Details')); ?>
+                                <?php // echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForShowcause', $eachdata['id']),array('class'=>'fas fa-exclamation-circle','title'=>'View Details')); ?>
                             </td>
                         </tr>
                     <?php $sr_no++; } 

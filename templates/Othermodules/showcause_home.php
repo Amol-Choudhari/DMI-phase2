@@ -29,7 +29,9 @@
 							<div class="card-header"><h3 class="card-title-new">Show Cause Notice</h3></div>
 							<?php 
 								echo $this->element('misgrade_elements/scn_user_form'); 
-								if ($_SESSION['whichUser'] == 'applicant') {echo $this->element('misgrade_elements/showcause_communication'); } 
+								if ($_SESSION['whichUser'] == 'applicant') {
+									echo $this->element('misgrade_elements/showcause_communication'); 
+								} 
 							?>
 							<div class="card-footer">
 								<?php echo $this->element('misgrade_elements/showcause_buttons'); ?>
@@ -54,17 +56,14 @@
 				<div class="col-md-4 d-inline"><a target="blank" href="../applicationformspdfs/showcauseApplPdf" >Preview</a></div><br>
 				<table class="mt-2">
 					<tbody>
-						<tr>
-							<td>Applicant ID : </td>
-							<td><?php echo $customer_id; ?></td>
-						</tr>
-						
+						This is to Issue of show cause notice on misgrading for the Packer : <b> <?php echo $firmDetails['firm_name']; ?> </b> having <br> ID : <b<?php echo $customer_id; ?></b>
+						With attached Sample for : <b><?php echo $sampleArray['commodity']; ?></b> having sample code : <b><?php echo $sample_code; ?></b>. Check and confirn the same and Click on Proceed.
 					</tbody>
 				</table>
 				<div class="clearfix"></div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-success" id="final_submit"><i class="fa fa-check-circle"></i> Submit</button>
+				<button class="btn btn-success" id="final_submit"><i class="fa fa-check-circle"></i> Proceed</button>
 				<button class="btn btn-danger" data-dismiss="modal"><i class="far fa-times-circle"></i> Close</button>
 			</div>
 		</div>

@@ -55,36 +55,42 @@
 	</tr>
 </table>
 
-<table width="100%" border="1">
-	<tr>
-		<td>Name of the Commodity with details</td>
-		<td>Lat No./ Date of Packing</td>
-		<td>Grade Assigned by the Grading Chemist</td>
-		<td>Quality Factor on which Sample Misgraded</td>
-		<td>Replica Number</td>
-		<td>TBL</td>
-		<td>Pack Size</td>
-		<td>Packing Material</td>
-	</tr>
-</table>
-<table width="100%" border="1">
-	<tr>
-		<td><?php echo $sampleArray['commodity']; ?></td>
-		<td><?php echo $sampleDetails['received_date']; ?></td>
-		<td><?php echo $sampleArray['grade_desc']; ?></td>
-		<td><?php echo $sampleArray['misgrade_category']; ?></td>
-		<td><?php echo $sampleArray['replica_serial_no']; ?></td>
-		<td><?php echo $sampleArray['tbl']; ?></td>
-		<td><?php echo $sampleArray['pack_size']; ?></td>
-		<td>N/A</td>
-	</tr>
-</table>
+<?php if (!empty($actionAarray)) { ?>
+	<table width="100%" border="1">
+		<tr>
+			<td>Name of the Commodity with details</td>
+			<td>Lat No./ Date of Packing</td>
+			<td>Grade Assigned by the Grading Chemist</td>
+			<td>Quality Factor on which Sample Misgraded</td>
+			<td>Replica Number</td>
+			<td>TBL</td>
+			<td>Pack Size</td>
+			<td>Packing Material</td>
+		</tr>
+	</table>
+	<table width="100%" border="1">
+		<tr>
+			<td><?php echo $sampleArray['commodity']; ?></td>
+			<td><?php echo $sampleDetails['received_date']; ?></td>
+			<td><?php echo $sampleArray['grade_desc']; ?></td>
+			<td><?php echo $sampleArray['misgrade_category']; ?></td>
+			<td><?php echo $sampleArray['replica_serial_no']; ?></td>
+			<td><?php echo $sampleArray['tbl']; ?></td>
+			<td><?php echo $sampleArray['pack_size']; ?></td>
+			<td>N/A</td>
+		</tr>
+	</table>
+<?php } ?>
+
+
+
 
 <table  width="100%">
-	<tr>
-		<td>It is the <b><?php echo $sampleArray['misgrade_level_name']; ?></b> misgrading of category <b><?php echo $sampleArray['misgrade_category']; ?></b> in calendar year <?php echo date('Y'); ?>. </td>
-	</tr>
-
+	<?php if (!empty($actionAarray)) { ?>
+		<tr>
+			<td>It is the <b><?php echo $sampleArray['misgrade_level_name']; ?></b> misgrading of category <b><?php echo $sampleArray['misgrade_category']; ?></b> in calendar year <?php echo date('Y'); ?>. </td>
+		</tr>
+	<?php } ?>
 	<tr>
 		<td>
 			<br>Accordingly, you are instructed to immediately withdraw the material from the market and

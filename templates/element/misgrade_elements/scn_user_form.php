@@ -17,36 +17,38 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-6">
-			<div class="form-group">
-				<label class="col-form-label">Reason <span class="cRed">*</span></label>
-				<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
-				<span id="error_reason" class="error invalid-feedback"></span>
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header bg-olive"><h3 class="card-title">Reason</h3></div>
+				<div class="card-body">
+					<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
+					<span id="error_reason" class="error invalid-feedback"></span>
+				</div>
 			</div>
 		</div>
-	</div>
-</div>
-
-<div class="col-md-6" id="sample_details">
-	<div class="card">
-		<div class="card-header bg-olive"><h3 class="card-title">Misgrading Details</h3></div>
-		<div class="card-body">
-			<dl class="row">
-				<dt class="col-sm-4">Sample : </dt>
-				<dd class="col-sm-8"><?php echo $sample_code; ?></dd>
-
-				<dt class="col-sm-4">Misgrade Category: </dt>
-				<dd class="col-sm-8"><?php echo $misCatName; ?> <br><label class="badge">(<?php echo $misCatDscp; ?>)</label></dd>
-
-				<dt class="col-sm-4">Misgrade Level: </dt>
-				<dd class="col-sm-8"><?php echo $misLvlName;?></dd>
-
-				<dt class="col-sm-4">Sample Details: </dt>
-				<dd class="col-sm-8"><?php echo $misActName; ?></dd>
-
-				<dt class="col-sm-4">Period: </dt>
-				<dd class="col-sm-8"><?php echo $periodMonth; ?></dd>
-			</dl>
+		<div class="col-md-6" id="sample_details">
+			<div class="card">
+				<div class="card-header bg-olive"><h3 class="card-title">Misgrading Details</h3></div>
+				<div class="card-body">
+					<dl class="row">
+						<dt class="col-sm-4">Sample : </dt>
+						<dd class="col-sm-8"><?php echo $sampleArray['sample_code']; ?></dd>
+						<dt class="col-sm-4">Sample Type: </dt>
+						<dd class="col-sm-8"><?php echo $sampleArray['sample_type']; ?></dd>
+						<dt class="col-sm-4">Commodity: </dt>
+						<dd class="col-sm-8"><?php echo $sampleArray['commodity']; ?></dd>
+						<dt class="col-sm-4">Sample Details: </dt>
+						<dd class="col-sm-8"><?php echo $sampleArray['grade_desc']; ?></dd>	
+					</dl>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<label class=""> Show Cause Notice PDF :
+			<?php if(!empty($scn_pdf_path)){?>
+				<a id="scn_pdf_path" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$scn_pdf_path); ?>">Preview</a>
+			<?php } ?>
+			</label>
 		</div>
 	</div>
 </div>
