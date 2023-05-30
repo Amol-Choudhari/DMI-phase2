@@ -28,17 +28,19 @@
                             <?php echo "<span class='badge'>Email:</span>".base64_decode($eachdata['email']); ?>
                         </td>
                         <td><?php echo $eachdata['category_name']; ?></td>
-                        <td><?php echo $this->Html->link(
-								'',
-								['controller' => 'othermodules', 'action' => 'fetchIdForAction', '?' => ['customer_id' => $eachdata['customer_id'], 'sample_code' => $eachdata['sample_code']]],
-								['class' => 'fas fa-arrow-right', 'title' => 'Go To Action Home']
-							); ?> |
-							<?php echo $this->Html->link(
-								'',
-								['controller' => 'othermodules', 'action' => 'fetchIdForShowcause', $eachdata['id'], $eachdata['customer_id'],$eachdata['sample_code']],
-								['class' => 'fas fa-exclamation-circle', 'title' => 'Send Show Cause Notice']
-							); ?>
-						</td>
+                        <td><?= $this->Html->link(
+                                '',
+                                ['controller' => 'Othermodules', 'action' => 'fetchIdForAction', '?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code']]],
+                                ['class' => 'fas fa-eye','title' => 'Take Action']
+                            ) ?>
+                            |
+                            <?= $this->Html->link(
+                                '', 
+                                ['controller' => 'othermodules', 'action'=>'fetchIdForShowcause','?' => ['id' => $eachdata['id'], 'customer_id' => $eachdata['customer_id'],'sample_code' => $eachdata['sample_code']]],
+                                ['class'=>'fas fa-exclamation-circle','title' => 'Send Showcause Notice Directly']
+                            ); ?>
+
+                        </td>
                     </tr>
                 <?php $sr_no++; } 
             ?>

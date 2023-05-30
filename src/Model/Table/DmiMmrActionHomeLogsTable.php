@@ -14,6 +14,12 @@ class DmiMmrActionHomeLogsTable extends Table{
 
 	public function saveMisgradeAction($postData){
 
+		if ($postData['time_period'] == null) {
+			$time_period = 0;
+		} else {
+			$time_period = $postData['time_period'];
+		}
+
 		$enity = $this->newEntity(array(
 
 			'customer_id'=>$_SESSION['firm_id'],
@@ -25,7 +31,7 @@ class DmiMmrActionHomeLogsTable extends Table{
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s'),
 			'status'=>'saved',
-			'time_period'=>$postData['time_period']
+			'time_period'=>$time_period
 		));
 
 		if ($this->save($enity)) {

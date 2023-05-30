@@ -524,8 +524,6 @@ class CommunicationComponent extends Component {
 
 	//Saved referredback comments in chemist flow, Done Akash Thakre 30-09-2021
 	public function showcauseReferredback($data){
-
-
 		
 		$DmiMmrShowcauseComments = TableRegistry::getTableLocator()->get('DmiMmrShowcauseComments');
 		$commentDetails = $DmiMmrShowcauseComments->find()->where(['customer_id IS' => $_SESSION['firm_id']])->order('id DESC')->first();
@@ -537,11 +535,6 @@ class CommunicationComponent extends Component {
 			$comment_from ="";
 			$comment_to ="";
 		}
-
-
-	
-
-	
 
 		if(!empty($commentDetails)){
 
@@ -567,10 +560,10 @@ class CommunicationComponent extends Component {
 		}else{
 			$comment = htmlentities($data['reffered_back_comment'], ENT_QUOTES);
 		}
-		
+
+		print_r($data); exit;
 		$newEntity = $DmiMmrShowcauseComments->newEntity(array(
 
-			'id'=>$commentid,
 			'customer_id'=>$comment_to,
 			'comment_by'=>$comment_by,
 			'comment_to'=>$comment_to,
@@ -580,13 +573,6 @@ class CommunicationComponent extends Component {
 		));
 
 		if($DmiMmrShowcauseComments->save($newEntity)){
-		
-			$formtable = TableRegistry::getTableLocator()->get($section_model);
-			$formtable->updateAll(
-				array('form_status' => "referred_back",'ro_current_comment_to'=>'applicant'),
-				array('customer_id'=>$comment_to,'is_latest'=>'1')
-			);
-			
 			return 1;
 		}else{
 			return 2;

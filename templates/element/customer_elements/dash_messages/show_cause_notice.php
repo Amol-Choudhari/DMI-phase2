@@ -5,6 +5,7 @@
             <h5><i class="icon fas fa-info"></i> Please Note !</h5>
             The AGMARK Office has issued an Show Cause Notice against your Firm on <b>Date: <?php echo date("d-m-Y",strtotime($showCauseNotice['date'])); ?></b>. 
             Your reply on the show cause notice should reach in the office within 14 days. ie : <b><?php echo date("d-m-Y",strtotime($showCauseNotice['end_date'])); ?>.</b>
+            To View the details click on the details on Action.
         </div>
     </div>  
 </div>

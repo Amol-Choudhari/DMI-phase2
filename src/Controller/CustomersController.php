@@ -1466,19 +1466,15 @@ class CustomersController extends AppController {
 			$this->set('actionSubmitted', $actionSubmitted);
 		
 
-			//For Showcause Notice
-			$this->loadModel('DmiMmrShowcauseLogs');
-			$this->loadModel('DmiMmrShowcauseNoticePdfs');
-
 			$conn = ConnectionManager::get('default');
 
 			$showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status
 										FROM dmi_mmr_showcause_logs AS dsl
-										INNER JOIN dmi_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
+										INNER JOIN dmi_mmr_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
 										WHERE dsl.customer_id='$customer_id' AND dsl.status='sent'")->fetch('assoc');
 			$this->set('showCauseNotice',$showCauseNotice);
 			
-
+			$sample_details = $conn->execute("SELECT * FROM sample ")
 
 		
 	}

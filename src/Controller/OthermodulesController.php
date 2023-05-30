@@ -1486,10 +1486,10 @@ class OthermodulesController extends AppController{
         //get posted office id
         $postedOffice = $this->DmiUsers->getPostedOffId($username);
        
-        $underThisOffice = $conn->execute("SELECT DISTINCT dmfs.id,dmfs.customer_id,dmfs.sample_code, df.firm_name, df.email,df.mobile_no,mc.category_name
-                                            FROM dmi_mmr_final_submits AS dmfs 
-                                            INNER JOIN dmi_firms AS df ON df.customer_id = dmfs.customer_id
-                                            INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dmfs.customer_id
+        $underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code, df.firm_name, df.email,df.mobile_no,mc.category_name
+                                            FROM dmi_mmr_final_submits AS dg 
+                                            INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
+                                            INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
                                             INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
                                             WHERE dd.office_id='$postedOffice' ")->fetchAll('assoc');
 
@@ -1528,10 +1528,11 @@ class OthermodulesController extends AppController{
     // DATE : 09-12-2022
     // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
-    public function fetchIdForAction($customer_id, $sample_code) {
+    public function fetchIdForAction() {
 
-        $this->Session->write('firm_id',$this->request->getQuery('customer_id'));
-		$this->Session->write('sample_code',$this->request->getQuery('sample_code'));
+        $this->Session->write('table_id', $this->request->getQuery('id'));
+        $this->Session->write('firm_id', $this->request->getQuery('customer_id'));
+        $this->Session->write('sample_code', $this->request->getQuery('sample_code'));
 		$this->redirect(array('controller'=>'othermodules','action'=>'misgrading_actions_home'));
 	}
 
@@ -1543,12 +1544,13 @@ class OthermodulesController extends AppController{
     // DATE : 09-12-2022
     // For : Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports
 
-	public function fetchIdForShowcause($id) {
+	public function fetchIdForShowcause() {
        
-        $this->loadModel('DmiGrantCertificatesPdfs');
-        $firm_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('id'=>$id)))->first();
+
       
-		$this->Session->write('firm_id',$firm_details['customer_id']);
+        $this->Session->write('table_id', $this->request->getQuery('id'));
+        $this->Session->write('firm_id', $this->request->getQuery('customer_id'));
+        $this->Session->write('sample_code', $this->request->getQuery('sample_code'));
         $this->Session->write('whichUser','dmiuser');
 		$this->redirect(array('controller'=>'othermodules','action'=>'showcause_home'));
 	}
@@ -1578,6 +1580,7 @@ class OthermodulesController extends AppController{
         $customer_id = $this->Session->read('firm_id');
         $this->set('customer_id',$customer_id);
 
+        $conn = ConnectionManager::get('default');
         //Load Models
         $this->loadModel('DmiMmrCategories');
         $this->loadModel('DmiMmrLevels');
@@ -1609,7 +1612,25 @@ class OthermodulesController extends AppController{
 
         //Status
         $misgradeStatus = $this->DmiMmrActionHomeLogs->getInformation($customer_id);
-        
+
+        //Check if the firm have the commodity of ghee
+        $ifGheeComm = $conn->execute("SELECT *
+                                        FROM dmi_firms
+                                        WHERE customer_id = '$customer_id' 
+                                            AND ((sub_commodity LIKE '13' 
+                                            OR sub_commodity LIKE '13,%' 
+                                            OR sub_commodity LIKE '%,13,%' 
+                                            OR sub_commodity LIKE '%,13')) 
+                                            AND sub_commodity NOT LIKE '%13[0-9]%' 
+                                        AND delete_status IS NULL AND certification_type = '1'")->fetchAll('assoc');
+    
+        if (!empty($ifGheeComm)) {
+            $isCommodityGhee = 'yes';
+        }else{
+            $isCommodityGhee = 'no';
+        }
+
+
         if (!empty($misgradeStatus)) {
 
             //Misgrade Category Info
@@ -1630,6 +1651,7 @@ class OthermodulesController extends AppController{
 
             //Misgrade Category Info
             $time_period = $this->DmiMmrTimePeriod->getTimePeriod($misgradeStatus['time_period']);
+           
             $periodId = $time_period['time_period'];
             $periodMonth = $time_period['month'];
 
@@ -1644,14 +1666,15 @@ class OthermodulesController extends AppController{
             $misActName = ''; $periodId = '';
         }
             
-       
+        
 
         //get the post value
         $postData = $this->request->getData();
        
         if (null !== $this->request->getData('save_action')) {
-
+            
             if($this->DmiMmrActionHomeLogs->saveMisgradeAction($postData) == 1){
+
                 $message = 'Saved';
                 $message_theme = 'success';
                 $redirect_to = '../othermodules/misgradingActionsHome';
@@ -1682,7 +1705,7 @@ class OthermodulesController extends AppController{
         
         }*/
 
-        
+        $this->set('isCommodityGhee',$isCommodityGhee);
         $this->set(compact('firmDetails','category','sub_commodity_value'));                             #Set the Firm Details
         $this->set(compact('misgradingActions','misgradingLevels','misgradingCategories','timePeriod')); #Set the Dropdowns
         $this->set(compact('misCatId','misCatName','misCatDscp','misLvlName','misActName'));             #Set the Saved Misgrade Category Values
@@ -1730,6 +1753,13 @@ class OthermodulesController extends AppController{
 
         $whichUser = $this->Session->read('whichUser');
 
+        $customer_id = $this->Session->read('firm_id');
+        $this->set('customer_id',$customer_id);
+
+        $sample_code = $this->Session->read('sample_code');
+        $this->set('sample_code',$customer_id);
+
+
         if ($whichUser == 'applicant') {
             $this->viewBuilder()->setLayout('secondary_customer');
             $this->loadComponent('Beforepageload');
@@ -1744,10 +1774,10 @@ class OthermodulesController extends AppController{
         $this->loadModel('MCommodity');
         $this->loadModel('DmiMmrShowcauseLogs');
         $this->loadModel('DmiMmrShowcauseNoticePdfs');
+        $this->loadModel('DmiMmrActionHomeLogs');
 
-        $customer_id = $this->Session->read('firm_id');
-        $this->set('customer_id',$customer_id);
-        //print_r($customer_id); exit;
+       
+      
          //Firm Details
          $firmDetails = $this->DmiFirms->firmDetails($customer_id); 
          
@@ -1763,6 +1793,41 @@ class OthermodulesController extends AppController{
             $reason = $statusofscn['reason'];
             $status = $statusofscn['status'];
         } 
+
+        $mmrcate = $this->DmiMmrActionHomeLogs->find()->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+       
+		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($mmrcate['misgrade_category']);
+		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($mmrcate['misgrade_category']);
+
+        $mmrlogs = $this->DmiMmrFinalSubmits->find()->where(['sample_code IS' => $_SESSION['sample_code']])->order('id DESC')->first();
+		$this->set('mmrlogs',$mmrlogs);
+
+		$sampleDetails = $this->SampleInward->find()->where(['org_sample_code' => $_SESSION['sample_code']])->first();
+		$this->set('sampleDetails',$sampleDetails);
+	
+		$commodity_name = $this->MCommodity->getCommodity($sampleDetails['commodity_code']);
+
+		$sample_type_code = $this->MSampleType->find()->where(['sample_type_code' => $sampleDetails['sample_type_code'],'display' => 'Y'])->first();
+
+		$grade_descrition = $this->MGradeDesc->find()->select(['grade_desc'])->where(['grade_code' => $sampleDetails['grade'],'display' => 'Y'])->first();
+		
+		$sample_inward_details = $this->SampleInwardDetails->find()->where(['org_sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
+
+
+		$sampleArray = [
+			'sample_code' => $sampleDetails['org_sample_code'],
+			'sample_type' => $sample_type_code['sample_type_desc'],
+			'commodity' => $commodity_name,
+			'grade_desc' => $grade_descrition['grade_desc'],
+			'misgrade_category' => $misgrade_category['misgrade_category_name']. " : ".$misgrade_category['misgrade_category_dscp'],
+			'smpl_drwl_dt' => $sample_inward_details['sample_inward_details'],
+			'replica_serial_no' => $sample_inward_details['replica_serial_no'],
+			'tbl' => $sample_inward_details['tbl'],
+			'pack_size' => $sample_inward_details['pack_size'],
+			'misgrade_level_name'=> $misgrade_level['misgrade_level_name']
+		];
+
+        pr($sampleArray); exit;
 
         //post values
         if ($this->request->is('post')) {
@@ -1795,6 +1860,10 @@ class OthermodulesController extends AppController{
                 }
                 
             } elseif(null!==($this->request->getData('scn_ro_referred_back'))){
+                
+                $customer_id = $_SESSION['username'];
+                $comment_by = $_SESSION['username'];
+
 
                 $result = $this->Communication->showcauseReferredback($this->request->getData());
 
