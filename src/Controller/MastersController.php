@@ -243,7 +243,7 @@ class MastersController extends AppController {
 		//[ 20 For the Misgrade Categories Master ] -> Akash [12-12-2022]
 		} elseif ($masterId=='20') {
 
-			$this->masterTable = 'DmiMisgradingCategories';
+			$this->masterTable = 'DmiMmrCategories';
 			$this->masterListTitle = 'List of All Misgrade Categories';
 			$this->masterListHeader = 'Misgrade Categories List';
 			$this->masterAddTitle = 'Add Misgrade Category';
@@ -253,7 +253,7 @@ class MastersController extends AppController {
 		//[ 21 For the Misgrade Levels Master ] -> Akash [12-12-2022]
 		} elseif ($masterId=='21') {
 
-			$this->masterTable = 'DmiMisgradingLevels';
+			$this->masterTable = 'DmiMmrLevels';
 			$this->masterListTitle = 'List of All Misgrade Levels';
 			$this->masterListHeader = 'Misgrade Levels';
 			$this->masterAddTitle = 'Add Misgrade Levels';
@@ -263,7 +263,7 @@ class MastersController extends AppController {
 		//[ 22 For the Misgrade Actions Master ] -> Akash [12-12-2022]
 		} elseif ($masterId=='22') {
 
-			$this->masterTable = 'DmiMisgradingActions';
+			$this->masterTable = 'DmiMmrActions';
 			$this->masterListTitle = 'List of All Misgrade Actions';
 			$this->masterListHeader = 'Misgrade Actions';
 			$this->masterAddTitle = 'Add Misgrade Action';

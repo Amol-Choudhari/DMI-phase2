@@ -3175,7 +3175,7 @@ class ApplicationformspdfsController extends AppController{
 		$this->loadModel('DmiStates');
 		$this->loadModel('MCommodity');
 		$this->loadModel('MCommodityCategory');
-		$this->loadModel('DmiShowcauseNoticePdfs');
+		$this->loadModel('DmiMmrShowcauseNoticePdfs');
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiUserRoles');
@@ -3221,10 +3221,10 @@ class ApplicationformspdfsController extends AppController{
 	
 		$rearranged_id = $pdfPrefix.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 		//check applicant last record version to increment		
-		$list_id = $this->DmiShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+		$list_id = $this->DmiMmrShowcauseNoticePdfs->find('list', array('valueField'=>'id', 'conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 
 		if(!empty($list_id)){
-			$max_id = $this->DmiShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
+			$max_id = $this->DmiMmrShowcauseNoticePdfs->find('all', array('fields'=>'pdf_version', 'conditions'=>array('id'=>max($list_id))))->first();
 			$last_pdf_version 	=	$max_id['pdf_version'];
 		} else { 
 			$last_pdf_version = 0;	
@@ -3240,7 +3240,7 @@ class ApplicationformspdfsController extends AppController{
 		
 		$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
 		
-		$pdfEntity = $this->DmiShowcauseNoticePdfs->newEntity(array(
+		$pdfEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
 				
 			'customer_id'=>$customer_id,
 			'pdf_file'=>$file_path,
@@ -3251,7 +3251,7 @@ class ApplicationformspdfsController extends AppController{
 		
 		));
 						
-		$this->DmiShowcauseNoticePdfs->save($pdfEntity);
+		$this->DmiMmrShowcauseNoticePdfs->save($pdfEntity);
 
 		$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
 

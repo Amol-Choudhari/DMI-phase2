@@ -31,8 +31,8 @@
 													<dd class="col-sm-8"><?php echo $customer_id; ?></dd>
 													<dt class="col-sm-4">Firm Name: </dt>
 													<dd class="col-sm-8"><?php echo $firmDetails['firm_name']; ?></dd>
-													<dt class="col-sm-4">Category: </dt>
-													<dd class="col-sm-8"><?php echo $category; ?></dd>
+													<dt class="col-sm-4">Sample Code: </dt>
+													<dd class="col-sm-8"><?php echo $_SESSION['sample_code']; ?></dd>
 													<dt class="col-sm-4">Commodity</dt>
 													<dd class="col-sm-8"><?php echo implode(',', $sub_commodity_value); ?></dd>
 												</dl>
@@ -46,6 +46,7 @@
 											<?php echo $this->Form->control('misgrade_category', array('type'=>'select','empty'=>'-- Select Misgrading Category --','id'=>'misgrade_category','value'=>$misCatId,'options'=>$misgradingCategories, 'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_misgrade_category" class="error invalid-feedback"></span>
 										</div>
+										
 										<div class="form-group">
 											<label class="col-form-label">Action To Be Taken <span class="cRed">*</span></label>
 											<?php echo $this->Form->control('misgrade_action', array('type'=>'select','empty'=>'-- Select Misgrading Action --','id'=>'misgrade_action', 'value'=>$misActId,'options'=>$misgradingActions, 'label'=>false, 'class'=>'form-control')); ?>
@@ -59,7 +60,7 @@
 											<?php echo $this->Form->control('misgrade_level', array('type'=>'select','empty'=>'-- Select Misgrading Level --','id'=>'misgrade_level', 'value'=>$misLvlId,'options'=>$misgradingLevels, 'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_misgrade_level" class="error invalid-feedback"></span>
 										</div>
-										<div class="form-group">
+										<div class="form-group" id="time_period_div">
 											<label class="col-form-label">Period <span class="cRed">*</span></label>
 											<?php echo $this->Form->control('time_period', array('type'=>'select','empty'=>'-- Select Period --','id'=>'time_period', 'value'=>$periodId,'options'=>$timePeriod, 'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_misgrade_action" class="error invalid-feedback"></span>
@@ -94,6 +95,9 @@
 											<?php echo $this->Form->control('reason', array('type'=>'textarea','id'=>'reason', 'value'=>$reason,'label'=>false, 'class'=>'form-control')); ?>
 											<span id="error_reason" class="error invalid-feedback"></span>
 										</div>
+									</div>
+									<div class="col-6">
+										<p id="mis_cat_desc"></p>
 									</div>
 								</div>
 							</div>
@@ -164,4 +168,5 @@
 
 <input type="hidden" id="status_id" value="<?php echo $status; ?>">
 <input type="hidden" id="customer_id_value" value="<?php echo $customer_id; ?>">
-<?php echo $this->Html->script('othermodules/misgrading_actions_home') ?>
+<?php echo $this->Html->script('othermodules/misgrading_actions_home'); ?>
+<?php echo $this->Html->script('othermodules/mmr_extra'); ?>

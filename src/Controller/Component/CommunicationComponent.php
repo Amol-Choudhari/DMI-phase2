@@ -502,22 +502,22 @@ class CommunicationComponent extends Component {
 
 		$which_user = $this->Session->read('whichUser');
 		$username = $_SESSION['username'];
-		$DmiShowcauseComments = TableRegistry::getTableLocator()->get('DmiShowcauseComments');
+		$DmiMmrShowcauseComments = TableRegistry::getTableLocator()->get('DmiMmrShowcauseComments');
 	
 		if($which_user == 'applicant'){
 
-			$showcause_comments = $DmiShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
+			$showcause_comments = $DmiMmrShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->toArray();
 			$this->Controller->set('showcause_comments',$showcause_comments);
 			
-			$referredbacksection = $DmiShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'is_latest'=>1)))->first();
+			$referredbacksection = $DmiMmrShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'is_latest'=>1)))->first();
 			$this->Controller->set('referredbacksection',$referredbacksection);
 
 		}elseif($which_user == 'dmiuser'){
 
-			$showcause_ref = $DmiShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'comment_by IS'=>$username)))->toArray();
+			$showcause_ref = $DmiMmrShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'comment_by IS'=>$username)))->toArray();
 			$this->Controller->set('showcause_ref',$showcause_ref);
 
-			$atleastOneComment = $DmiShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'is_latest'=>1,'comment_by IS'=>$username)))->toArray();
+			$atleastOneComment = $DmiMmrShowcauseComments->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'is_latest'=>1,'comment_by IS'=>$username)))->toArray();
 			$this->Controller->set('atleastOneComment',$atleastOneComment);
 		}	
 	}
@@ -527,16 +527,16 @@ class CommunicationComponent extends Component {
 
 
 		
-		$DmiShowcauseComments = TableRegistry::getTableLocator()->get('DmiShowcauseComments');
-		$commentDetails = $DmiShowcauseComments->find()->where(['customer_id IS' => $_SESSION['firm_id']])->order('id DESC')->first();
+		$DmiMmrShowcauseComments = TableRegistry::getTableLocator()->get('DmiMmrShowcauseComments');
+		$commentDetails = $DmiMmrShowcauseComments->find()->where(['customer_id IS' => $_SESSION['firm_id']])->order('id DESC')->first();
 		
 		if ($_SESSION['whichUser'] == 'applicant') {
 			$comment_to = $this->Session->read('customer_id');
 			$comment_by = $this->Session->read('username');
 		} elseif ($_SESSION['whichUser'] == 'dmiUser') {
-			$comment_from =
-			$comment_to =
-		}*/
+			$comment_from ="";
+			$comment_to ="";
+		}
 
 
 	
@@ -557,7 +557,7 @@ class CommunicationComponent extends Component {
 			if(!empty($commentDetails['reply_comment'])&& !empty($commentDetails['reply_dt'])){
 
 				$commentid= '';
-				$DmiShowcauseComments->updateAll(
+				$DmiMmrShowcauseComments->updateAll(
 					array('is_latest' => 0),
 					array('customer_id' => $comment_to,'comment_by'=>$comment_by,'is_latest'=>'1')
 				);
@@ -568,7 +568,7 @@ class CommunicationComponent extends Component {
 			$comment = htmlentities($data['reffered_back_comment'], ENT_QUOTES);
 		}
 		
-		$newEntity = $DmiShowcauseComments->newEntity(array(
+		$newEntity = $DmiMmrShowcauseComments->newEntity(array(
 
 			'id'=>$commentid,
 			'customer_id'=>$comment_to,
@@ -579,7 +579,7 @@ class CommunicationComponent extends Component {
 			'is_latest'=>1
 		));
 
-		if($DmiShowcauseComments->save($newEntity)){
+		if($DmiMmrShowcauseComments->save($newEntity)){
 		
 			$formtable = TableRegistry::getTableLocator()->get($section_model);
 			$formtable->updateAll(

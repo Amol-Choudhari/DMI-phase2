@@ -5,11 +5,11 @@
         <thead class="table-dark">
             <tr>
                 <th>Sr.No</th>
-                <th>Applicant ID</th>
+                <th>Packer ID</th>
+                <th>Sample Code</th>
                 <th>Firm Name</th>
-                <th>Firm Contact</th>
+                <th>Firm Contact</th>   
                 <th>Commodity</th>
-                <th>Certification Type</th>
                 <th>Take Action</th>
             </tr>
         </thead>
@@ -20,20 +20,25 @@
                     <tr>
                         <td><?php echo $sr_no;?></td>
                         <td><?php echo $eachdata['customer_id']; ?></td>
+                        <td><?php echo $eachdata['sample_code']; ?></td>
                         <td><?php echo $eachdata['firm_name']; ?></td>
                         <td>
                             <?php echo "<span class='badge'>Mobile:</span>".base64_decode($eachdata['mobile_no']); ?>
                             <br>
                             <?php echo "<span class='badge'>Email:</span>".base64_decode($eachdata['email']); ?>
                         </td>
-                        <td><?php echo $eachdata['certificate_type']; ?></td>
                         <td><?php echo $eachdata['category_name']; ?></td>
-                        <td>
-                            <?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForAction', $eachdata['id']),array('class'=>'fas fa-arrow-right','title'=>'Go To Action Home')); ?>
-                            |
-                            <?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForShowcause', $eachdata['id']),array('class'=>'fas fa-exclamation-circle','title'=>'Send Show Cause Notice')); ?>
-
-                        </td>
+                        <td><?php echo $this->Html->link(
+								'',
+								['controller' => 'othermodules', 'action' => 'fetchIdForAction', '?' => ['customer_id' => $eachdata['customer_id'], 'sample_code' => $eachdata['sample_code']]],
+								['class' => 'fas fa-arrow-right', 'title' => 'Go To Action Home']
+							); ?> |
+							<?php echo $this->Html->link(
+								'',
+								['controller' => 'othermodules', 'action' => 'fetchIdForShowcause', $eachdata['id'], $eachdata['customer_id'],$eachdata['sample_code']],
+								['class' => 'fas fa-exclamation-circle', 'title' => 'Send Show Cause Notice']
+							); ?>
+						</td>
                     </tr>
                 <?php $sr_no++; } 
             ?>
