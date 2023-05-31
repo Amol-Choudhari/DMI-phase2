@@ -90,10 +90,15 @@
 								<div class="col-sm-6"><div id="report_allocation_status"></div></div> <!--This is For the Report Status -->
 								</div>
 							</div>
-							<!--This is For the Communications Status -->
-							<div id="mmr_communication">
-								<?php echo $this->element('../Misgrading/mmr_communication'); ?>
-							</div>
+
+							<?php if ($isAllocatd == 'yes') { ?>
+					
+								<div id="mmr_communication">
+									<?php echo $this->element('../Misgrading/mmr_communication'); ?>
+								</div>
+								
+							<?php } ?>
+							
 							<div class="card-footer">
 								<?php echo $this->element('../Misgrading/mmr-buttons'); ?>
 							</div>
@@ -107,6 +112,7 @@
 
 <input type="hidden" id="sample_code_value" value="<?php echo $sample_code; ?>">
 <input type="hidden" id="current_level" value="<?php echo $_SESSION['current_level']; ?>">
+<input type="hidden" id="is_allocated_id" value="<?php echo $isAllocatd; ?>">
 
 <?php
 	echo $this->Html->script('dropdowncustom');

@@ -44,11 +44,11 @@
 			</div>
 		</div>
 		<div class="col-md-6">
-			<label class=""> Show Cause Notice PDF :
 			<?php if(!empty($scn_pdf_path)){?>
-				<a id="scn_pdf_path" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$scn_pdf_path); ?>">Preview</a>
+				<label class=""> Show Cause Notice PDF :
+					<a id="scn_pdf_path" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$scn_pdf_path); ?>">Preview</a>
+				</label>
 			<?php } ?>
-			</label>
 		</div>
 	</div>
 </div>

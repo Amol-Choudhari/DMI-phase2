@@ -14,9 +14,6 @@ use xmldsign;
 use Cake\Utility\Xml;
 use FR3D;
 use Cake\View;
-use Cake\Utility\Hash;
-use Cake\Utility\Text;
-use Cake\Http\Session;
 
 class ApplicationformspdfsController extends AppController{
 	
@@ -3302,49 +3299,22 @@ class ApplicationformspdfsController extends AppController{
 		//creating filename and file path to save
 		$file_path = '/writereaddata/DMI/showcause_notice/'.$rearranged_id.'('.$current_pdf_version.')'.'.pdf';
 		
-
-		$pdf_array = [
+		$showcauseNoticeEntity = $this->DmiMmrShowcauseNoticePdfs->newEntity(array(
+	
 			'customer_id'=>$customer_id,
 			'pdf_file'=>$file_path,
 			'date'=>date('Y-m-d H:i:s'),
 			'pdf_version'=>$current_pdf_version,
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s')	
-		];
+		));
 
-		
-		// Get the session object
-		$session = new Session();
+		$this->DmiMmrShowcauseNoticePdfs->save($showcauseNoticeEntity);
 
-		// Serialize the array
-		$serializedArray = serialize($pdf_array);
-
-		// Generate a unique key to store the serialized array in the session
-		$key = Text::uuid();
-
-		// Store the serialized array in the session
-		$session->write('PdfArray.' . $key, $serializedArray);
-
-		// To retrieve the array from the session, you can use the following code:
-
-		// Get the serialized array from the session
-		$serializedArray = $session->read('PdfArray.' . $key);
-
-		// Unserialize the array
-		$pdf_array = unserialize($serializedArray);
-
-		// Access the values in the array
-		$customer_id = Hash::get($pdf_array, 'customer_id');
-		$pdf_file = Hash::get($pdf_array, 'pdf_file');
-		$date = Hash::get($pdf_array, 'date');
-		$pdf_version = Hash::get($pdf_array, 'pdf_version');
-		$created = Hash::get($pdf_array, 'created');
-		$modified = Hash::get($pdf_array, 'modified');
-
-		
 		$file_path = $_SERVER["DOCUMENT_ROOT"].$file_path;
+
 		//to preview application
-		$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
+		///$this->callTcpdf($all_data_pdf,'I',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with preview mode
 		$this->callTcpdf($all_data_pdf,'F',$customer_id,'showcause_notice',$file_path);//on 23-01-2020 with save mode
 		$this->redirect('/dashboard/home');
 

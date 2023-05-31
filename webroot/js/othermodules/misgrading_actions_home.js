@@ -23,22 +23,52 @@ $('#save_action').click(function (e) {
 $("#final_submit").click(function(){
 
 	var customer_id = $("#customer_id_value").val();
+	var sample_code = $("#sample_code_id").val();
 
 	$.ajax({
 		type: "POST",
 		url: "../othermodules/final_submit_actions",
-		data: {customer_id:customer_id},
+		data: {
+			customer_id:customer_id,sample_code:sample_code,
+		},
 		beforeSend: function (xhr) {
 			xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
 		},
 		success: function(response){
+
 			response = response.match(/~([^']+)~/)[1];
-			if($.trim(response)=='done'){
+
+			if($.trim(response) != ''){
+
+				var action = '';
+				var redirect_to = '';
+
+				if (response == 'Suspension') {
+					action = 'suspension, this firm will be Suspended for a period of time. This will be now redirecting to the suspension module for consent and e-sign.';
+					redirect_to = '../othermodules/suspensionHome?customer_id=' + encodeURIComponent(customer_id) + '&sample_code=' + encodeURIComponent(sample_code) + '&for_module=' + encodeURIComponent(response);
+				} else if (response == 'Cancellation') {
+					action = 'cancellation, this firm will be Cancelled. This will be now redirecting to the suspension module for consent and e-sign.';
+					redirect_to = 'othermodules/suspensionHome?param1=value1&param2=value2';
+				} else if (response == 'Refer') {
+					action = 'This is now referring to Head Office';
+					// No redirection needed
+				}
+
+
 				$.alert({
-					content:"The Action is Taken against the Applicant.",
-					onClose: function(){
-						location.reload();
-					}
+					title : '',
+					columnClass: 'l',
+					type: 'blue',
+					content:"The Actions on Misgrading is final submitted as " + response + " for Packer ID: " + customer_id + " as selection for " + action + "",
+					buttons: {
+						Proceed: {
+							btnClass: 'btn-green',
+							action: function(){
+
+								//window.location.href = redirect_to;
+							}
+						}
+					}	
 				});
 			}
 		}

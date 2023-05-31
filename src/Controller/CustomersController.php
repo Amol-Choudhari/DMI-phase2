@@ -1468,15 +1468,28 @@ class CustomersController extends AppController {
 
 			$conn = ConnectionManager::get('default');
 
-			$showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status
+			$showCauseNotice = $conn->execute("SELECT dsl.id,dsl.customer_id,dsl.reason,
+										dsl.date,dsl.end_date,dsnp.pdf_file,dsl.status,dsl.sample_code
 										FROM dmi_mmr_showcause_logs AS dsl
 										INNER JOIN dmi_mmr_showcause_notice_pdfs AS dsnp ON dsnp.customer_id = dsl.customer_id
 										WHERE dsl.customer_id='$customer_id' AND dsl.status='sent'")->fetch('assoc');
-			$this->set('showCauseNotice',$showCauseNotice);
 			
-			$sample_details = $conn->execute("SELECT * FROM sample ")
-
+			$this->set('showCauseNotice',$showCauseNotice);
 		
+
+		//check if the applicant is commented on the showcause notice.
+		$this->loadModel('DmiMmrShowcauseComments');
+		$is_scn_replied_details = $this->DmiMmrShowcauseComments->find()->where(['customer_id' => $customer_id,'to_user' => 'ro'])->order('id DESC')->first();
+		if(!empty($is_scn_replied_details)){
+			$is_scn_replied='yes';
+		}else{
+			$is_scn_replied='no';
+		}
+		
+		$this->set('is_scn_replied_details',$is_scn_replied_details);
+		$this->set('is_scn_replied',$is_scn_replied);
+
+
 	}
 
 

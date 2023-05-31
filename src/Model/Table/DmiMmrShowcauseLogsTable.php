@@ -26,8 +26,10 @@ class DmiMmrShowcauseLogsTable extends Table{
 
 		$customer_id = $_SESSION['firm_id'];
 		$username = $_SESSION['username'];
-		$postedOffice = $DmiUsers->getPostedOffId($username);
+		$sample_code = $_SESSION['sample_code'];
 
+		$postedOffice = $DmiUsers->getPostedOffId($username);
+		
 		$log_entity = $this->newEntity(array(
 			
 			'customer_id'=>$customer_id,
@@ -37,10 +39,12 @@ class DmiMmrShowcauseLogsTable extends Table{
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s'),
 			'by_user'=>$username,
-			'posted_ro_office'=> (int) $postedOffice
+			'posted_ro_office'=> (int) $postedOffice,
+			'sample_code' => $sample_code
 		));
 
 		if($this->save($log_entity)){
+
 			return true;
 		}
 	}
@@ -50,6 +54,7 @@ class DmiMmrShowcauseLogsTable extends Table{
 		$record_id = $this->getInformation($_SESSION['firm_id']);
 		$customer_id = $_SESSION['firm_id'];
 		$username = $_SESSION['username'];
+		$sample_code = $_SESSION['sample_code'];
 
 		$log_entity = $this->newEntity(array(
 
@@ -61,7 +66,8 @@ class DmiMmrShowcauseLogsTable extends Table{
 			'created'=>$record_id['created'],
 			'modified'=>date('Y-m-d H:i:s'),
 			'by_user'=>$username,
-			'posted_ro_office'=>$record_id['posted_ro_office']
+			'posted_ro_office'=>$record_id['posted_ro_office'],
+			'sample_code' => $sample_code
 		));
 
 		if($this->save($log_entity)){
@@ -69,12 +75,17 @@ class DmiMmrShowcauseLogsTable extends Table{
 		}
 	}
 
+
+
 	public function sendFinalNotice($postData){
 
 		$DmiUsers = TableRegistry::getTableLocator()->get('DmiUsers');
 		$DmiMmrShowcauseComments = TableRegistry::getTableLocator()->get('DmiMmrShowcauseComments');
+
 		$customer_id = $_SESSION['firm_id'];
 		$username = $_SESSION['username'];
+		$sample_code = $_SESSION['sample_code'];
+
 		$date = date('Y-m-d H:i:s');
 		$postedOffice = $DmiUsers->getPostedOffId($username);
 
@@ -89,36 +100,30 @@ class DmiMmrShowcauseLogsTable extends Table{
 			'by_user'=>$username,
 			'start_date'=>$date,
 			'end_date'=>date('Y-m-d H:i:s', strtotime($date. ' + 14 days')),
-			'posted_ro_office'=>$postedOffice
+			'posted_ro_office'=>$postedOffice,
+			'sample_code'=>$sample_code
 		));
 
 		if($this->save($log_entity)){
 
+			$comment = htmlentities($postData['reason']);
 			
 			if($_SESSION['whichUser'] == 'dmiuser'){
 
-				$comment_by = $_SESSION['username'];
-				$comment_to =  $_SESSION['firm_id'];
-				$comments = htmlentities($postData['reason']);
-				$reply_by ='';
-				$reply_to ='';
-				$reply_comment ='';
-				$reply_date = '';
-				$is_latest = '';
-				 
+				$from_user = 'ro';
+				$to_user = 'applicant';
+				$comment_by = $username;
+				$comment_to = $customer_id;
+
 			}elseif ($_SESSION['whichUser'] == 'applicant') {
 
-				$comment_by = $_SESSION['username'];
-				$comment_to = '';
-				$comments = '';
-				$reply_by ='';
-				$reply_to ='';
-				$reply_comment ='';
-				$reply_date = '';
-				$is_latest = '';
+				$from_user = 'applicant';
+				$to_user = 'ro';
+				$comment_by = $username;
+				$comment_to = $customer_id;
 			}
 
-			$DmiMmrShowcauseComments->saveComment($customer_id,$comment_by,$comment_to,$comments,$reply_by,$reply_to,$reply_comment);
+			$DmiMmrShowcauseComments->saveCommentDetails($customer_id,$sample_code,$comment_by,$comment_to,$comment,$from_user,$to_user);
 			return true;
 		}
 	}

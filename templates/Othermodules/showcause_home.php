@@ -29,9 +29,11 @@
 							<div class="card-header"><h3 class="card-title-new">Show Cause Notice</h3></div>
 							<?php 
 								echo $this->element('misgrade_elements/scn_user_form'); 
-								if ($_SESSION['whichUser'] == 'applicant') {
+							
+								if (!empty($statusofscn)) {
 									echo $this->element('misgrade_elements/showcause_communication'); 
-								} 
+								}
+						
 							?>
 							<div class="card-footer">
 								<?php echo $this->element('misgrade_elements/showcause_buttons'); ?>
@@ -52,15 +54,8 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			</div>
 			<div class="modal-body">
-				<div class="col-md-3 d-inline">Show Cause Notice PDF: </div>
-				<div class="col-md-4 d-inline"><a target="blank" href="../applicationformspdfs/showcauseApplPdf" >Preview</a></div><br>
-				<table class="mt-2">
-					<tbody>
-						This is to Issue of show cause notice on misgrading for the Packer : <b> <?php echo $firmDetails['firm_name']; ?> </b> having <br> ID : <b<?php echo $customer_id; ?></b>
-						With attached Sample for : <b><?php echo $sampleArray['commodity']; ?></b> having sample code : <b><?php echo $sample_code; ?></b>. Check and confirn the same and Click on Proceed.
-					</tbody>
-				</table>
-				<div class="clearfix"></div>
+				This is to Issue of show cause notice on misgrading for the Packer : <b> <?php echo $firmDetails['firm_name']; ?> </b> having <br> ID : <b<?php echo $customer_id; ?></b>
+				With attached Sample for : <b><?php echo $sampleArray['commodity']; ?></b> having sample code : <b><?php echo $sample_code; ?></b>. Check and confirn the same and Click on Proceed.
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-success" id="final_submit"><i class="fa fa-check-circle"></i> Proceed</button>
@@ -73,4 +68,7 @@
 <input type="hidden" id="status_id" value="<?php echo $status; ?>">
 <input type="hidden" id="customer_id_value" value="<?php echo $customer_id; ?>">
 <input type="hidden" id="which_user" value="<?php echo $_SESSION['whichUser']; ?>">
-<?php echo $this->Html->script('othermodules/showcause_home') ?>
+<?php 
+	echo $this->Form->control('scn_mode_id', array('type'=>'hidden', 'id'=>'scn_mode_id', 'value'=>$_SESSION['scn_mode'],'label'=>false,));
+	echo $this->Html->script('othermodules/showcause_home');
+ ?>

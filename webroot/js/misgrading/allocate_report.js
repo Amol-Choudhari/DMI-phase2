@@ -8,6 +8,8 @@
 
 		var isAlreadyExist = $('#packers_id').data('already-exist');
 		
+		var is_allocated = $('#is_allocated_id').val();
+
 		if (Boolean(isAlreadyExist)) {
 			$('.dropdown-select').addClass('read-only');
 			$('#save_details').prop('disabled', false);
@@ -25,7 +27,11 @@
 
 		//Calling this methods to show the status
 		statusOfPacker();
-		statusOfReportAlloactions();
+
+		if (is_allocated == 'yes') {
+			statusOfReportAlloactions();	
+		}
+	
 
 		if (current_level == 'level_1') {
 

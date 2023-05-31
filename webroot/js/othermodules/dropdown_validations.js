@@ -5,18 +5,6 @@ var misActId_val = $('#misActId_val').val();
 var misLvlId_val = $('#misLvlId_val').val();
 var periodId_val = $('#periodId_val').val();
 
-$(document).ready(function() {
-   
-
-    if (misCatId_val != null) {
-        $('.hide_det').hide();
-    }
-  
-    $('#edit_action').click(function(event) {
-        event.preventDefault();
-        $('.hide_det').toggle();
-      });
-});
 
   
   

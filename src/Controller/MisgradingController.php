@@ -202,7 +202,14 @@ class MisgradingController extends AppController{
 		
 		// fetch all allocation details
 		$allocation_deatils = $this->DmiMmrAllocations->find('all',array('conditions'=>array('sample_code IS'=>$sample_code)))->first();
+		if (!empty($allocation_deatils)) {
+			$isAllocatd = 'yes';
+		} else {
+			$isAllocatd = 'no';
+		}
+		
 		$this->set('allocation_deatils',$allocation_deatils);
+		$this->set('isAllocatd',$isAllocatd);
 		
 	
 		// Check current user roles

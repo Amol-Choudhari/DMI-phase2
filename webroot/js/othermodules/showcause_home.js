@@ -1,6 +1,12 @@
 
 var whichUser = $('#which_user').val();
 var status_id = $('#status_id').val();
+var scn_mode = $('#scn_mode_id').val();
+
+if(scn_mode == 'view'){
+    $('#comment_box_with_btn').css('display','none');
+}
+
 
 if(whichUser == 'applicant' || status_id == 'sent'){
     $("#reason").prop( "disabled", true );

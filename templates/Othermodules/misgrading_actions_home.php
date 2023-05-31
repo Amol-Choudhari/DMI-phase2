@@ -111,10 +111,10 @@
 							<div class="card-footer cardFooterBackground">
 								<?php 
 									if (!empty($status)){
-										if ($status == 'saved') {
+										//if ($status == 'submitted') {
 											echo $this->Form->submit('Update', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 											echo $this->Form->control('Final Submit',array('type'=>'button','name'=>'take_action','class'=>'btn btn-primary ml-2 float-left', 'data-toggle'=>'modal','data-target'=>'#confirm_action','label'=>false));
-										} 
+										//} 
 									} else {
 										echo $this->Form->submit('Save', array('name'=>'save_action','id'=>'save_action','label'=>false,'class'=>'float-left btn btn-success'));
 									}
@@ -174,7 +174,8 @@
 </div>
 
 <input type="hidden" id="status_id" value="<?php echo $status; ?>">
-<input type="hidden" id="customer_id_value" value="<?php echo $customer_id; ?>">
+<input type="hidden" id="customer_id_value" value="<?php echo $_SESSION['firm_id']; ?>">
+<input type="hidden" id="sample_code_id" value="<?php echo $_SESSION['sample_code']; ?>">
 <input type="hidden" id="is_ghee_comm" value="<?php echo $isCommodityGhee; ?>">
 <input type="hidden" id="misCatId_val" value="<?php echo $misCatId; ?>">
 <input type="hidden" id="misActId_val" value="<?php echo $misActId; ?>">

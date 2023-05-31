@@ -16,17 +16,21 @@
 		
 		if ($_SESSION['current_level'] == 'level_3') {
 			
-			echo $this->Form->submit('Scrutiny', array('name'=>'scrutiny', 'id'=>'scrutiny', 'label'=>false,'class'=>'btn btn-primary float-left mr-2','title'=>'Scrutiny this Report'));
+			echo $this->Form->submit('Scrutiny', array('name'=>'scrutiny', 'id'=>'scrutiny', 'label'=>false,'class'=>'btn btn-primary float-left ml-2','title'=>'Scrutiny this Report'));
 		}
 
+		echo $this->Html->link('Take Action', ['controller' => 'othermodules', 'action' => 'misgrading_home'], ['class' => 'ml-2 btn btn-outline-dark float-left']);
+
 	}
 
-	//Send Comment Button
-	if(isset($_SESSION['application_mode']) &&  $_SESSION['application_mode'] == 'edit'){
-		echo $this->Form->submit('Send Comment', array('name'=>'send_comment', 'id'=>'send_comment_btn', 'label'=>false,'class'=>'float-left btn btn-success'));
+	if ($isAllocatd == 'yes') {
+		//Send Comment Button
+		if(isset($_SESSION['application_mode']) &&  $_SESSION['application_mode'] == 'edit'){
+			echo $this->Form->submit('Send Comment', array('name'=>'send_comment', 'id'=>'send_comment_btn', 'label'=>false,'class'=>'float-left btn btn-success'));
+		}
 	}
+	
 
-	echo $this->Html->link('Take Action', ['controller' => 'othermodules', 'action' => 'misgrading_home'], ['class' => 'ml-2 btn btn-outline-dark float-right']);
 
 	echo $this->Html->link('Cancel', ['controller' => 'dashboard', 'action' => 'home'], ['class' => 'btn btn-danger float-right']);
 ?>

@@ -12,26 +12,71 @@ class DmiMmrShowcauseCommentsTable extends Table{
 
 	var $name = "DmiMmrShowcauseComments";
 
-	//For 
-	public function saveComment($customer_id,$comment_by,$comment_to,$comments,$reply_by,$reply_to,$reply_comment){
-
-		$commeny_entity = $this->newEntity(array(
+	public function saveCommentDetails($customer_id,$sample_code,$comment_by,$comment_to,$comment,$from_user,$to_user) {
+		
+		$dataArray = $this->newEntity(array(
 
 			'customer_id'=>$customer_id,
+			'sample_code'=>$sample_code,
 			'comment_by'=>$comment_by,
 			'comment_to'=>$comment_to,
-			'comments'=>$comments,
-			'reply_by'=>$reply_by,
-			'reply_to'=>$reply_to,
-			'reply_comment'=>$reply_comment,
-			'reply_date'=>date('Y:m:d H:i:s'),
-			'is_latest'=>'1'
+			'comment_date'=>date('Y-m-d H:i:s'),
+			'comment'=>$comment,
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s'),
+			'from_user'=>$from_user,
+			'to_user'=>$to_user
 		));
 
-		if($this->save($commeny_entity)){
+		if($this->save($dataArray)){
 			return true;
 		}
 	}
+
+
+	public function replyFromApplicant ($customer_id,$sample_code,$comment_by,$comment_to,$comment,$from_user,$to_user) {
+		
+		$dataArray = $this->newEntity(array(
+
+			'customer_id'=>$customer_id,
+			'sample_code'=>$sample_code,
+			'comment_by'=>$comment_by,
+			'comment_to'=>$comment_to,
+			'comment_date'=>date('Y-m-d H:i:s'),
+			'comment'=>$comment,
+			'created'=>date('Y-m-d H:i:s'),
+			'modified'=>date('Y-m-d H:i:s'),
+			'from_user'=>$from_user,
+			'to_user'=>$to_user
+		));
+
+		if($this->save($dataArray)){
+
+			$DmiMmrShowcauseLogs = TableRegistry::getTableLocator()->get('DmiMmrShowcauseLogs');
+			$getDetails = $DmiMmrShowcauseLogs->getInformation($customer_id);
+			
+			$log_entity = $DmiMmrShowcauseLogs->newEntity(array(
+
+				'id'=>$getDetails['id'],
+				'customer_id'=>$customer_id,
+				'reason'=>$getDetails['reason'],
+				'status'=>'saved',
+				'date'=>date('Y-m-d H:i:s'),
+				'created'=>$getDetails['created'],
+				'modified'=>date('Y-m-d H:i:s'),
+				'by_user'=>$getDetails['by_user'],
+				'posted_ro_office'=>$getDetails['posted_ro_office'],
+				'sample_code' => $sample_code,
+	
+			));
+
+			if($DmiMmrShowcauseLogs->save($log_entity)){
+				return true;
+			}
+		}
+	}
+
+
 }
 
 

@@ -6,7 +6,7 @@ use Cake\ORM\TableRegistry;
 
 class DmiMmrActionHomeLogsTable extends Table{
 	
-	var $name = "DmiMmrActionHomeLogsTable";
+	var $name = "DmiMmrActionHomeLogs";
 	
 	public function getMisgradingActionList(){
 		return $this->find('list', array('keyField'=>'id','valueField' => 'misgrade_action_name', 'conditions' => array('OR' => array('delete_status IS NULL', 'delete_status =' => 'no')), 'order' => array('id')))->toArray();
@@ -31,7 +31,8 @@ class DmiMmrActionHomeLogsTable extends Table{
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s'),
 			'status'=>'saved',
-			'time_period'=>$time_period
+			'time_period'=>$time_period,
+			'sample_code'=>$_SESSION['sample_code']
 		));
 
 		if ($this->save($enity)) {
@@ -51,7 +52,8 @@ class DmiMmrActionHomeLogsTable extends Table{
 			'user_email'=>$_SESSION['username'],
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s'),
-			'status'=>'saved'
+			'status'=>'saved',
+			'sample_code'=>$_SESSION['sample_code']
 		));
 
 		if ($this->save($enity)) {
@@ -59,9 +61,9 @@ class DmiMmrActionHomeLogsTable extends Table{
 		}
 	}
 
-	public function getInformation($customer_id){
+	public function getInformation($customer_id,$sample_code=null){
 
-		return $this->find()->where(['customer_id' => $customer_id])->order(['created' => 'DESC'])->first();
+		return $this->find()->where(['customer_id' => $customer_id,'sample_code IS'=>$sample_code])->order('id DESC')->first();
 	}
 
 	public function applicationFinalSubmit($postData) {
@@ -76,7 +78,8 @@ class DmiMmrActionHomeLogsTable extends Table{
 													'created'=>date('Y-m-d H:i:s'),
 													'modified'=>date('Y-m-d H:i:s'),
 													'status'=>'submitted',
-													'time_period'=>$postData['time_period']));
+													'time_period'=>$postData['time_period'],
+													'sample_code'=>$postData['sample_code']));
 
 		if ($this->save($finalSubmitEntity)) {
 
