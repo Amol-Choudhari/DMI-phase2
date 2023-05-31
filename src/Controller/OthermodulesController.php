@@ -1593,6 +1593,9 @@ class OthermodulesController extends AppController{
 		$customer_id = $this->Session->read('firm_id');
 		$this->set('customer_id',$customer_id);
 
+		$sample_code = $this->Session->read('sample_code');
+		$this->set('sample_code',$sample_code);
+
 		$conn = ConnectionManager::get('default');
 		//Load Models
 		$this->loadModel('DmiMmrCategories');
@@ -1624,7 +1627,7 @@ class OthermodulesController extends AppController{
 		$timePeriod = $this->DmiMmrTimePeriod->getTimePeriodList();
 
 		//Status
-		$misgradeStatus = $this->DmiMmrActionHomeLogs->getInformation($customer_id);
+		$misgradeStatus = $this->DmiMmrActionHomeLogs->getInformation($customer_id,$sample_code);
 
 		//Check if the firm have the commodity of ghee
 		$ifGheeComm = $conn->execute("SELECT *
@@ -1643,7 +1646,7 @@ class OthermodulesController extends AppController{
 			$isCommodityGhee = 'no';
 		}
 
-
+	
 		if (!empty($misgradeStatus)) {
 
 			//Misgrade Category Info
@@ -1717,7 +1720,9 @@ class OthermodulesController extends AppController{
 			}
 		
 		}
-
+		
+		
+		
 		$this->set('isCommodityGhee',$isCommodityGhee);
 		$this->set(compact('firmDetails','category','sub_commodity_value'));                             #Set the Firm Details
 		$this->set(compact('misgradingActions','misgradingLevels','misgradingCategories','timePeriod')); #Set the Dropdowns
@@ -2028,8 +2033,59 @@ class OthermodulesController extends AppController{
     	$sample_code = $this->getRequest()->getQuery('sample_code');
     	$for_module = $this->getRequest()->getQuery('for_module');
 
-		pr($customer_id);pr($sample_code);pr($for_module); exit;
+		//get the view for diffrent module
+		if ($for_module == 'Suspension') {
+			$dashMessage = "Note: This module is to:<br>
+			1. To process the Suspension of the Packer through AQCMS system online with option to select time period for suspension.<br>
+			2. To lock registered Packer account on for time period of suspension.<br>
+			3. Click on Proceed to Esign button. After esign the suspension  will be completed and packer will receive the suspension notice on dashboard.";
+		} elseif ($for_module == 'Cancellation') {
+			$dashMessage = "Note: This module is to:<br>
+			1. To process the Cancellation of the Packer through AQCMS system online.<br>
+			2. To cancel registered Packer account permantly and cancel the packer's certificates.";
+		} elseif ($for_module == 'Refer') {
+			
+		}
 
+		//Get the details
+		$this->loadModel('DmiMmrActionFinalSubmits');
+		$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])->order('id DESC')->first();
+		$is_showcause = $actionDetails['showcause'];
+
+		//Misgrade Category Info
+		$this->loadModel('DmiMmrCategories');
+		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($actionDetails['misgrade_category']);
+		$misgradeCategory  = $misgrade_category['misgrade_category_name']. " : " .$misgrade_category['misgrade_category_dscp'];
+
+		//Misgrade Category Info
+		$this->loadModel('DmiMmrLevels');
+		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($actionDetails['misgrade_level']);
+		$levelName = $misgrade_level['misgrade_level_name'];
+
+		//Misgrade Category Info
+		$this->loadModel('DmiMmrActions');
+		$misgrade_action = $this->DmiMmrActions->getMisgradingAction($actionDetails['misgrade_action']);
+		$actionName = $misgrade_action['misgrade_action_name'];
+
+		//Misgrade Category Info
+		$this->loadModel('DmiMmrTimePeriod');
+		$time_period = $this->DmiMmrTimePeriod->getTimePeriod($actionDetails['time_period']);
+		$periodMonth = $time_period['month'];
+
+		//Packer Details
+		$this->loadModel('DmiFirms');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('MCommodity');
+
+		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
+		$category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
+		$sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
+		$sub_commodity_value = $this->MCommodity->find('list',array('valueField'=>'commodity_name', 'conditions'=>array('commodity_code IN'=>$sub_comm_id)))->toList();
+
+
+		$this->set(compact('firmDetails','category','sub_commodity_value'));
+		$this->set(compact('dashMessage','misgradeCategory','levelName','actionName','periodMonth','is_showcause'));
+		$this->set(compact('customer_id','sample_code','for_module'));
 	}
 
 

@@ -94,7 +94,7 @@
 			$.ajax({
 				url: '../misgrading/remove_sample_packer',
 				type: 'POST',
-				data: {sample_code: sample_code,},
+				data: {sample_code: sample_code},
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
 				},

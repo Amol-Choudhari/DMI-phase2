@@ -1,8 +1,10 @@
-$('#actions_div').hide();
+
 
 var status_id = $('#status_id').val();
 if (status_id != null && status_id == 'saved') {
 	$('#actions_div').show();
+}else{
+	$('#actions_div').hide();
 }
 
 $('#save').on('shown.bs.modal', function () {
@@ -65,7 +67,7 @@ $("#final_submit").click(function(){
 							btnClass: 'btn-green',
 							action: function(){
 
-								//window.location.href = redirect_to;
+								window.location.href = redirect_to;
 							}
 						}
 					}	

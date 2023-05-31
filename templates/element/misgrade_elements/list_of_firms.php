@@ -33,8 +33,10 @@
 					<?php 
 						if ($eachdata['showcause_status'] == 'sent') {
 							echo 'The Showcause notice is sent to the packer.';
-						}elseif($eachdata['showcause_status'] == 'replied') {
+						} elseif ($eachdata['showcause_status'] == 'replied') {
 							echo 'Applicant has been replied to issued Showcause notice';
+						} else {
+							echo 'N/A';
 						}
 					?>
 				</td>
