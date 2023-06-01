@@ -14,7 +14,7 @@
 <!-- Call element of declaration message box out of form tag on 31-05-2021 by Amol for Form base method -->
 
 <!-- for Report esign -->
-	<?php if ($current_level == 'level_2' && ($application_type == 1 || $application_type == 5 || $application_type == 6) && $form_type != 'F' ) {
+	<?php if ($current_level == 'level_2' && ($application_type == 1 || $application_type == 5 || $application_type == 6) && $form_type != 'F' ) { 
 				echo $this->element('esign_views/declaration-message_boxes'); ?>
 		<!-- for Certificate esign -->
 	<?php } elseif ($final_granted_btn == 'yes') {

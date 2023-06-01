@@ -348,7 +348,7 @@
 											</a>
 										</li>	
 										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_firms_for_action" class="bg-success nav-link">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_packer_action_taken" class="bg-success nav-link">
 												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
 												<p class="nav-icon-p">Suspension/Cancellation</p>
 											</a>

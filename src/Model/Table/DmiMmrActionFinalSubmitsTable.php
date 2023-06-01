@@ -76,6 +76,16 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 	}
 
 
+	
+	public function detailsForPdf($customer_id){
+
+		$details =	$this->find()->where(['customer_id' => $customer_id])->order('id DESC')->first();
+		
+		$detailsArray [
+			'misgarde_details' = '';
+		];
+	}
+
 
 
 }

@@ -177,12 +177,13 @@ class OthermodulesController extends AppController{
 		$grant_date = $grant_date[0];	   
 		$this->Session->write('re_esign_grant_date',$grant_date);
 
+		
 		//creating application type session
 		$applicationType = 1;
 		if ($grant_details['pdf_version'] > 1) {
 
 			$applicationType = 2;
-		}
+		} 
 
 		$this->Session->write('application_type',$applicationType);
 
@@ -2033,13 +2034,26 @@ class OthermodulesController extends AppController{
     	$sample_code = $this->getRequest()->getQuery('sample_code');
     	$for_module = $this->getRequest()->getQuery('for_module');
 
+		$this->Session->write('customer_id',$customer_id);
+		$this->Session->write('sample_code',$sample_code);
+		$this->Session->write('for_module',$for_module);
+		$this->Session->write('current_level','level_3');
+		$this->set('btn_to_re_esign','yes');
+
 		//get the view for diffrent module
 		if ($for_module == 'Suspension') {
+
+			$this->Session->write('application_type','Suspension'); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as SPN
+
 			$dashMessage = "Note: This module is to:<br>
 			1. To process the Suspension of the Packer through AQCMS system online with option to select time period for suspension.<br>
 			2. To lock registered Packer account on for time period of suspension.<br>
 			3. Click on Proceed to Esign button. After esign the suspension  will be completed and packer will receive the suspension notice on dashboard.";
+	
 		} elseif ($for_module == 'Cancellation') {
+
+			$this->Session->write('application_type','Cancellation'); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as CAN
+
 			$dashMessage = "Note: This module is to:<br>
 			1. To process the Cancellation of the Packer through AQCMS system online.<br>
 			2. To cancel registered Packer account permantly and cancel the packer's certificates.";
@@ -2088,6 +2102,68 @@ class OthermodulesController extends AppController{
 		$this->set(compact('customer_id','sample_code','for_module'));
 	}
 
+
+
+	public function listOfPackerActionTaken()
+	{
+		$conn = ConnectionManager::get('default');
+
+		$firmDetails = $conn->execute("
+			SELECT dmafs.customer_id, df.firm_name, dmafs.sample_code
+			FROM dmi_mmr_action_final_submits AS dmafs 
+			INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id 
+			WHERE dmafs.status != 'taken'
+			GROUP BY dmafs.customer_id, df.firm_name, dmafs.sample_code
+			ORDER BY dmafs.customer_id DESC
+			LIMIT 1
+		")->fetchAll('assoc');
+
+		// Customer IDs
+		$customer_list = [];
+
+		foreach ($firmDetails as $customer) {
+			$customer_list[$customer['customer_id']] = $customer['customer_id'] . ' - ' . $customer['firm_name'] . ' (' . $customer['sample_code'] . ')';
+		}
+
+		$this->set('customer_list', $customer_list);
+
+		if ($this->request->is('post')) {
+
+			$this->loadModel('DmiMmrActionFinalSubmits');
+			$customer_id = $this->request->getData('customer_id');
+			$sample_code = substr($customer_list[$this->request->getData('customer_id')], strrpos($customer_list[$this->request->getData('customer_id')], '(') + 1, -1);
+			$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])->order('id DESC')->first();
+
+		
+			if (!empty($actionDetails)) {
+
+			
+				if ($actionDetails['for_suspension'] == 'Yes') {
+					$for_module = 'Suspension';
+				} elseif ($actionDetails['for_cancel'] == 'Yes') {
+					$for_module = 'Cancellation';
+				} elseif ($actionDetails['refer_to_ho'] == 'Yes') {
+					$for_module = 'Refer';
+				}
+			
+				// Redirect to suspensionHome() with parameters
+				return $this->redirect([
+					'controller' => 'othermodules',
+					'action' => 'suspensionHome',
+					'?' => [
+						'customer_id' => $customer_id,
+						'sample_code' => $sample_code,
+						'for_module' => $for_module
+					]
+				]);
+			} else {
+				// Handle the else case if needed
+			}
+			
+		}
+	}
+
+	
 
 }
 

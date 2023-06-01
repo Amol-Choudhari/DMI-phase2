@@ -467,13 +467,8 @@
 					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
 					
 				</tr>
-				
-				
-							
 				<!-- element call to show change updates added on 02-01-2023-->
-				<?php echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
-						
-		
+				<?php // echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
 		</table>
 		
 		
@@ -486,21 +481,47 @@
 		
 		
 		
-		<!-- for cancellation in certification part -->
-		<p></p>
-		<table width="100%" border="1" style="margin-top:50px;">
-				<tr>
-					<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>PART IV</b></th>
-					<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>See Rule no. 7</b></th>		
-					
-				</tr>
-				
-				<tr>
-					<td style="padding:10px; vertical-align:top;">Endorsement of the competent authority about suspension or cancellation of the Certificate of Authorization:</td>
-					<td style="padding:10px; vertical-align:top;">E-signed By: <?php echo 'NA'; ?><br>Date: <?php echo 'NA'; ?></td>
-				</tr>
-				
-		</table>
-       <!-- QR Code added by shankhpal shende on 16/08/2022 -->
-		<div style="text-align: left;"> <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>"></div>
+	<!-- for cancellation in certification part This updated for the suspension / cancellation process  : Akash [01-06-2023] -->
+	<p></p>
+	<table width="100%" border="1" style="margin-top:50px;">
+		<tr>
+			<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>PART IV</b></th>
+			<th style="padding:10px;" width="50%" cellspacing="50" align="left"><b>See Rule no. 7</b></th>		
+		</tr>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">Endorsement of the competent authority about suspension or cancellation of the Certificate of Authorization:</td>
+			<td style="padding:10px; vertical-align:top;">
+				E-signed By:	<?php if(!empty($suspended_by)){ echo $suspended_by; }else{ echo 'NA'; } ?><br>
+				Date: <?php echo date("d-m-y"); ?>
+			</td>
+		</tr>
+		<tr>
+			<td style="padding:10px; vertical-align:top;">
+					<?php if ($isForSuspension != null && $isForSuspension == 'Yes') {
+						echo "This Certificate is Suspended For Misgrading";
+					} else if ($isForCancellation !=null && $isForCancellation == 'Yes') { 
+						echo "This Certificate is Cancelled For Misgrading";
+					}?> 
+			</td>
+			<td style="padding:10px; vertical-align:top;">
+				<table width="100%" border="1">
+					<tr>
+						<td style="padding:10px; vertical-align:top;"><b>Suspension/Cancellation</b></td>
+						<td style="padding:10px; vertical-align:top;"><b>For Period</b></td>
+					</tr>
+					<tr>
+						<td style="padding:10px; vertical-align:top;">
+						<b>Details: <?php echo $details_of_action; ?></b>
+					</td>
+						<td style="padding:10px; vertical-align:top;"><b>
+
+						</b></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+	<!-- QR Code added by shankhpal shende on 16/08/2022 -->
+	<div style="text-align: left;"> <img width="100" height="100" src="<?php echo $result_for_qr['qr_code_path']; ?>"></div>
 	

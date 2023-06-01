@@ -36,7 +36,7 @@
 															<dt class="col-sm-4">Firm Name: </dt>
 															<dd class="col-sm-8"><?php echo $firmDetails['firm_name']; ?></dd>
 															<dt class="col-sm-4">Sample Code: </dt>
-															<dd class="col-sm-8"><?php echo $_SESSION['sample_code']; ?></dd>
+															<dd class="col-sm-8"><?php echo $sample_code; ?></dd>
 															<dt class="col-sm-4">Commodity</dt>
 															<dd class="col-sm-8"><?php echo implode(',', $sub_commodity_value); ?></dd>
 														</dl>
@@ -64,14 +64,28 @@
 										
 									</div>
 								</div>
+									
 							</div>
-							<div class="card-footer cardFooterBackground">
-								<label><?php echo $this->form->submit('Proceed to Esign', array('id'=>'proceed_to_esign', 'label'=>false,'class'=>'btn btn-success')); ?></label>
+							<div class="card-footer">
+								
+								<?php 
+									if(!empty($btn_to_re_esign)) { 
+										echo $this->Form->control('re_esign_concent', array('type'=>'checkbox', 'id'=>'re_esign_concent', 'label'=>'	I confirm the changes and proceed to re-esign','escape'=>false));
+						
+										echo $this->form->submit('Proceed', array('name'=>'proceed_btn','id'=>'proceed_btn', 'label'=>false,'class'=>'float-right btn btn-success'));
+									} 
+								 ?>
+							
+								<a href="../dashboard/home" class="btn btn-secondary float-right">Back</a>
 							</div>
 						</div>
 					<?php echo $this->Form->end(); ?>
 				</div>
+				<!-- moved out of form tag on 28-05-2021 for Form Based Esign method -->
+				<?php echo $this->element('esign_views/re_esign_pdf_popup'); ?>
 			</div>
 		</div>
 	</section>
 </div>
+<input type="hidden" id="appl_id" value="<?php echo $customer_id; ?>">
+<?php echo $this->Html->script('Othermodules/suspension_home'); ?>

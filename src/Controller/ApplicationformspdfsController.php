@@ -1681,11 +1681,25 @@ class ApplicationformspdfsController extends AppController{
 		$this->set('get_grant_details',$get_grant_details);
 		$this->set('user_full_name',$user_full_name);
 		$this->set('certificate_valid_upto',$certificate_valid_upto);
+
+		//This is added to check the URL without the passed values for Suspension / Cancellation Module - Akash [01-06-2023]
+		$url = $this->request->referer();
+		$parsedUrl = parse_url($url);
+		if (isset($parsedUrl['path'])) {
+			$path = $parsedUrl['path'];
+		} 
 		
+
+
 		//added this condition on 08-06-2019 by Amol
 		//to proceed for re esigning renewal grant if session is set and check previous URL
 		if($this->Session->read('re_esigning')=='yes' && 
-			($this->request->referer('/',true)=='/othermodules/re_esign_module' || $this->request->referer('/',true)=='/othermodules/update-firm-details')){//updated new condition on 24-12-2021 by Amol, re-esign for firm details updates
+			(
+				$this->request->referer('/',true)=='/othermodules/re_esign_module' || 
+				$this->request->referer('/',true)=='/othermodules/update-firm-details' ||
+				$path //=> This is added for Suspension / Cancellation PDF changes. - Akash [01-06-2023]
+		
+			)){//updated new condition on 24-12-2021 by Amol, re-esign for firm details updates
 			
 			//added below code and conditions on 08-01-2021 by Amol
 			$user_full_name = array();
@@ -1718,7 +1732,7 @@ class ApplicationformspdfsController extends AppController{
 			
 			//added lines below on 08-01-2021 by Amol
 			$this->set('get_grant_details',$get_grant_details);
-			$this->set('user_full_name',$user_full_name);																						   
+			$this->set('user_full_name',$user_full_name);
 			$this->set('certificate_valid_upto',$certificate_valid_upto);
 
 			//This below line is added for the QR Code genration on Shankhpal [16-08-2022]	
@@ -1726,6 +1740,34 @@ class ApplicationformspdfsController extends AppController{
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 			$result_for_qr = $this->Customfunctions->getQrCode($data);
 			$this->set('result_for_qr',$result_for_qr);
+
+			#To check if the application is for Surrender Flow - Akash [14-04-2023]
+			$isSurrender = $this->DmiSurrenderFinalSubmits->checkIfSurrender($customer_id);
+			$this->set('isSurrender',$isSurrender);
+
+			#Check if the application is for Suspension / Cancellation - Akash [01-06-2023]
+			$this->loadModel('DmiMmrActionFinalSubmits');
+			$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id, 'sample_code' => $_SESSION['sample_code']])->order('id DESC')->first();
+		
+			if (!empty($actionDetails)) {
+				$isForSuspension = ($actionDetails['for_suspension'] == 'Yes') ? 'Yes' : 'No';
+				$isForCancellation = ($actionDetails['for_cancel'] == 'Yes') ? 'Yes' : 'No';
+				$suspended_by = $this->DmiUsers->getFullName($actionDetails['by_user']);
+				$status_mmr = $actionDetails['status'];
+				$details_of_action = $this->DmiMmrActionFinalSubmits->detailsForPdf($actionDetails['customer_id']);
+			} else {
+				$isForSuspension = null;
+				$isForCancellation = null;
+				$suspended_by = null;
+				$status_mmr = null;
+			}
+			
+			$this->set('isForSuspension',$isForSuspension);
+			$this->set('isForCancellation',$isForCancellation);
+			$this->set('suspended_by',$suspended_by);
+			$this->set('status_mmr',$status_mmr);
+
+		
 
 			$this->generateGrantCerticateToReEsignPdf('/Applicationformspdfs/grantCaCertificatePdf'); 
 			//$this->create_grant_certificate_pdf_to_re_esign();
