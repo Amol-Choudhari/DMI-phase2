@@ -13,16 +13,49 @@
 	.cRed{
 		color: red;
 	}
+	
 </style>
 
 	<?php if ($isSurrender== 'yes') { ?>
 		<table width="100%" border="1">
 			<tr>
 				<td>
-					<h4 class="cRed">This Application is Surrendered on Date: <?php echo date('d-m-y'); ?></h4>
+					<h4 class="cRed">
+						This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+					</h4>
 				</td>
 			</tr>
 		</table>
+	<?php } elseif ($isForSuspension != null && $isForSuspension == 'Yes') { ?>
+
+		<table width="100%" border="1">
+			<tr>
+				<td>
+					<h4 class="cRed">
+						This Certificate of Authorisation is Suspended by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+					</h4>
+				</td>
+			</tr>
+		</table>
+
+ 	<?php } elseif ($isForCancellation !=null && $isForCancellation == 'Yes') { ?>
+
+		<table width="100%" border="1">
+			<tr>
+				<td>
+					<h4 class="cRed">
+						This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+					</h4>
+				</td>
+			</tr>
+		</table>
+
 	<?php } ?>
 
 	<table width="100%" border="1">
@@ -467,6 +500,9 @@
 					<th style="padding:10px;" width="30%" cellspacing="50" align="left"><b>Signature & Designation of Authorised Officer</b></th>
 					
 				</tr>
+				
+				
+							
 				<!-- element call to show change updates added on 02-01-2023-->
 				<?php // echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
 		</table>
@@ -498,7 +534,7 @@
 		<tr>
 			<td style="padding:10px; vertical-align:top;">
 					<?php if ($isForSuspension != null && $isForSuspension == 'Yes') {
-						echo "This Certificate is Suspended For Misgrading";
+						echo "This is the	". $details_of_action['misgrade_level'] ."	for this Packer therefore this Certificate is Suspended For	". $details_of_action['misgarde_details'];
 					} else if ($isForCancellation !=null && $isForCancellation == 'Yes') { 
 						echo "This Certificate is Cancelled For Misgrading";
 					}?> 
@@ -511,11 +547,11 @@
 					</tr>
 					<tr>
 						<td style="padding:10px; vertical-align:top;">
-						<b>Details: <?php echo $details_of_action; ?></b>
-					</td>
-						<td style="padding:10px; vertical-align:top;"><b>
-
-						</b></td>
+						 	<b class="cRed"><?php echo $details_of_action['actionName']; ?></b>
+						</td>
+						<td style="padding:10px; vertical-align:top;">
+							<b class="cRed"><?php echo $details_of_action['periodMonth']; ?></b>
+						</td>
 					</tr>
 				</table>
 			</td>

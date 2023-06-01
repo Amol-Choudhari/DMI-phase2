@@ -1675,19 +1675,33 @@ class AjaxFunctionsController extends AppController{
 		$this->loadComponent('Randomfunctions');
 		$resultArray = $this->Randomfunctions->dashboardApplicationSearch($customer_id,$check_user_role);
 
+		//below rejected data fetch using customer id if rejected status is rejected by laxmi on 13-01-2023
+		$this->loadModel('DmiRejectedApplLogs');
+        $rejectedData = $this->DmiRejectedApplLogs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id)))->last();
+
+		//Check If application is surrender - Akash [10-05-2023]
+		$isApplSurrender = $this->Customfunctions->isApplicationSurrendered($customer_id);
 
 		if ($resultArray['no_result']==null) {
 
-			echo "<table class='table'>
+			if (!empty($isApplSurrender)) {
+				echo "<b>This Application is surrendered on ".$isApplSurrender." and no longer available.</b>";
+			} else {
+				echo "<table class='table table-sm'>
 				<thead>
 					<tr>
 						<th>Application Id</th>
 						<th>District</th>
 						<th>Position</th>
 						<th>Process</th>
-						<th>Available With</th>
+						<th>Available With</th>";
 
-					</tr>
+						//if entery in rejected table with same id status is empty added by laxmi on 13-01-2023
+						if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
+							echo "<th>Status</th>";
+						}
+
+				echo "</tr>
 				</thead>
 				<tbody>
 					<tr>
@@ -1695,10 +1709,17 @@ class AjaxFunctionsController extends AppController{
 						<td>".$resultArray['firm_data']['district']."</td>
 						<td>".$resultArray['current_position']."</td>
 						<td>".$resultArray['process']."</td>
-						<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td>
-					</tr>
+							<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td> ";
+							//added by laxmi on 13-12-23
+							if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
+								echo "<td>Rejected</td>";
+							}
+
+				echo "</tr>
 				</tbody>
 			</table>";
+			}
+			
 
 		}else{
 			echo $resultArray['no_result'];

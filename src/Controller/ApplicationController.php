@@ -463,7 +463,12 @@ class ApplicationController extends AppController{
 						}
 					}
 
-					$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+					if ($application_type == 9) {
+						$message = "Application of Surrender for ".$firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					}else{
+						$message = $firm_type_text.' - '.ucwords(str_replace('_',' ',$section_details['section_name'])).' section, '.$process_query.' successfully';
+					}
 
 					#Action: Application Section Saved
 					if ($application_type == 4) {
@@ -505,7 +510,14 @@ class ApplicationController extends AppController{
 				if ($final_submit_call_result == true) {
 
 					$this->Customfunctions->saveActionPoint('Application Final Submit', 'Success'); #Action
-					$message = $firm_type_text.' - Final submitted successfully ';
+
+					// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+					if ($application_type == 9) {
+						$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+					}else{
+						$message = $firm_type_text.' - Final submitted successfully ';
+					}
+
 					$message_theme = 'success';
 
 					//For Chemist i.e Apllication Type 4 then redirect to Chemist Home after Final Submit -> Akash [29-09-2021].
@@ -850,14 +862,41 @@ class ApplicationController extends AppController{
 							$this->loadModel('DmiRenewalSubmissionLogs');
 							//get record id to update the status of renewal final submit
 							$getId = $this->DmiRenewalSubmissionLogs->find('all',array('fields'=>'id','conditions'=>array('customer_id'=>$customer_id,$grantDateCondition),'order'=>'id desc'))->first();
+	   
+							//for remark  added  by laxmi B. on 30-1-23
+                            if(null !== ($this->request->getData('late_remark'))){
+                               $remark = $this->request->getData('late_remark');
+                            }else{
+								$remark = $intRemark;
+                            }
+							
+							if (!empty($getId)) {
+								
 							$renRecordId = $getId['id'];
 							$renewalSubmissionLogEntity = $this->DmiRenewalSubmissionLogs->newEntity(array(
 
 								'id'=>$renRecordId,
-								'remark'=>$this->request->getData('late_remark'),
+									//'remark'=>$this->request->getData('late_remark'),									
+									'remark' =>$remark,//commented above and added new by laxmi B. on 30-1-23
+									'modified'=>date('Y-m-d H:i:s'),
+									'status'=>'submitted'
+								));
+								
+							} else { //else is added on 13-01-2023, to add new entry if record not found, specially for renewal applied in phase I
+								
+								$renewalSubmissionLogEntity = $this->DmiRenewalSubmissionLogs->newEntity(array(
+
+									'customer_id'=>$customer_id,
+									'form_type'=>$form_type,
+									'last_validity'=>$validity_date,
+									//'remark'=>$this->request->getData('late_remark'),
+									'remark' =>$remark,//commented above and added new by laxmi B. on 30-1-23
+									'created'=>date('Y-m-d H:i:s'),
 								'modified'=>date('Y-m-d H:i:s'),
 								'status'=>'submitted'
 							));
+							}
+							
 
 							$this->DmiRenewalSubmissionLogs->save($renewalSubmissionLogEntity);
 						}
@@ -869,7 +908,14 @@ class ApplicationController extends AppController{
 						$this->DmiSmsEmailTemplates->sendMessage(5,$customer_id); #APPLICANT , RO , DDO
 						$this->DmiSmsEmailTemplates->sendMessage(6,$customer_id); #Applicant , RO , DDO
 						
-						$message = $firm_type_text.' - Final submitted successfully ';
+
+						// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+						if ($application_type == 9) {
+							$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+						}else{
+							$message = $firm_type_text.' - Final submitted successfully ';
+						}
+
 						$message_theme = 'success';
 						$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
 
@@ -991,9 +1037,17 @@ class ApplicationController extends AppController{
 		$final_submit_call_result =  $this->Customfunctions->applicationFinalSubmitCall($customer_id,$all_section_status);
 
 		if ($final_submit_call_result == true) {
+
+			// This message is changed for the Surrender module (SOC) - Akash [12-05-2023]
+			if ($application_type == 9) {
+				$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
+			}else{
 			$message = $firm_type_text.' - Final submitted successfully ';
+			}
+
 			$message_theme = 'success';
 			$redirect_to = '../applicationformspdfs/'.$section_details['forms_pdf'];
+			
 		} else {
 			$message = $firm_type_text.' - All Sections not filled, Please fill all Section and then Final Submit ';
 			$message_theme = 'failed';

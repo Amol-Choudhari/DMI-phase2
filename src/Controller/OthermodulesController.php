@@ -179,12 +179,19 @@ class OthermodulesController extends AppController{
 
 		
 		//creating application type session
-		$applicationType = 1;
-		if ($grant_details['pdf_version'] > 1) {
 
-			$applicationType = 2;
-		} 
-
+		//For Management of Misgrading / SCN / CAN Module  added the temp session for application type - Akash [01-06-2023]
+		if (isset($_SESSION['application_type'])) {
+			$application_type = $this->Session->read('application_type');
+		} else {
+			$applicationType = 1;
+			if ($grant_details['pdf_version'] > 1) {
+	
+				$applicationType = 2;
+			} 
+		}
+	
+		pr($application_type);exit;
 		$this->Session->write('application_type',$applicationType);
 
 		exit;
@@ -2043,7 +2050,7 @@ class OthermodulesController extends AppController{
 		//get the view for diffrent module
 		if ($for_module == 'Suspension') {
 
-			$this->Session->write('application_type','Suspension'); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as SPN
+			$this->Session->write('application_type',13); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as SPN
 
 			$dashMessage = "Note: This module is to:<br>
 			1. To process the Suspension of the Packer through AQCMS system online with option to select time period for suspension.<br>
@@ -2052,7 +2059,7 @@ class OthermodulesController extends AppController{
 	
 		} elseif ($for_module == 'Cancellation') {
 
-			$this->Session->write('application_type','Cancellation'); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as CAN
+			$this->Session->write('application_type',14); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as CAN
 
 			$dashMessage = "Note: This module is to:<br>
 			1. To process the Cancellation of the Packer through AQCMS system online.<br>

@@ -1201,6 +1201,8 @@ class CustomersController extends AppController {
 		//Set the Layout
 		$this->viewBuilder()->setLayout('secondary_customer');
 		//Load Models
+		$this->loadModel('DmiApplicationPdfRecords');
+		$this->loadModel('DmiRenewalApplicationPdfRecords');
 		$this->loadModel('DmiFinalSubmits');
 		$this->loadModel('DmiRenewalFinalSubmits');
 		$this->loadModel('DmiGrantCertificatesPdfs');
@@ -1211,6 +1213,10 @@ class CustomersController extends AppController {
 		$this->loadModel('DmiAdpFinalSubmits');
 		$this->loadModel('DmiSurrenderFinalSubmits');
 		$this->loadModel('DmiAdvPaymentDetails');
+
+	
+		$commoditiesDetails = $this->Customfunctions->commodityNames($customer_id);
+		$this->set('commoditiesDetails',$commoditiesDetails);
 
 		// to get export unit added by shankhpal shende on 08/11/2022 
 		$export_unit_status = $this->Customfunctions->checkApplicantExportUnit($customer_id);
@@ -1927,9 +1933,12 @@ class CustomersController extends AppController {
 
 	// customer_information function added by Laxmi Bhadade on 18-11-22
 	public function customerInformation(){
+
 		$result = '';
 		$commodity = '';
+
 		$this->viewBuilder()->setLayout('document_check_list_layout');
+
 		$this->loadModel('DmiFirms');
 		$this->loadModel('DmiCustomers');
 		$this->loadModel('DmiStates');
@@ -1940,17 +1949,22 @@ class CustomersController extends AppController {
 		
 
 		$conn = ConnectionManager::get('default');
+
 			if( $this->request->is('post') ) {
+
 			if($this->request->getdata('name') == 'primary'){
+
 				$customer_id = $this->request->getdata('id');
 				$primary_data = $this->DmiCustomers->find('all')->where(array('customer_id IS' => $customer_id))->first();
+
 				if (!empty($primary_data->district )) {
 				$dist = $this->DmiDistricts->find('all',array('fields'=>array('district_name','state_id')))->where(array('id IS'=>$primary_data->district , 'state_id IS'=> $primary_data->state))->first();
 				$state = $this->DmiStates->find('all',array('fields'=>array('state_name')))->where(array('id IS'=> $primary_data->state , 'id IS'=> $dist->state_id))->first();
-				
 				}
+
 				if ($primary_data  !=null) {
-			$result= "<table class= table table-bordered >
+
+					$result= "<table class= table table-bordered>
 							<thead>
 								<tr>
 								<th>ID</th>
@@ -1959,47 +1973,50 @@ class CustomersController extends AppController {
 								<th>State</th>
 								</tr>
 							</thead>
+								<tbody>
 								<tr id= custmer_data >
 								<td id= id>".$customer_id."</td>
 								<td id= name>".$primary_data->f_name." &nbsp; ".$primary_data->l_name."</td>
 								<td id= district>".$dist->district_name."</td>
 								<td id= state>".$state->state_name."</td>
-								
 								</tr>
-								
-								
 							</tbody>
-							</table>
-						";
+							</table>";
 					
 						echo $result;
-					}else{
 
+					}else{
 						echo $result = "<p class = 'text-danger' id = 'danger-id'>This Customer Id is not valid</p>";
-				
-				
 					}
 						
+				exit; // This is added Intensionally
 					
-				exit;
 			}elseif($this->request->getdata('name') == 'firm'){
+
 					$customer_id = $this->request->getdata('id');
 
+				//This Code is added to this function to avoid the customer ids if the firm is surrendered For SOC - Akash [12-05-2023]
+				$isSurrender = $this->Customfunctions->isApplicationSurrendered($customer_id);
+
+				//This all will be avoided if the customer id is found in the Surrendered grant table 
+				if (empty($isSurrender)) {
 					
 				$firm_data = $this->DmiFirms->find('all')->where(array('customer_id IS' => $customer_id))->first();
+
 				//if commodity is one then select packaging type
-				
 					if(!empty($firm_data->commodity) && $firm_data->commodity > 1) {
 					
 						$commodity = $this->MCommodityCategory->find('all',array('fields'=>array('category_name')))->where(array('category_code IS'=> $firm_data->commodity))->first();
-
 							if(!empty ($commodity->category_name)) { 
 								$commodity = $commodity->category_name;
 							} else { 
 								$commodity = "Not found ";
 							}
+
 				}else{
+
 					if(!empty($firm_data->packaging_materials) && $firm_data->commodity == 1){
+
 						$packaging =  explode(',', $firm_data->packaging_materials);
 							foreach($packaging as $packtype){
 								$pacging_type = $this->DmiPackingTypes->find('all',array('fields'=>array('packing_type')))->where(array('id IS'=> $packtype))->first();
@@ -2012,13 +2029,9 @@ class CustomersController extends AppController {
 								$commodity = "Not found ";
 								}
 							} 
-							
 						}
 				}
 
-                   
-                
-				
 					$grant_date = $this->DmiGrantCertificatesPdfs->find('all',array('fields'=>array('date')))->where(array('customer_id IS'=> $customer_id))->last();
 						if(!empty($grant_date->date)){
 							$grant_date = $grant_date->date;
@@ -2026,22 +2039,33 @@ class CustomersController extends AppController {
 							$date =  date('d-m-Y', strtotime("$uptoDate +1 Months"));
 						}
 					
+					//added by laxmi on 27-12-2022
+					$status = "";
 					if(!empty($date)){
-					$current_date = date("d-m-Y");
-					if($current_date <  $date ){
-						$status = "Inactive";
+
+						$current_date = date("Y-m-d");
+						$current_date = date("Y-m-d", strtotime($current_date));
+						$date = date("Y-m-d", strtotime($date));
+
+						if($date > $current_date ){
+							$status = "Valid";
 					}else{
-						$status = "Active valid on &nbsp;" .$grant_date;
-					}
-				}else{
-						$status = "Not Found";
+							$status = "Invalid";
 				}
 					
+												
+					
+						
 					if ($firm_data  !=null) {
 				
 					$result .= "<tr><td><b>Name:</b></td><td>".$firm_data->firm_name."</td></tr>";
 					$result .= "<tr><td><b>Commodity:</b></td><td>".$commodity."</td></tr>";
+						//added by laxmi on 27-12-2022
+						if(!empty($status && !empty($uptoDate))){
 					$result .= "<tr><td><b>Status:</b></td><td>".$status."</td></tr>";
+								$result .= "<tr><td><b>Valid Upto:</b></td><td>".$uptoDate."</td></tr>";
+						}
+						
 						
 						echo $result;
 					}else{
@@ -2050,21 +2074,97 @@ class CustomersController extends AppController {
 				
 				
 					}
-				exit;
+							//else part added by laxmi on 06-02-2023
+					}else{
+						echo $result = "<tr><td></td><td>Sorry, This Customer Id you have searched is not valid</td></tr>";
+					}
+
+				} else {
+					echo "<b>This Application is surrendered on ".$isSurrender." and no longer available.</b>";
+				}
+
+				exit; // This is added Intensionally
 
 			}else{
 				
-				$customer_id_not_valid_msg = 'Sorry, This Customer Id is not valid';
+				$result = "<tr><td></td><td>This Customer Id you have searched is not valid</td></tr>";
+				echo $result;
+				exit; // This is added Intensionally
 
-						// $this->set('customer_id_not_valid_msg', $customer_id_not_valid_msg);
-						echo $result = "<tr><td></td><td>This Customer Id you have searched is not valid</td></tr>";
+			}
+		}
+	}
+
+	//To fetch certified firm list added by laxmi B. dated on 06-02-23
+	public function certifiedFirmList(){
+
+		$this->viewBuilder()->setLayout('customer_information_layout');
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiCustomers');
+		$this->loadModel('DmiStates');
+		$this->loadModel('DmiDistricts');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('DmiGrantCertificatesPdfs');
+		$this->loadModel('DmiPackingTypes');
+
+
+		if(null!== ($this->request->getData('save'))){
+
+			$data = $this->request->getData();
+			$type = $data['type'];
+			$firmname = array();
+			$customer_id = array();
+			$commodity = array();
+			$date = array();
+			$firmData = array();
+			$i=0;
+			$s=1;
+			$current_date = date('d-m-Y');
+			$grantData = $this->DmiGrantCertificatesPdfs->find('all')->where(array('customer_id LIKE'=>'%/'.$type.'/%',))->order(array('id'=>'desc'))->toArray();
+
+			if(!empty($grantData)){
+
+				foreach ($grantData as $key => $grantdata) {
+
+					//This Code is added to this function to avoid the customer ids if the firm is surrendered For SOC - Akash [12-05-2023]
+					$isSurrender = $this->Customfunctions->isApplicationSurrendered($grantdata['customer_id']);
+					
+					if (empty($isSurrender)) {
+						
+						$uptoDate = $this->Customfunctions->getCertificateValidUptoDate($grantdata['customer_id'], $grantdata['date']);
+						$date =  date('d-m-Y', strtotime("$uptoDate +1 Months"));
+						$date =date('Y-m-d', strtotime($date));
+						$current_date = date('Y-m-d', strtotime($current_date));
+							
+						if($date > $current_date){
+							
+							$customerId[$i] = $grantdata['customer_id'];
+							$firmData = $this->DmiFirms->find('all')->where(array('delete_status IS'=> NULL, 'customer_id'=>$customerId[$i]))->order(array('firm_name'=> 'asc'))->first();
+							if(!empty($firmData)){
+								$commodityData = $this->MCommodityCategory->find('all')->where(array('category_code IS'=>$firmData['commodity']))->first();
+
+								$result= "<tr><td>".$i+$s."</td>";
+								$result.= "<td>".$customer_id[$i] = $firmData['customer_id']."</td>";
+								$result.= "<td>".$firmname[$i] = $firmData['firm_name']."</td>";
+								$result.= "<td>".$commodity[$i] = $commodityData['category_name']."</td>";
+								$result.= "<td>".$date = $date."</td></tr>";
+								echo $result;
+							}
 				
+							$i=$i+1;
+						}else{
+							$result= "<p>Records not found..</p>";
 							echo $result;
-						exit;
+						}
+					} 
+				} 
+				
+				exit; // This is intensionally added.
 			}
 		}
 	}
 
 
 }
+
 ?>

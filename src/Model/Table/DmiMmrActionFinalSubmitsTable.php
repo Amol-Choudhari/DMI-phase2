@@ -80,10 +80,39 @@ class DmiMmrActionFinalSubmitsTable extends Table{
 	public function detailsForPdf($customer_id){
 
 		$details =	$this->find()->where(['customer_id' => $customer_id])->order('id DESC')->first();
+
+		if (!empty($details)) {
+			//Misgrade Category Info
+			$DmiMmrCategories = TableRegistry::getTableLocator()->get('DmiMmrCategories');
+			$misgrade_category = $DmiMmrCategories->getMisgradingCategory($details['misgrade_category']); 
+
+			//Misgrade Category Info
+			$DmiMmrLevels = TableRegistry::getTableLocator()->get('DmiMmrLevels');
+			$misgrade_level = $DmiMmrLevels->getMisgradingLevel($details['misgrade_level']);
+			
+
+			//Misgrade Category Info
+			$DmiMmrActions = TableRegistry::getTableLocator()->get('DmiMmrActions');
+			$misgrade_action = $DmiMmrActions->getMisgradingAction($details['misgrade_action']);
+			
+			//Misgrade Category Info
+			$DmiMmrTimePeriod = TableRegistry::getTableLocator()->get('DmiMmrTimePeriod');
+			$time_period = $DmiMmrTimePeriod->getTimePeriod($details['time_period']);
+			
+			
+			
+			$detailsArray = [
+				'misgarde_details' => $misgrade_category['misgrade_category_name'] . " : " . $misgrade_category['misgrade_category_dscp'],
+				'misgrade_level' => $misgrade_level['misgrade_level_name'],
+				'actionName' => $misgrade_action['misgrade_action_name'],
+				'periodMonth' => $time_period['month']
+			];
+		} else {
+			$detailsArray = array();
+		}
+	
+		return $detailsArray;
 		
-		$detailsArray [
-			'misgarde_details' = '';
-		];
 	}
 
 

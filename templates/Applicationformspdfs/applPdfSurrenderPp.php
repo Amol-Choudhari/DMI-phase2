@@ -6,20 +6,22 @@
 		font-size: 13pt;					
 	}
 							 
-
 	table{
 		padding: 5px;
 		font-size: 12pt;
 		font-family: times;
 	}
 				
+	.cRed{
+		color: red;
+	}
 </style>
 
 
 	<table width="100%" border="1">
 		<tr>
 			<td align="center" style="padding:5px;">		
-				<h4>Application for Approval of Surrender of Printing Press</h4>
+				<h4>Application for Approval of <b><span class="cRed">SURRENDER</span></b> of Permission of Printing Press</h4>
 			</td>
 		</tr>
 	</table>
@@ -121,9 +123,6 @@
 														$file_name = $split_file_path[count($split_file_path) - 1];?>
 													<a href="<?php echo $surrenderData[0]['printing_declaration_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
 		</tr>
-
-		<?php if ($surrenderData[0]['is_ca_have_replica'] == 'yes') { ?>
-
 			<tr>
 				<td style="padding:10px; vertical-align:top;">4.Is Associated packers conveyed ?</td>
 				<td style="padding:10px; vertical-align:top;"><?php echo $surrenderData[0]['is_packers_conveyed']; ?> <br></td>
@@ -134,8 +133,6 @@
 															$file_name = $split_file_path[count($split_file_path) - 1];?>
 														<a href="<?php echo $surrenderData[0]['is_packers_conveyed_docs']; ?>"><?php echo substr($file_name, 23); ?></a><?php }else{ echo 'NA'; }  ?></td>
 			</tr>
-			
-		<?php } ?>
 	</table>
 
 	<table>					

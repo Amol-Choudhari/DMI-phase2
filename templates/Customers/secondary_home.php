@@ -1,6 +1,21 @@
 <div class="content-wrapper">
 	<section id="applicanthome" class="content">
 		<div class="applhome container-fluid">
+		
+			<!-- This new block is added on 28-04-2023 to show In-process Application Message by Amol -->
+			<?php if (!empty($InprocessMsg)) { ?>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="alert alert-info alert-dismissible">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+							<h5><i class="icon fas fa-info"></i> Please Note !</h5>
+							<?php echo $InprocessMsg; ?>
+						</div>
+					</div>
+				</div>
+			
+			<?php } ?>
+		
 			<div id="accordion">
 				<div class="card bsc">
 					<div class="card-header" id="headingOne">
@@ -246,19 +261,17 @@
 						<div class="card-header" id="headingThree">
 							<h5 class="mb-0">
 								<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-								Approval of Designated Person Application
+								Change Request Application
 								</button>
 							</h5>
 						</div>
 						<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
 							<div class="card-body">
 								<?php 
-									#For ADP Application PDF Table View - Shankhpal [18/11/2022] 
 									if(!empty($appl_change_records)) { 
 										echo $this->element('customer_elements/pdf_table_view/application/mod_application');
 									} 
 
-									#For ADP Grant PDF Table View - Shankhpal [18/11/2022]
 									if(!empty($appl_change_grant_pdfs)) {
 										echo $this->element('customer_elements/pdf_table_view/grant/mod_grant');
 									}

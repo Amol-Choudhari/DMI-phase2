@@ -539,8 +539,12 @@ class InspectionsController extends AppController{
 				// Send to current application postion entry to all_applications_current_position Table	
 				$Dmi_appl_current_pos_table->currentUserUpdate($customer_id,$user_email_id,$current_level); //call to custom function from model			
 				
-				#SMS: RO forwarded to HO
-				$this->DmiSmsEmailTemplates->sendMessage(20,$customer_id);				
+				if($forward_to == 'RO'){
+					//$this->DmiSmsEmailTemplates->sendMessage(20,$customer_id);	#SMS: SO forwarded to RO
+				} elseif ($forward_to == 'HO') {
+					$this->DmiSmsEmailTemplates->sendMessage(20,$customer_id);	#SMS: RO forwarded to HO
+				}
+				
 				$result_message = $this->reportPopupMessage('accepted_forward',1,$section_details,$firm_type_text,$office_type);
 				$show_message = 'yes'; 
 				$redirect_url = '../dashboard/home';
@@ -811,10 +815,15 @@ class InspectionsController extends AppController{
 				//deleting record from temp esign status table, to clear that esign process reached till end succesfully.
 				//added on 01-10-2018 by Amol
 				$this->DmiTempEsignStatuses->deleteTempEsignRecord($customer_id);													 
-				$message = $firm_type_text.' - '.'Final Granted Successfully';
-				$redirect_to = '../applicationformspdfs/'.$allSectionDetails[0]['grant_pdf'];	
-				//$this->view = '/Element/message_boxes';		
 				
+				//This below code is modified for the Surrender Flow (SOC), the message needed to be diffrent - Akash[12-05-2023]
+				if($application_type == '9'){
+					$message = "Application for surrender of $firm_type_text - Final Granted Successfully";
+				}else{
+				$message = $firm_type_text.' - '.'Final Granted Successfully';
+				}
+			
+				$redirect_to = '../applicationformspdfs/'.$allSectionDetails[0]['grant_pdf'];	
 				
 		}elseif(!empty($customer_level_3_approved)){
 				
@@ -836,9 +845,14 @@ class InspectionsController extends AppController{
 				//deleting record from temp esign status table, to clear that esign process reached till end succesfully.
 				//added on 01-10-2018 by Amol 
 				$this->DmiTempEsignStatuses->deleteTempEsignRecord($customer_id);
+
+				//This below code is modified for the Surrender Flow (SOC), the message needed to be diffrent - Akash[12-05-2023]
+				if($application_type == '9'){
+					$message = "Application for surrender of $firm_type_text - Final Granted Successfully";
+				}else{
 				$message = $firm_type_text.' - '.'Final Granted Successfully';
+				}
 				$redirect_to = '../applicationformspdfs/'.$allSectionDetails[0]['grant_pdf'];	
-				//$this->view = '/Element/message_boxes';		
 		}			
 		
 		$this->set('message',$message);

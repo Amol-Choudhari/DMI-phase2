@@ -7,6 +7,8 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Datasource\EntityInterface;
 use QRcode;
+use Cake\Datasource\ConnectionManager;
+
 
 class CustomfunctionsComponent extends Component {
 
@@ -481,21 +483,25 @@ class CustomfunctionsComponent extends Component {
 			$appl_type = $this->Session->read('application_type');
 		}
 		
-		if ($appl_type == 5) { #For Fifteen Digit Code (FDC) - Amol [15/05/2022]
+		if ($appl_type == 5) {	#For Fifteen Digit Code (FDC) - Amol [15/05/2022]
 
 			$form_type = 'FDC';
 
-		} elseif ($appl_type == 6) { #For Approval of E-Code (EC) - Amol [15/05/2022]
+		} elseif ($appl_type == 6) {	#For Approval of E-Code (EC) - Amol [15/05/2022]
 			
 			$form_type = 'EC';
 			
-		} elseif ($appl_type == 8) {  #For Approval of Desginated Person (ADP) - Shankhpal [17/11/2022]
+		} elseif ($appl_type == 8) {	#For Approval of Desginated Person (ADP) - Shankhpal [17/11/2022]
 			
 			$form_type = 'ADP';
 
-		} elseif ($appl_type == 9) {  #For Surrender of Certificate (SOC) - Akash [17/11/2022]
+		} elseif ($appl_type == 9) {	#For Surrender of Certificate (SOC) - Akash [17/11/2022]
 			
 			$form_type = 'SOC';
+
+		} elseif ($appl_type==10) {		#For Routine Inspection (RTI) - Shankhpal [12/12/2022] 
+			
+			$form_type = 'RTI';
 		}
 
 		return $form_type;
@@ -881,7 +887,8 @@ class CustomfunctionsComponent extends Component {
 			$section_model = TableRegistry::getTableLocator()->get($each_table);
 
 			// find the max modified date by pravin 30//05/2017
-			$latest_modified__date_id = $section_model->find('all', array('fields'=>'modified', 'conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('id desc')))->first();
+			//changed order by to 'modified desc' from 'id desc' on 21-04-2023, to solve Ro to MO or RO to applicant comments final submits issues
+			$latest_modified__date_id = $section_model->find('all', array('fields'=>'modified', 'conditions'=>array('customer_id IS'=>$customer_id),'order'=>array('modified desc')))->first();
 			if (isset($latest_modified__date_id['modified'])) {
 				$latest_modified__date = $latest_modified__date_id['modified'];
 			}
@@ -3503,18 +3510,54 @@ class CustomfunctionsComponent extends Component {
 		}
 
 	
-
 		$DmiCertQrCodes = TableRegistry::getTableLocator()->get('DmiCertQrCodes'); //initialize model in component
 				
 		require_once(ROOT . DS .'vendor' . DS . 'phpqrcode' . DS . 'qrlib.php');
 		
-		if ($type == 'CHM') {
+		
+		if($type == 'SOC'){ # For Surrender Flow (SOC)
+		
+			$split_customer_id = explode('/',$result[0]); 
+			if ($split_customer_id[1] == 1) {
+				$data = "This Certificate of Authorisation is cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+			} elseif ($split_customer_id[1] == 2) {
+				$data = "This Permission to Printing Press is cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n". 
+				"Applicant should do the Submission of balance printed material and declaration that applicant will not print under Agmark.\n\n" .
+				"If, violation is observed than action shall be taken as per APGM Act and GGM Rule.";
+			} elseif ($split_customer_id[1] == 3) {
+				$data = "This Approval of Laboratory is cancelled by the competent authority dated " . htmlspecialchars($isSurrender) . ".\n\n". 
+						"Laboratory should be issue NOC to associated packer to migrate to another Laboratory for commodity/ies under AGMARK.
+						If a violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+			}
+
+		} elseif ($type == 'SPN') { # For Suspension Flow (SCN)
+			
+			$data = "This Certificate of Authorisation is Suspended by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+
+		} elseif ($type == 'CAN') {	# For Cancellation Flow (CAN)
+
+			$data = "This Certificate of Authorisation is Cancelled by the competent authority dated " . date('d-m-Y') . ".\n\n" .
+					"Therefore Applicant do not grade and mark " . $this->commodityNames($result[0]) . " commodity/ies under AGMARK.\n\n" .
+					"If violation is observed, action shall be taken as per APGM Act and GGM Rule.";
+
+		}elseif ($type == 'CHM') {	# For Chemist Flow (CHM)
+
 			$data = "Chemist Name :".$result[0]." ## "." CA ID :".$result[1]." CA Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4];
-		}elseif ($type=='FDC') {
+		
+		}elseif ($type=='FDC') {	# For 15 Digit Code Flow (FDC)
+
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"."Region : ".$result[4]."##".$result[5];		  
-		}elseif($type=='ECode'){
+		
+		}elseif($type=='ECode'){	# For  E Code Flow (EC)
+
 			$data = "CA ID : ".$result[0]." ## "." CA Name : ".$result[1]."##"." Chemist Name : ".$result[2]."##"." Date : ".$result[3]."##"." Region : ".$result[4];		  
+		
 		}else{
+
 			$data = "Certificate No :".$result[0]." ## "."Firm Name :".$result[3]." ## "."Grant Date :".$result[1]." ## "." Valid up to date: ".$result[2][max(array_keys($result[2]))];
 		}
 
@@ -3526,6 +3569,7 @@ class CustomfunctionsComponent extends Component {
 		
 		$file_name = $file_path;
 		
+
 		QRcode::png($data,$file_name);
 		
 		
@@ -3575,10 +3619,11 @@ class CustomfunctionsComponent extends Component {
 	//@Author : Akash Thakre
 	//Date : 14-11-2022
 
-	public function isApplicationRejected($username){
+	//updated function on 28-04-2023 by Amol, added new parameter $appl_type=null
+	public function isApplicationRejected($username,$appl_type=null){
 
 		$DmiRejectedApplLogs = TableRegistry::getTableLocator()->get('DmiRejectedApplLogs');
-		$checkApplication = $DmiRejectedApplLogs->find('all')->select(['remark'])->where(['customer_id IS ' => $username])->first();
+		$checkApplication = $DmiRejectedApplLogs->find('all')->select(['remark'])->where(['customer_id IS ' => $username,'appl_type IS'=>$appl_type])->first();
 		if (!empty($checkApplication)) {
 			$is_rejected = $checkApplication['remark'];
 		}else{
@@ -3611,9 +3656,48 @@ class CustomfunctionsComponent extends Component {
     }
 
 
-	    
-    
-   
+
+	// Description : To get the Comma Sepearated Values for the Commodites for any Firm 
+	// Author : Akash Thakre
+	// Date : 11-05-2023
+	// For : Surrender Module (SOC) / General Use
+
+	public function commodityNames($customer_id){
+
+		//Check if the firm type is 2 i.e Printing Press avoid this as there is no commodities for Priting Press
+		$firm_type = $this->firmType($customer_id);
+
+		if ($firm_type !== 2 ) {
+
+			$conn = ConnectionManager::get('default');
+
+			$commodities = $conn->execute("
+				SELECT commodity_name 
+				FROM m_commodity 
+				WHERE commodity_code IN (
+					SELECT regexp_split_to_table(sub_commodity, ',')::integer 
+					FROM dmi_firms 
+					WHERE customer_id = '$customer_id'
+				)
+			")->fetchAll('assoc');
+			
+	
+			$commodity_names = array_map(function($c) {return $c['commodity_name'];}, $commodities);
+			
+		
+			$commodity_names = implode(',',$commodity_names);
+		
+		} else {
+			$commodity_names = '';
+		}
+		
+		
+		return $commodity_names;
+	}
+
+
+
+
 	// Author : Shankhpal Shende
 	// Description : This will return QR code for Sample Test Report
 	// Date : 04-05-2023

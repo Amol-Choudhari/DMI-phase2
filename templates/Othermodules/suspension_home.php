@@ -61,21 +61,23 @@
 												</div>
 											</div>	
 										</div>
-										
+										<div class="col-md-6">
+										<?php 
+											if(!empty($btn_to_re_esign)) { 
+												echo $this->Form->control('re_esign_concent', array('type'=>'checkbox', 'id'=>'re_esign_concent', 'label'=>'	I confirm the changes and proceed to re-esign','escape'=>false));
+											} 
+										?>
+										</div>
 									</div>
 								</div>
-									
+								
 							</div>
 							<div class="card-footer">
-								
 								<?php 
 									if(!empty($btn_to_re_esign)) { 
-										echo $this->Form->control('re_esign_concent', array('type'=>'checkbox', 'id'=>'re_esign_concent', 'label'=>'	I confirm the changes and proceed to re-esign','escape'=>false));
-						
-										echo $this->form->submit('Proceed', array('name'=>'proceed_btn','id'=>'proceed_btn', 'label'=>false,'class'=>'float-right btn btn-success'));
+										echo $this->form->submit('Proceed', array('name'=>'proceed_btn','id'=>'proceed_btn', 'label'=>false,'class'=>'float-left btn btn-success'));
 									} 
 								 ?>
-							
 								<a href="../dashboard/home" class="btn btn-secondary float-right">Back</a>
 							</div>
 						</div>

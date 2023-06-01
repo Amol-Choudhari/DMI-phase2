@@ -17,6 +17,7 @@
 .wd22  { width     : 22%; }
 .wd42  { width     : 42%; }
 .wd60  { width     : 60px; }
+.wd120 {width: 120px;}
 .wd100 { width     : 100%; }
 .wd180 { width     : 180px; }
 .wd350 { width     : 350px; }
@@ -127,6 +128,8 @@
 }
 .sub_card_header_prof {
 	background-color: #007bff !important;
+    color:#fff; 
+    /* color code added by shankhpal shende on 04/01/2023 */
 }
 .progress_bar_status {
 	font-size: 14px;
@@ -715,6 +718,7 @@ a:hover {
 #applSearchInPopup .btn{width:100px; float:right;}
 #applSearchInPopup .close{cursor:pointer;}
 
+.searchmod{width:50%; margin:100px auto 0;padding:15px;}
 
 /*login user*/
 .login-tips{border-left:1px solid #eaeaea;}
@@ -756,7 +760,9 @@ a:hover {
 .marTop{
     margin-top: 41px;
 }
-
+.marLeft {
+    margin-left: 10px;
+}
 .encodedEmail{
     color:green;font-weight:600 ;font-size: 17px;
 }
@@ -901,6 +907,10 @@ date: 04/11/2022
     width: 200%;
     overflow: auto;
  }
+.bgrtbl {
+    width: 150%;
+    overflow: auto;
+}
  .scroll{
     overflow-x: scroll;
  }
@@ -934,5 +944,17 @@ date: 04/11/2022
     color: yellow;
   }
 
-
+  .readOnly{
+    pointer-events: none;
+  }
   
+  blink {
+    animation: blinker 0.6s linear infinite;
+    color: red;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
