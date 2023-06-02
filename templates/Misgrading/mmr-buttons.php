@@ -17,10 +17,8 @@
 		if ($_SESSION['current_level'] == 'level_3') {
 			
 			echo $this->Form->submit('Scrutiny', array('name'=>'scrutiny', 'id'=>'scrutiny', 'label'=>false,'class'=>'btn btn-primary float-left ml-2','title'=>'Scrutiny this Report'));
+			echo $this->Html->link('Take Action', ['controller' => 'othermodules', 'action' => 'misgrading_home'], ['class' => 'ml-2 btn btn-outline-dark float-left']);
 		}
-
-		echo $this->Html->link('Take Action', ['controller' => 'othermodules', 'action' => 'misgrading_home'], ['class' => 'ml-2 btn btn-outline-dark float-left']);
-
 	}
 
 	if ($isAllocatd == 'yes') {

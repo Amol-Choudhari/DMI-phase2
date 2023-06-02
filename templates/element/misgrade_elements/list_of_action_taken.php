@@ -8,35 +8,35 @@
                 <th>Applicant ID</th>
                 <th>Firm Name</th>
                 <th>Firm Contact</th>
-                <th>Commodity</th>
-                <th>Certification Type</th>
-                <th>Take Action</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <?php 
-                $sr_no=1; 
+            $sr_no=1; 
+            if (!empty($actionTaken)) {
                 foreach($actionTaken as $eachdata){ ?>
-                    <tr>
-                        <td><?php echo $sr_no;?></td>
-                        <td><?php echo $eachdata['customer_id']; ?></td>
-                        <td><?php echo $eachdata['firm_name']; ?></td>
-                        <td>
-                            <?php echo "<span class='badge'>Mobile:</span>".base64_decode($eachdata['mobile_no']); ?>
-                            <br>
-                            <?php echo "<span class='badge'>Email:</span>".base64_decode($eachdata['email']); ?>
-                        </td>
-                        <td><?php echo $eachdata['certificate_type']; ?></td>
-                        <td><?php echo $eachdata['category_name']; ?></td>
-                        <td>
-                            <?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForAction', $eachdata['id']),array('class'=>'fas fa-arrow-right','title'=>'Go To Action Home')); ?>
-                            |
-                            <?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForShowcause', $eachdata['id']),array('class'=>'fas fa-exclamation-circle','title'=>'Send Show Cause Notice')); ?>
-
-                        </td>
-                    </tr>
-                <?php $sr_no++; } 
-            ?>
+                <tr>
+                    <td><?php echo $sr_no;?></td>
+                    <td><?php echo $eachdata['customer_id']; ?></td>
+                    <td><?php echo $eachdata['firm_name']; ?></td>
+                    <td>
+                        <?php echo "<span class='badge'>Mobile:</span>".base64_decode($eachdata['mobile_no']); ?>
+                        <br>
+                        <?php echo "<span class='badge'>Email:</span>".base64_decode($eachdata['email']); ?>
+                    </td>
+                    <td>
+                        <?php  if($eachdata['is_suspended'] != null && $eachdata['is_suspended'] == "Yes") { 
+                            echo "This Firm is Suspended (To get the details click on view button)";
+                        } elseif ($eachdata['is_cancelled'] != null && $eachdata['is_cancelled'] == "Yes") {
+                            echo "This Firm is Cancelled (To get the details click on view button)";
+                        }
+                         ?>
+                    </td>
+                    <td><?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForAction', $eachdata['id']),array('class'=>'fas fa-eye','title'=>'View')); ?></td>
+                </tr>
+            <?php $sr_no++; } } ?>
         </tbody>
     </table>
 </div>

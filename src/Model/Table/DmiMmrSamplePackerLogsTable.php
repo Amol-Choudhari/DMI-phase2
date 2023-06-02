@@ -90,25 +90,27 @@ class DmiMmrSamplePackerLogsTable  extends Table{
 		$attached_by = htmlentities($postData['attached_by'], ENT_QUOTES);
 		$office = htmlentities($postData['office'], ENT_QUOTES);
 
-		//add array
-		$data_array = array(	
+		// Find the last record by table ID
+		$entity = $this->find()
+			->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])
+			->order(['id' => 'DESC'])
+			->first();
 
-			'customer_id'=>$customer_id,
-			'sample_code'=>$sample_code,
-			'attached_by'=>$attached_by,
-			'office'=>$office,
-			'created'=>date('Y-m-d H:i:s'),
-			'modified'=>date('Y-m-d H:i:s'),
-			'delete_status'=>'Y'
-		);
-		
-		$saveEntity = $this->newEntity($data_array);
+		if ($entity) {
+			// Update the last record
+			$entity->attached_by = $attached_by;
+			$entity->office = $office;
+			$entity->modified = date('Y-m-d H:i:s');
+			$entity->delete_status = 'Y';
 
-		if ($this->save($saveEntity)) {
-
-			return 1;
+			if ($this->save($entity)) {
+				return true;
+			}
 		}
+
+		return false;
 	}
+
 
 	
 

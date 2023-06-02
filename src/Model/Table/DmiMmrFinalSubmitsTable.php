@@ -27,27 +27,37 @@ class DmiMmrFinalSubmitsTable extends Table{
 		return $validator;
 	}	
 
-	//Save the Entity
-	public function saveData($data)
-	{	
+
+
+
+	public function saveData($data){
+
 		$dataArray = [
-			'customer_id' => htmlentities($data['packers_id'],ENT_QUOTES),
-			'sample_code' => htmlentities($data['sample_code'],ENT_QUOTES),
+			'customer_id' => $data['packers_id'],
+			'sample_code' => $data['sample_code'],
 			'status' => 'saved',
 			'user_id' => $_SESSION['username'],
-			'created'=>date('Y-m-d H:i:s'),
-			'modified'=>date('Y-m-d H:i:s'),
-			'is_attached_packer_sample'=>'Y'
+			'created' => date('Y-m-d H:i:s'),
+			'modified' => date('Y-m-d H:i:s'),
+			'is_attached_packer_sample' => 'Y',
 		];
 
 		$entity = $this->newEntity($dataArray);
 
 		if ($this->save($entity)) {
-			return 1; // Return the saved entity ID or any other desired response
+			// Update the Flags In the Sample Inward table for packer_attached and packer_id
+			$sampleInward = TableRegistry::getTableLocator()->get('sampleInward');
+			$sampleInward->updateAll(
+				['packer_attached' => 'Y', 'packer_id' => $data['packers_id']],
+				['org_sample_code' => $data['sample_code']]
+			);
+
+			return true; // Return the saved entity ID or any other desired response
 		}
 
 		return false; // Return false if the save operation failed
 	}
+
 
 
 	// Method to scrutinized forms section by RO/SO

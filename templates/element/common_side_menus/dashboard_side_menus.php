@@ -359,6 +359,12 @@
 												<p class="nav-icon-p badge">LIMS Reports</p>
 											</a>
 										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/allocated_reports_for_mo/" class="bg-success nav-link">
+												<i class="fas fa-folder-open"></i>
+												<p class="nav-icon-p badge">Allocated LIMS Reports</p>
+											</a>
+										</li>
 									</li>
 								</ul>
 							</li>

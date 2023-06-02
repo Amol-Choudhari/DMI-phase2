@@ -99,7 +99,8 @@ class DmiMmrActionHomeLogsTable extends Table{
 				'modified'=>date('Y-m-d H:i:s'),
 				'applicant_response'=>null,
 				'reason'=>$postData['reason'],
-				'by_user'=>$_SESSION['username']
+				'by_user'=>$_SESSION['username'],
+				'is_cancelled'=>null
 			));
 				
 			if($DmiMmrActionFinalSubmits->save($enitity)){

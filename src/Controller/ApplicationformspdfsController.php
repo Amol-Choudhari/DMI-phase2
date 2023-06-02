@@ -496,9 +496,22 @@ class ApplicationformspdfsController extends AppController{
 		$Dmi_esign_status = TableRegistry::getTableLocator()->get($esign_status);
 		
 		$all_data_pdf = $this->render($pdf_view_path);		
-	
-		$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 		
+		//Below Block Is added to Change the PDF prefix if the Firm is Suspended or Cancelled- Akash [02-06-2023]
+		if ($this->Session->check('for_module')) {
+
+			$for_module = $this->Session->read('for_module');
+			
+			if ($for_module === 'Suspension') {
+				$rearranged_id = 'G-SPN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+			} elseif ($for_module === 'Cancellation') {
+				$rearranged_id = 'G-CAN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+			} 
+
+		} else {
+			$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+		}
+
 		//updated logic as per new order on 01-04-2021, 5 years validity for PP and Laboratory
 		//as the module is to reesign renewal certificate only, So now need to re-esign the first grant also, if granted with 2 years of validity
 		//but not the old first grant record

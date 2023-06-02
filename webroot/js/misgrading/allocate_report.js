@@ -90,11 +90,12 @@
 			event.preventDefault(); 
 
 			var sample_code = $('#sample_code_value').val();
-
+			var customer_id = $('#packers_id').val();
+			
 			$.ajax({
 				url: '../misgrading/remove_sample_packer',
 				type: 'POST',
-				data: {sample_code: sample_code},
+				data: {sample_code: sample_code,customer_id:customer_id},
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
 				},

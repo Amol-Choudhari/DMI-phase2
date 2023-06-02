@@ -72,7 +72,11 @@ class MisgradingController extends AppController{
 
 				$sampleCode = $orgSampleCode['org_sample_code'];
 				
-				$query = "SELECT w.stage_smpl_cd, w.tran_date, mcc.category_name, mc.commodity_name, mst.sample_type_desc, mc.commodity_code, si.report_pdf, w.org_sample_code
+				$query = "SELECT w.stage_smpl_cd, w.tran_date, mcc.category_name, 
+								mc.commodity_name, mst.sample_type_desc, 
+								mc.commodity_code, si.report_pdf, w.org_sample_code,
+								si.packer_attached,si.action_final_submit,si.scrutiny_status,si.packer_id
+			
 						FROM workflow w
 						INNER JOIN sample_inward si ON si.org_sample_code = w.org_sample_code
 						INNER JOIN m_commodity_category mcc ON mcc.category_code = si.category_code
@@ -81,6 +85,7 @@ class MisgradingController extends AppController{
 						WHERE si.status_flag != 'junked' 
 						AND w.stage_smpl_flag = 'FG' 
 						AND w.org_sample_code = '$sampleCode' 
+						AND si.action_final_submit IS NULL
 						ORDER BY w.tran_date DESC";
 				$finalGrading = $con->execute($query)->fetchAll('assoc');
 		
@@ -233,9 +238,18 @@ class MisgradingController extends AppController{
 			///Custmer IDs
 			$customer_list = [];
 
+			$this->loadModel('DmiMmrActionFinalSubmits');
+
 			foreach ($this->getCaDetails() as $subarray) {
 				foreach ($subarray as $customer) {
-					$customer_list[$customer['customer_id']] = $customer['customer_id'] . ' - ' . $customer['firm_name'];
+					$action_taken = $this->DmiMmrActionFinalSubmits->find()
+						->where(['customer_id' => $customer['customer_id']])
+						->orderDesc('id')
+						->first();
+					
+					if (empty($action_taken)) {
+						$customer_list[$customer['customer_id']] = $customer['customer_id'] . ' - ' . $customer['firm_name'];
+					}
 				}
 			}
 
@@ -1420,54 +1434,62 @@ class MisgradingController extends AppController{
 	}
 
 
-	// Description : To attach the customer id to the sample code 
+	// Description : To Remove the customer id to the sample code 
 	// Author : Akash Thakre
 	// Date : 23-05-2023
 	// For : MMR
+	// Follow Up Private Method : updateFinalSubmitDetails()
 
-	public function removeSamplePacker(){
-
+	public function removeSamplePacker()
+	{
 		$this->autoRender = false;
 
-		//get the values from post
+		// Get the values from post
 		$customer_id = $this->request->getData('customer_id');
 		$sample_code = $this->request->getData('sample_code');
 		$username = $this->Session->read('username');
 		$office = $this->DmiUsers->getPostedOffId($username);
 
-
-		$saveArray = [
-
+		// Save the entity
+		$samplePackerData = [
 			'customer_id' => trim($customer_id),
 			'sample_code' => trim($sample_code),
 			'attached_by' => trim($username),
 			'office' => $office,
 		];
+		$result = $this->DmiMmrSamplePackerLogs->removeSampleWithPacker($samplePackerData);
 
-		//Save the Entity 
-		$result = $this->DmiMmrSamplePackerLogs->removeSampleWithPacker($saveArray);
-		if ($result == true) {
-			
-			//Change the Details in the Final Submit Table
-			$this->loadModel('DmiMmrFinalSubmits');
-			$query = $this->DmiMmrFinalSubmits->query();
-			$subquery = $this->DmiMmrFinalSubmits->find();
-			$subquery->select(['id'])
-				->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])
-				->order(['id' => 'DESC'])
-				->limit(1);
-
-			$query->update()
-				->set(['is_attached_packer_sample' => 'N'])
-				->where(['id IN' => $subquery])
-				->execute();
-
+		if ($result) {
+			$this->updateFinalSubmitDetails($customer_id, $sample_code);
 		}
 
 		echo '~' . $result . '~';
 		exit;
-
 	}
+
+	// this is the private funtion for the Update the entries if sample is removed
+	private function updateFinalSubmitDetails($customer_id, $sample_code)
+	{
+		$finalSubmitTable = $this->loadModel('DmiMmrFinalSubmits');
+		$query = $finalSubmitTable->query();
+		$subquery = $finalSubmitTable->find();
+		$subquery
+			->select(['id'])
+			->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])
+			->order(['id' => 'DESC'])
+			->limit(1);
+		
+		$result = $subquery->first(); // Retrieve the first result from the subquery
+		
+		if ($result) {
+			$query
+				->update()
+				->set(['is_attached_packer_sample' => 'N'])
+				->where(['id' => $result->id])
+				->execute();
+		}
+	}
+
 
 
 
@@ -1550,7 +1572,7 @@ class MisgradingController extends AppController{
 
 		//Save Array of the allocation table
 		$saveAllocationDetails = $this->DmiMmrAllocations->saveAllocationDetails($customer_id,$sample_code,$current_level,$mo_user_id,$username);
-
+	
 		if($saveAllocationDetails == true){
 
 			$this->DmiMmrRoMoComments->saveCommentDetails($customer_id,$username,$sample_code,$mo_user_id);
@@ -1579,6 +1601,51 @@ class MisgradingController extends AppController{
 		echo '~' . json_encode($status) . '~';
 		exit;
 	}
+
+
+
+	//Description : This function is added to get the details of sample
+	//Author : Akash Thakre
+	//Date : 22-05-2023
+	//For : MMR 
+
+	public function allocatedReportsForMo(){
+
+		$this->Session->write('current_level','level_2');
+
+		$this->loadModel('DmiMmrAllocations');
+		$this->loadModel('DmiFirms');
+
+	
+		$allocationDetails = $this->DmiMmrAllocations
+		->find()
+		->select([
+			'customer_id',
+			'DmiMmrAllocations.id', // Specify the table alias for id column
+			'sample_code',
+			'current_level',
+			'created',
+			'modified',
+			'level_1',
+			'level_3',
+			'DmiUsers.f_name',
+			'DmiUsers.l_name'
+		])
+		->distinct(['customer_id'])
+		->order(['customer_id', 'DmiMmrAllocations.id DESC']) // Specify the table alias for id column
+		->leftJoin(
+			['DmiUsers' => 'dmi_users'],
+			['DmiUsers.email = DmiMmrAllocations.level_3']
+		)
+		->toArray();
+		
+		$this->set('allocationDetails',$allocationDetails);
+
+	}
+
+
+
+
 
 }
 ?>

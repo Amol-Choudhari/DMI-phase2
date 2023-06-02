@@ -58,20 +58,33 @@
 												$i = 0;
 												foreach ($final_reports as $each) :
 													$i++;
+
+													if ($each['packer_attached'] == null && $each['action_final_submit'] == null && $each['scrutiny_status']) {
+														$status = 'N/A';
+													}else{
+														if ($each['packer_attached'] == 'Yes') {
+															$status = 'N/A';
+														}elseif ($each['scrutiny_status'] == 'Yes') {
+															$status = 'N/A';
+														}else {
+															$status = 'N/A';
+														}
+													}
 													?>
+
 													<tr>
 														<td><?php echo $i; ?></td>
 														<td><?php echo $each['org_sample_code']; ?></td>
 														<td><?php echo date('d-m-Y', strtotime($each['tran_date'])); ?></td>
 														<td><?php echo $each['category_name']; ?></td>
 														<td><?php echo $each['commodity_name']; ?></td>
-														<td><?php echo $each['sample_type_desc'] ?></td>
-														<td><?php //echo $each['level_1'] ?></td>
-														<td><?php echo $this->Html->link(
+														<td><?php echo $each['sample_type_desc']; ?></td>
+														<td><?php echo $status; ?></td>
+														<td><?php /* echo $this->Html->link(
 																'',
 																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3','view'],
 																['class' => 'fas fa-eye', 'title' => 'Scrutiny Report']
-															); ?> |
+															); */?> |
 															<?php echo $this->Html->link(
 																'',
 																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3','edit'],
@@ -144,17 +157,14 @@
 											if (isset($get_allocations)) {
 												$i = 0;
 												foreach ($get_allocations as $each) :
-													$i++; ?>
+													$i++; 	
+																
+													?>
 													<tr>
 														<td><?php echo $i; ?></td>
 														<td><?php echo $each['sample_code']; ?></td>
 														<td><?php echo $each['customer_id'] ?></td>
 														<td>
-															<?php echo $this->Html->link(
-																'',
-																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['sample_code'], 'level_1','view'],
-																['class' => 'fas fa-eye', 'title' => 'View']
-															); ?> |
 															<?php echo $this->Html->link(
 																'',
 																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['sample_code'], 'level_1','edit'],

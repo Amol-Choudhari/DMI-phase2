@@ -179,85 +179,16 @@ class OthermodulesController extends AppController{
 
 		
 		//creating application type session
+		$applicationType = 1;
+		if ($grant_details['pdf_version'] > 1) {
 
-		//For Management of Misgrading / SCN / CAN Module  added the temp session for application type - Akash [01-06-2023]
-		if (isset($_SESSION['application_type'])) {
-			$application_type = $this->Session->read('application_type');
-		} else {
-			$applicationType = 1;
-			if ($grant_details['pdf_version'] > 1) {
-	
-				$applicationType = 2;
-			} 
-		}
-	
-		pr($application_type);exit;
+			$applicationType = 2;
+		} 
 		$this->Session->write('application_type',$applicationType);
 
 		exit;
 	}
 
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ RE-ESIGN ]|
-	//To Create Grant Certificate PDFs to ReESign
-	/*	public function createGrantCertificatePdfToReEsign() {
-
-		$customer_id = $this->Session->read('customer_id');
-		$split_customer_id = explode('/',$customer_id);
-
-		//$view = new View($this, false);
-		//$view->layout = null;
-		$all_data_pdf = $this->render($pdf_view_path);
-
-		if ($split_customer_id[1] == 1) {
-
-			$all_data_pdf = $view->render('/Applicationformspdfs/grant_ca_certificate_pdf');
-
-		} elseif ($split_customer_id[1] == 2) {
-
-			$all_data_pdf = $view->render('/Applicationformspdfs/grant_printing_certificate_pdf');
-
-		} elseif ($split_customer_id[1] == 3) {
-
-			$all_data_pdf = $view->render('/Applicationformspdfs/grant_laboratory_certificate_pdf');
-		}
-
-		//commented all mpdf code and used tcpdf functionality on 27-01-2020
-		/*	$this->Mpdf->init();
-			$stylesheet = file_get_contents('css/forms-style.css');
-			//$this->Mpdf->WriteHTML($stylesheet,1);
-
-			$this->Mpdf->ob_clean();
-			$this->Mpdf->SetDisplayMode('fullpage');
-			$this->Mpdf->WriteHTML($all_data_pdf);
-		*/
-
-		/*		$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
-
-		//Check Applicant Last Record Version to Increment
-		$this->loadModel('DmiGrantCertificatesPdfs');
-
-		//updated logic as per new order on 01-04-2021, 5 years validity for PP and Laboratory
-		//as the module is to reesign renewal certificate only, So now need to re-esign the first grant also, if granted with 2 years of validity
-		//but not the old first grant record
-		//on 15-09-2021 by Amol
-
-		//$list_id = $this->DmiGrantCertificatesPdfs->find('list', array('fields'=>'id', 'conditions'=>array('customer_id'=>$customer_id)))->toArray();
-		//For Version 2 Only
-		//$current_pdf_version = 2;
-
-		$grant_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'user_email_id !='=>'old_application'),'order'=>'id desc'))->first();
-		$current_pdf_version = $grant_details['pdf_version'];
-
-		//taking complete file name in session, which will be use in esign controller to esign the file.
-		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
-
-		$applicationPdf = new ApplicationformspdfsController();
-		$applicationPdf->callTcpdf($all_data_pdf,'I',$customer_id,'re_esign');
-		$applicationPdf->callTcpdf($all_data_pdf,'F',$customer_id,'re_esign');//on 27-01-2020 with save mode
-
-
-	}*/
 
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
@@ -1508,7 +1439,7 @@ class OthermodulesController extends AppController{
 											INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
 											INNER JOIN sample_inward AS si ON si.org_sample_code = dg.sample_code
 											INNER JOIN m_commodity AS mc ON mc.commodity_code = si.commodity_code
-											WHERE dd.office_id='$postedOffice'")->fetchAll('assoc');
+											WHERE dd.office_id='$postedOffice' AND dg.is_attached_packer_sample = 'Y'")->fetchAll('assoc');
 		
 	
 
@@ -1522,18 +1453,25 @@ class OthermodulesController extends AppController{
 		
 			// Add the 'showcause_status' key to the current element with the fetched value
 			$each['showcause_status'] = $showcause_status ? $showcause_status->status : null;
+
+			//Check the Final Submitted or not
 		}
 		
-		$actionTaken = $conn->execute("SELECT DISTINCT on (dmafs.customer_id) dmafs.id,dmafs.customer_id,df.firm_name, df.email,df.mobile_no,dc.certificate_type,mc.category_name,dmafs.created
+
+		$actionTaken = $conn->execute("SELECT DISTINCT on (dmafs.customer_id) dmafs.id,dmafs.customer_id,
+														df.firm_name, df.email,df.mobile_no,dmafs.status,
+														dmafs.is_suspended,dmafs.is_cancelled,dmafs.refer_to_ho
 										FROM dmi_mmr_action_final_submits AS dmafs 
 										INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dmafs.customer_id
 										INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id
 										INNER JOIN m_commodity_category AS mc ON mc.category_code = df.commodity::INTEGER
 										INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
-										WHERE dd.office_id='$postedOffice' AND df.certification_type='1'")->fetchAll('assoc');
+										WHERE dd.office_id='$postedOffice' AND dmafs.status='final_submit'")->fetchAll('assoc');
 
 		$this->loadModel('DmiMmrShowcauseLogs');
 		$countForScn = $this->DmiMmrShowcauseLogs->find()->where(['status' => 'sent','posted_ro_office'=> $postedOffice])->distinct('customer_id')->count();
+
+		
 
 		$this->set('countForScn',$countForScn);
 		$this->set('underThisOffice',$underThisOffice);
@@ -2050,8 +1988,6 @@ class OthermodulesController extends AppController{
 		//get the view for diffrent module
 		if ($for_module == 'Suspension') {
 
-			$this->Session->write('application_type',13); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as SPN
-
 			$dashMessage = "Note: This module is to:<br>
 			1. To process the Suspension of the Packer through AQCMS system online with option to select time period for suspension.<br>
 			2. To lock registered Packer account on for time period of suspension.<br>
@@ -2059,11 +1995,10 @@ class OthermodulesController extends AppController{
 	
 		} elseif ($for_module == 'Cancellation') {
 
-			$this->Session->write('application_type',14); #This is temporary added to avoid the error in esigning Application Type 13 is for Suspension as CAN
-
 			$dashMessage = "Note: This module is to:<br>
 			1. To process the Cancellation of the Packer through AQCMS system online.<br>
 			2. To cancel registered Packer account permantly and cancel the packer's certificates.";
+			
 		} elseif ($for_module == 'Refer') {
 			
 		}
@@ -2119,7 +2054,7 @@ class OthermodulesController extends AppController{
 			SELECT dmafs.customer_id, df.firm_name, dmafs.sample_code
 			FROM dmi_mmr_action_final_submits AS dmafs 
 			INNER JOIN dmi_firms AS df ON df.customer_id = dmafs.customer_id 
-			WHERE dmafs.status != 'taken'
+			WHERE dmafs.status != 'final_submit'
 			GROUP BY dmafs.customer_id, df.firm_name, dmafs.sample_code
 			ORDER BY dmafs.customer_id DESC
 			LIMIT 1
