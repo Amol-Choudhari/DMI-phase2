@@ -523,13 +523,23 @@ class BeforepageloadComponent extends Component {
 			$isAppSurrender = 'no';
 		}
 
-		#For Misgrade Actions
-		$DmiMmrActionFinalSubmits = TableRegistry::getTableLocator()->get('DmiMmrActionFinalSubmits');
-        $isActionTaken = $DmiMmrActionFinalSubmits->find('all')->where(['customer_id IS' => $customer_id])->order('id asc')->first();
-		if (!empty($isActionTaken)) {
-			$isActionTaken = 'yes';
+		#For Suspension
+		$currentDate = date('Y-m-d H:i:s'); 
+		$DmiMmrSuspensions = TableRegistry::getTableLocator()->get('DmiMmrSuspensions');
+		$suspension_record = $DmiMmrSuspensions->find('all')->where(['customer_id IS' => $customer_id,'to_date >=' => $currentDate])->order('id DESC')->first();
+		if (!empty($suspension_record )) {
+			$isSuspended = 'yes';
 		}else{
-			$isActionTaken = 'no';
+			$isSuspended = 'no';
+		}
+
+		#For Cancellation	
+		$DmiMmrCancelledFirms = TableRegistry::getTableLocator()->get('DmiMmrCancelledFirms');
+		$cancellation_record = $DmiMmrCancelledFirms->find('all')->where(['customer_id IS' => $customer_id])->order('id DESC')->first();
+		if (!empty($cancellation_record )) {
+			$isCancelled = 'yes';
+		}else{
+			$isCancelled = 'no';
 		}
 		
 		
@@ -588,7 +598,8 @@ class BeforepageloadComponent extends Component {
 		$this->Controller->set('Is15DigitApproved',$Is15DigitApproved);
 		$this->Controller->set('IsECodeApproved',$IsECodeApproved);
 		$this->Controller->set('isAppSurrender',$isAppSurrender);
-		$this->Controller->set('isActionTaken', $isActionTaken);
+		$this->Controller->set('isSuspended', $isSuspended);
+		$this->Controller->set('isCancelled', $isCancelled);
 
 
 	}

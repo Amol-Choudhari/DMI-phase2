@@ -158,6 +158,9 @@ class AppController extends Controller
 
 		$user_last_login = $this->Customfunctions->userLastLogins();
 		$this->set('user_last_login',$user_last_login);
+
+		
+
 	}
 
 	public function invalidActivities(){

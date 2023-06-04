@@ -340,32 +340,6 @@
 											<p class="nav-icon-p"><b>Routine Inspection</b></p>
 										</a>
 									</li>
-
-										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/misgrading_home" class="bg-success nav-link">
-												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
-												<p class="nav-icon-p">Actions On Misgrade</p>
-											</a>
-										</li>	
-										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_packer_action_taken" class="bg-success nav-link">
-												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
-												<p class="nav-icon-p">Suspension/Cancellation</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/report_listing_for_allocation" class="bg-success nav-link">
-												<i class="fas fa-folder-open"></i>
-												<p class="nav-icon-p badge">LIMS Reports</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/allocated_reports_for_mo/" class="bg-success nav-link">
-												<i class="fas fa-folder-open"></i>
-												<p class="nav-icon-p badge">Allocated LIMS Reports</p>
-											</a>
-										</li>
-									</li>
 								</ul>
 							</li>
 						</li>
@@ -400,6 +374,46 @@
 								</ul>
 							</li>
 						</li>
+
+						<li class="nav-item">
+							<li class="nav-item has-treeview">
+								<a href="#" class="nav-link">
+									<i class="nav-icon fas fa-sitemap"></i>
+									<p class="badge">Management of Misgrading</p><i class="fas fa-long-arrow-alt-right right"></i>
+								</a>
+								<ul class="nav nav-treeview ">
+									<li class="nav-item has-treeview">
+									
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/report_listing_for_allocation" class="bg-success nav-link">
+												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+												<p class="nav-icon-p">LIMS Reports</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>misgrading/allocated_reports_for_mo/" class="bg-success nav-link">
+												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+												<p class="nav-icon-p">Allocated Reports</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/misgrading_home" class="bg-success nav-link">
+												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+												<p class="nav-icon-p">Actions On Misgrade</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute('webroot');?>othermodules/list_of_packer_action_taken" class="bg-success nav-link">
+												<i class="fas fa-arrow-alt-circle-right nav-icon"></i>
+												<p class="nav-icon-p">Suspension/Cancellation</p>
+											</a>
+										</li>
+									</li>
+								</ul>
+							</li>
+						</li>
+
+									
 
 					<?php } if ($current_user_roles['old_appln_data_entry'] == 'yes') { ?>
 

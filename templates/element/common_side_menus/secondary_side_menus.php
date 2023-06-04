@@ -13,9 +13,7 @@
 					</a>
 				</li>
 
-				<?php if ($isAppSurrender == 'no') { ?>
-
-					<?php if($isActionTaken == 'no') { ?>
+					<?php if($isSuspended == 'no' || $isCancelled =='no' || $isAppSurrender == 'no') { ?>
 
 						<li class="nav-item has-treeview">
 
@@ -178,7 +176,7 @@
 						
 						<?php } ?>
 					<?php } ?>
-				<?php } ?>
+
 
 	
 
