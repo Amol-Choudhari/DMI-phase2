@@ -2036,11 +2036,11 @@ class CustomersController extends AppController {
 							if(!empty($firm_data->commodity) && $firm_data->commodity > 1) {
 							
 								$commodity = $this->MCommodityCategory->find('all',array('fields'=>array('category_name')))->where(array('category_code IS'=> $firm_data->commodity))->first();
-									if(!empty ($commodity->category_name)) { 
-										$commodity = $commodity->category_name;
-									} else { 
-										$commodity = "Not found ";
-									}
+								if(!empty ($commodity->category_name)) { 
+									$commodity = $commodity->category_name;
+								} else { 
+									$commodity = "Not found ";
+								}
 
 							}else{
 
@@ -2049,12 +2049,9 @@ class CustomersController extends AppController {
 									$packaging =  explode(',', $firm_data->packaging_materials);
 									foreach($packaging as $packtype){
 										$pacging_type = $this->DmiPackingTypes->find('all',array('fields'=>array('packing_type')))->where(array('id IS'=> $packtype))->first();
-											
-										
 										if(!empty($pacging_type->packing_type)){
 											$commodity .= $pacging_type->packing_type. ",";
-										}
-										else{
+										}else{
 											$commodity = "Not found ";
 										}
 									} 
@@ -2085,21 +2082,19 @@ class CustomersController extends AppController {
 								
 								if ($firm_data  !=null) {
 							
-								$result .= "<tr><td><b>Name:</b></td><td>".$firm_data->firm_name."</td></tr>";
-								$result .= "<tr><td><b>Commodity:</b></td><td>".$commodity."</td></tr>";
+									$result .= "<tr><td><b>Name:</b></td><td>".$firm_data->firm_name."</td></tr>";
+									$result .= "<tr><td><b>Commodity:</b></td><td>".$commodity."</td></tr>";
+									
 									//added by laxmi on 27-12-2022
 									if(!empty($status && !empty($uptoDate))){
-								$result .= "<tr><td><b>Status:</b></td><td>".$status."</td></tr>";
-											$result .= "<tr><td><b>Valid Upto:</b></td><td>".$uptoDate."</td></tr>";
+										$result .= "<tr><td><b>Status:</b></td><td>".$status."</td></tr>";
+										$result .= "<tr><td><b>Valid Upto:</b></td><td>".$uptoDate."</td></tr>";
 									}
-									
-									
-									echo $result;
-									}else{
 
+									echo $result;
+
+								}else{
 									echo $result = "<tr><td></td><td>Sorry, This Customer Id you have searched is not valid</td></tr>";
-							
-							
 								}
 									//else part added by laxmi on 06-02-2023
 							}else{
@@ -2113,14 +2108,11 @@ class CustomersController extends AppController {
 					} else {
 						$date = new \DateTime($suspension_record['to_date']);
 						echo "<b>This Application is Suspended till Date: ".$date->format('d/m/Y')." and no longer available.</b>";
-
 					}
 
 				} else {
-					echo "<b>This Application is Suspended till Date: ".$cancellation_record->date->format('d/m/Y')." and no longer available.</b>";
-
+					echo "<b>This Application is cancelled on Date: ".$cancellation_record->date->format('d/m/Y')." and no longer available.</b>";
 				}
-					
 
 				exit; // This is added Intensionally
 
@@ -2132,6 +2124,8 @@ class CustomersController extends AppController {
 
 			}
 		}
+
+
 	}
 
 	//To fetch certified firm list added by laxmi B. dated on 06-02-23

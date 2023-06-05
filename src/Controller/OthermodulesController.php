@@ -28,6 +28,28 @@ class OthermodulesController extends AppController{
 		$this->viewBuilder()->setLayout('admin_dashboard');
 		$this->Session = $this->getRequest()->getSession();
 
+		
+		$this->loadModel('DmiMmrFinalSubmits');
+		$this->loadModel('SampleInward');
+		$this->loadModel('MSampleType');
+		$this->loadModel('MGradeDesc');
+		$this->loadModel('SampleInwardDetails');
+		$this->loadModel('DmiMmrShowcauseComments');
+		$this->loadModel('DmiMmrCancelledFirms');
+		$this->loadModel('DmiMmrSuspensions');
+		$this->loadModel('DmiMmrActionHomeLogs');
+		$this->loadModel('DmiMmrShowcauseNoticePdfs');
+		$this->loadModel('DmiMmrShowcauseLogs');
+		$this->loadModel('DmiMmrCategories');
+		$this->loadModel('DmiMmrLevels');
+		$this->loadModel('DmiMmrActions');
+		$this->loadModel('DmiMmrTimePeriod');
+		$this->loadModel('DmiFirms');
+		$this->loadModel('MCommodityCategory');
+		$this->loadModel('MCommodity');
+		$this->loadModel('DmiMmrActionFinalSubmits');
+
+
 	}
 
 	//Before Filter
@@ -601,7 +623,7 @@ class OthermodulesController extends AppController{
 		$appl_type = trim($_POST['appl_type']);
 
 		//get firm details
-		$this->loadModel('DmiFirms');
+		
 		$this->loadModel('DmiAllApplicationsCurrentPositions');
 		$this->loadModel('DmiFinalSubmits');
 		$this->loadModel('DmiRenewalAllCurrentPositions');
@@ -867,7 +889,7 @@ class OthermodulesController extends AppController{
 		$userName = $this->Session->read('username');
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiDistricts');
-		$this->loadModel('DmiFirms');
+		
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUserRoles');
 		$this->loadModel('DmiCustomers');
@@ -1207,7 +1229,7 @@ class OthermodulesController extends AppController{
 		$userName = $this->Session->read('username');
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiDistricts');
-		$this->loadModel('DmiFirms');
+		
 		$this->loadModel('DmiRoOffices');
 		$this->loadModel('DmiUserRoles');
 		$conn = ConnectionManager::get('default');
@@ -1269,7 +1291,7 @@ class OthermodulesController extends AppController{
 		$this->loadModel('DmiUsers');
 		$this->loadModel('DmiUserRoles');
 		$this->loadModel('DmiPaoDetails');
-		$this->loadModel('DmiFirms');
+		
 		$this->loadModel('DmiDistricts');
 
 		//get details
@@ -1425,39 +1447,68 @@ class OthermodulesController extends AppController{
 		$username = $this->Session->read('username');
 
 		$countForScn = '';
-
-		$this->loadModel('DmiMmrShowcauseLogs');
-
+		$currentDate = date('Y-m-d H:i:s'); 
+		
 		//get posted office id
 		$postedOffice = $this->DmiUsers->getPostedOffId($username);
-		
-		$underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code,
-														   df.firm_name, df.email,df.mobile_no,
-														   mc.commodity_name
+
+		//::: For the Firm who have attached the Sample code and customer_id to take action
+		$underThisOffice = $conn->execute("SELECT DISTINCT dg.id,dg.customer_id,dg.sample_code,df.firm_name, df.email,df.mobile_no,mc.commodity_name
 											FROM dmi_mmr_final_submits AS dg 
 											INNER JOIN dmi_appl_with_ro_mappings AS dd ON dd.customer_id = dg.customer_id
 											INNER JOIN dmi_firms AS df ON df.customer_id = dg.customer_id
 											INNER JOIN sample_inward AS si ON si.org_sample_code = dg.sample_code
 											INNER JOIN m_commodity AS mc ON mc.commodity_code = si.commodity_code
 											WHERE dd.office_id='$postedOffice' AND dg.is_attached_packer_sample = 'Y'")->fetchAll('assoc');
-		
-	
+		$filteredRecords = [];
 
-		foreach ($underThisOffice as &$each) {
+		foreach ($underThisOffice as $each) {
+			$customer_id = $each['customer_id'];
 
-			$showcause_status = $this->DmiMmrShowcauseLogs->find()
+			// Check if customer_id is present in $is_cancelled
+			$is_cancelled = $this->DmiMmrCancelledFirms
+				->find()
+				->select('customer_id')
+				->where(['customer_id' => $customer_id])
+				->order(['id' => 'DESC'])
+				->first();
+			
+			// Check if customer_id is present in $suspension_record
+			$suspension_record = $this->DmiMmrSuspensions
+				->find('all')
+				->where([
+					'customer_id' => $customer_id,
+					'to_date >=' => $currentDate
+				])
+				->order(['id' => 'DESC'])
+				->first();
+			
+			// Exclude the record if customer_id is present in either $is_cancelled or $suspension_record
+			if ($is_cancelled || $suspension_record) {
+				continue; // Skip to the next iteration of the loop
+			}
+
+			// Rest of your code logic here
+
+			$showcause_status = $this->DmiMmrShowcauseLogs
+				->find()
 				->select(['status'])
 				->where(['sample_code IS' => $each['sample_code']])
-				->order('id DESC')
+				->order(['id' => 'DESC'])
 				->first();
-		
-			// Add the 'showcause_status' key to the current element with the fetched value
+
 			$each['showcause_status'] = $showcause_status ? $showcause_status->status : null;
 
-			//Check the Final Submitted or not
+			// Add the record to the filtered array
+			$filteredRecords[] = $each;
 		}
-		
 
+		$this->set('underThisOffice', $filteredRecords);
+
+
+
+
+		//::: For the Action Taken Listing
 		$actionTaken = $conn->execute("SELECT DISTINCT on (dmafs.customer_id) dmafs.id,dmafs.customer_id,
 														df.firm_name, df.email,df.mobile_no,dmafs.status,
 														dmafs.is_suspended,dmafs.is_cancelled,dmafs.refer_to_ho
@@ -1468,15 +1519,7 @@ class OthermodulesController extends AppController{
 										INNER JOIN dmi_certificate_types AS dc ON dc.id = df.certification_type::INTEGER
 										WHERE dd.office_id='$postedOffice' AND dmafs.status='final_submit'")->fetchAll('assoc');
 
-		$this->loadModel('DmiMmrShowcauseLogs');
-		$countForScn = $this->DmiMmrShowcauseLogs->find()->where(['status' => 'sent','posted_ro_office'=> $postedOffice])->distinct('customer_id')->count();
-
-		
-
-		$this->set('countForScn',$countForScn);
-		$this->set('underThisOffice',$underThisOffice);
 		$this->set('actionTaken',$actionTaken);
-
 
 	}
 
@@ -1544,14 +1587,7 @@ class OthermodulesController extends AppController{
 
 		$conn = ConnectionManager::get('default');
 		//Load Models
-		$this->loadModel('DmiMmrCategories');
-		$this->loadModel('DmiMmrLevels');
-		$this->loadModel('DmiMmrActions');
-		$this->loadModel('DmiMmrActionHomeLogs');
-		$this->loadModel('DmiFirms');
-		$this->loadModel('MCommodityCategory');
-		$this->loadModel('MCommodity');
-		$this->loadModel('DmiMmrTimePeriod');
+		
 
 		//Firm Details
 		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
@@ -1637,7 +1673,7 @@ class OthermodulesController extends AppController{
 			
 			if($this->DmiMmrActionHomeLogs->saveMisgradeAction($postData) == 1){
 
-				$message = 'Saved';
+				$message = 'The Actions to be taken for the current firm is saved Successfully.';
 				$message_theme = 'success';
 				$redirect_to = '../othermodules/misgradingActionsHome';
 			}else{
@@ -1646,27 +1682,7 @@ class OthermodulesController extends AppController{
 				$redirect_to = '../othermodules/misgradingActionsHome'; 
 			}
 			
-		} elseif (null !== $this->request->getData('final_submit')) {
-			
-			
-
-			if ($final_submit_call_result == true) {
-
-				$this->Customfunctions->saveActionPoint('Application Final Submit', 'Success'); #Action
-				$message = 'Misgrading Action is Taken against the selected  Firm Successfully ';
-				$message_theme = 'success';
-				$redirect_to = '../othermodules/list_of_firms_for_action'; 
-
-			} else {
-				
-				$this->Customfunctions->saveActionPoint('Application Final Submit', 'Failed'); #Action
-				$message = 'Error Occured During Submitting!! ';
-				$message_theme = 'failed';
-				$redirect_to = '../application/misgradingActionsHome';
-			}
-		
-		}
-		
+		} 
 		
 		
 		$this->set('isCommodityGhee',$isCommodityGhee);
@@ -1693,11 +1709,9 @@ class OthermodulesController extends AppController{
 		$sample_code = trim($_POST['sample_code']);
 		
 		//Get the saved details
-		$this->loadModel('DmiMmrActionHomeLogs');
 		$savedDetails = $this->DmiMmrActionHomeLogs->getInformation($customer_id,$sample_code);
 		
 		//Showcause Details
-		$this->loadModel('DmiMmrShowcauseNoticePdfs');
 		$scnDetails = $this->DmiMmrShowcauseNoticePdfs->find()->where(['customer_id IS'=>$customer_id])->order('id DESC')->first();
 		if (!empty($scnDetails)) {
 			$showcause = 'Yes';
@@ -1749,7 +1763,6 @@ class OthermodulesController extends AppController{
 			'refer_to_ho' => $refer_to_ho
 		];
 
-		$this->loadModel('DmiMmrActionFinalSubmits');
 		$misgradeStatus = $this->DmiMmrActionFinalSubmits->saveActionFinalData($arrayFinal);
 		
 		echo '~'. $misgradeStatus. '~';
@@ -1791,19 +1804,7 @@ class OthermodulesController extends AppController{
 			$this->set('customer_last_login', $customer_last_login);
 		}
 
-		//Load Model    
-		$this->loadModel('DmiFirms');
-		$this->loadModel('MCommodityCategory');
-		$this->loadModel('MCommodity');
-		$this->loadModel('DmiMmrShowcauseLogs');
-		$this->loadModel('DmiMmrShowcauseNoticePdfs');
-		$this->loadModel('DmiMmrActionHomeLogs');
-		$this->loadModel('DmiMmrFinalSubmits');
-		$this->loadModel('SampleInward');
-		$this->loadModel('MSampleType');
-		$this->loadModel('MGradeDesc');
-		$this->loadModel('SampleInwardDetails');
-		$this->loadModel('DmiMmrShowcauseComments');
+	
 
 		//Firm Details
 		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
@@ -1956,7 +1957,6 @@ class OthermodulesController extends AppController{
 		$this->autoRender = false;
 		//get ajax post data
 		$customer_id = $_POST['customer_id'];
-		$this->loadModel('DmiMmrShowcauseLogs');
 		$showCause = $this->DmiMmrShowcauseLogs->getInformation($customer_id);
 		$result =  $this->DmiMmrShowcauseLogs->sendFinalNotice($showCause); 
 		
@@ -2004,35 +2004,26 @@ class OthermodulesController extends AppController{
 		}
 
 		//Get the details
-		$this->loadModel('DmiMmrActionFinalSubmits');
 		$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])->order('id DESC')->first();
 		$is_showcause = $actionDetails['showcause'];
 
 		//Misgrade Category Info
-		$this->loadModel('DmiMmrCategories');
 		$misgrade_category = $this->DmiMmrCategories->getMisgradingCategory($actionDetails['misgrade_category']);
 		$misgradeCategory  = $misgrade_category['misgrade_category_name']. " : " .$misgrade_category['misgrade_category_dscp'];
 
 		//Misgrade Category Info
-		$this->loadModel('DmiMmrLevels');
 		$misgrade_level = $this->DmiMmrLevels->getMisgradingLevel($actionDetails['misgrade_level']);
 		$levelName = $misgrade_level['misgrade_level_name'];
 
 		//Misgrade Category Info
-		$this->loadModel('DmiMmrActions');
 		$misgrade_action = $this->DmiMmrActions->getMisgradingAction($actionDetails['misgrade_action']);
 		$actionName = $misgrade_action['misgrade_action_name'];
 
 		//Misgrade Category Info
-		$this->loadModel('DmiMmrTimePeriod');
 		$time_period = $this->DmiMmrTimePeriod->getTimePeriod($actionDetails['time_period']);
 		$periodMonth = $time_period['month'];
 
 		//Packer Details
-		$this->loadModel('DmiFirms');
-		$this->loadModel('MCommodityCategory');
-		$this->loadModel('MCommodity');
-
 		$firmDetails = $this->DmiFirms->firmDetails($customer_id); 
 		$category = $this->MCommodityCategory->getCategory($firmDetails['commodity']); 
 		$sub_comm_id = explode(',',(string) $firmDetails['sub_commodity']); #For Deprecations
@@ -2071,15 +2062,12 @@ class OthermodulesController extends AppController{
 
 		if ($this->request->is('post')) {
 
-			$this->loadModel('DmiMmrActionFinalSubmits');
 			$customer_id = $this->request->getData('customer_id');
 			$sample_code = substr($customer_list[$this->request->getData('customer_id')], strrpos($customer_list[$this->request->getData('customer_id')], '(') + 1, -1);
 			$actionDetails = $this->DmiMmrActionFinalSubmits->find()->where(['customer_id' => $customer_id, 'sample_code' => $sample_code])->order('id DESC')->first();
 
-		
 			if (!empty($actionDetails)) {
 
-			
 				if ($actionDetails['for_suspension'] == 'Yes') {
 					$for_module = 'Suspension';
 				} elseif ($actionDetails['for_cancel'] == 'Yes') {
@@ -2101,8 +2089,8 @@ class OthermodulesController extends AppController{
 			} else {
 				// Handle the else case if needed
 			}
-			
 		}
+	
 	}
 
 	

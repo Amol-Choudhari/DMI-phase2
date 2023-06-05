@@ -2414,7 +2414,7 @@ class ApplicationformspdfsController extends AppController{
 			if($user_email_id == $ro_email_id){ //applied condition on 06-03-2018 by Amol
 				
 				if($split_customer_id[1] == 1)
-				{ 																																		//changed query logic on 06-03-2018 by Amol
+				{	//changed query logic on 06-03-2018 by Amol
 					//$fetch_ca_max_id = $this->DmiGrantCertificatesPdfs->find('first',array('fields'=>'id','conditions'=>array('customer_id'=>$customer_id,/* 'user_email_id'=>$user_email_id*/)));
 					
 					$all_ca_grant_certificates_list = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
@@ -2427,7 +2427,7 @@ class ApplicationformspdfsController extends AppController{
 				
 				
 				if($split_customer_id[1] == 2)
-				{																																		//changed query logic on 06-03-2018 by Amol
+				{	//changed query logic on 06-03-2018 by Amol
 					//$fetch_printing_max_id = $this->Dmi_grant_certificates_pdf->find('first',array('fields'=>'max(id)','conditions'=>array('customer_id'=>$customer_id,/* 'user_email_id'=>$user_email_id*/)));
 					
 					$all_printing_grant_certificates_list = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
@@ -2440,7 +2440,7 @@ class ApplicationformspdfsController extends AppController{
 				
 				// Find the Final Granded laboratory Application pdf list file By pravin (19/05/2017)
 				if($split_customer_id[1] == 3)
-				{																																			//changed query logic on 06-03-2018 by Amol
+				{	//changed query logic on 06-03-2018 by Amol
 					//$fetch_laboratory_max_id = $this->Dmi_grant_certificates_pdf->find('first',array('fields'=>'max(id)','conditions'=>array('customer_id'=>$customer_id,/* 'user_email_id'=>$user_email_id*/)));
 					
 					$all_laboratory_grant_certificates_list = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
@@ -2496,11 +2496,24 @@ class ApplicationformspdfsController extends AppController{
 		//generatin pdf starts here
 		//create new pdf using tcpdf including signature apprearence to generate its hash below
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
-		//require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
+		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php'); //This is added for the watermarks on PDF - Akash [05-06-2023]
+
+		
 
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
-		if ($appl_type == 9 && $current_level != 'applicant') { 
+		if (($appl_type == 9 && $current_level != 'applicant')) { 
+
+			$this->Session->write('for_module','Surrender');
 			$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+		//This is added to add the watermark on the pdf if the pdf for suspension or cancelletion - Akash [05-06-2023]
+		} elseif ($this->Session->check('for_module')) {
+	
+			$for_module = $this->Session->read('for_module');
+			if ($for_module === 'Suspension' || $for_module === 'Cancellation') {
+				$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+			}
+
 		}else{
 			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);	
 		}

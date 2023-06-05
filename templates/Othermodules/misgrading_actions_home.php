@@ -89,7 +89,6 @@
 													<dt class="col-sm-4">Period: </dt>
 													<dd class="col-sm-8"><?php echo $periodMonth; ?></dd>
 												</dl>
-												<button class="float-right" id="edit_action" ></i> Edit</button>
 											</div>
 										</div>
 									</div>
@@ -137,8 +136,6 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			</div>
 			<div class="modal-body">
-				<div class="col-md-3 d-inline">Show Cause Notice PDF: </div>
-				<div class="col-md-4 d-inline"><a target="blank" href="../applicationformspdfs/showcauseApplPdf" >Preview</a></div><br>
 				<table class="mt-2">
 					<tbody>
 						<tr>

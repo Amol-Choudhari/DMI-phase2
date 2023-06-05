@@ -28,13 +28,13 @@
                     </td>
                     <td>
                         <?php  if($eachdata['is_suspended'] != null && $eachdata['is_suspended'] == "Yes") { 
-                            echo "This Firm is Suspended (To get the details click on view button)";
+                            echo "This Firm is Suspended ";
                         } elseif ($eachdata['is_cancelled'] != null && $eachdata['is_cancelled'] == "Yes") {
-                            echo "This Firm is Cancelled (To get the details click on view button)";
+                            echo "This Firm is Cancelled";
                         }
                          ?>
                     </td>
-                    <td><?php echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForAction', $eachdata['id']),array('class'=>'fas fa-eye','title'=>'View')); ?></td>
+                    <td><?php //    echo $this->Html->link('', array('controller' => 'othermodules', 'action'=>'fetchIdForAction', $eachdata['id']),array('class'=>'fas fa-eye','title'=>'View')); ?></td>
                 </tr>
             <?php $sr_no++; } } ?>
         </tbody>

@@ -84,7 +84,7 @@
 																'',
 																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3','view'],
 																['class' => 'fas fa-eye', 'title' => 'Scrutiny Report']
-															); */?> |
+															); */?> 
 															<?php echo $this->Html->link(
 																'',
 																['controller' => 'misgrading', 'action' => 'redirectToAllocate', $each['org_sample_code'], 'level_3','edit'],
