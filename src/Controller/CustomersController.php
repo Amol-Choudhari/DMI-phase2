@@ -1280,6 +1280,8 @@ class CustomersController extends AppController {
 				$this->set('misgrading_details', $misgrading_details);
 			}
 			
+	
+	
 		//================================================================//
 		
 		//// Grant PDFs for Applications ////
@@ -1310,7 +1312,7 @@ class CustomersController extends AppController {
 			$surrender_grant_certificate = $this->DmiSurrenderGrantCertificatePdfs->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
 			$this->set('surrender_grant_certificate', $surrender_grant_certificate);
 			
-			#Suspension Application @ SPN (9) /GRANT PDF/ - Akash [14-04-2023] 
+			#Suspension Application @ SPN  /GRANT PDF/ - Akash [14-04-2023] 
 			$this->loadModel('DmiMmrSuspendedFirmsLogs');
 			$suspension_grant_certificate = $this->DmiMmrSuspendedFirmsLogs->find('all')->where(['customer_id IS' => $customer_id])->order('id desc')->first();
 			$this->set('suspension_grant_certificate', $suspension_grant_certificate);
@@ -1475,8 +1477,8 @@ class CustomersController extends AppController {
 
 
 
-		//// For Rejected / Suspension / Surrender / Showcause Notices ////
-		
+		//// For Rejected / Suspension / Surrender / Showcause Notices  by Akash//// 	
+			
 			//To check if the application is rejected or junked and set the custom message - Akash[14-11-2022]
 			$is_appl_rejected =  $this->Customfunctions->isApplicationRejected($customer_id);
 			$this->set('is_appl_rejected',$is_appl_rejected);
@@ -1513,6 +1515,9 @@ class CustomersController extends AppController {
 		
 		$this->set('is_scn_replied_details',$is_scn_replied_details);
 		$this->set('is_scn_replied',$is_scn_replied);
+	
+
+
 
 
 	}
@@ -1992,15 +1997,15 @@ class CustomersController extends AppController {
 								<th>State</th>
 								</tr>
 							</thead>
-								<tbody>
+							<tbody>
 								<tr id= custmer_data >
-								<td id= id>".$customer_id."</td>
-								<td id= name>".$primary_data->f_name." &nbsp; ".$primary_data->l_name."</td>
-								<td id= district>".$dist->district_name."</td>
-								<td id= state>".$state->state_name."</td>
+									<td id= id>".$customer_id."</td>
+									<td id= name>".$primary_data->f_name." &nbsp; ".$primary_data->l_name."</td>
+									<td id= district>".$dist->district_name."</td>
+									<td id= state>".$state->state_name."</td>
 								</tr>
 							</tbody>
-							</table>";
+						</table>";
 					
 					echo $result;
 
@@ -2076,7 +2081,7 @@ class CustomersController extends AppController {
 								if($date > $current_date ){
 									$status = "Valid";
 								}else{
-										$status = "Invalid";
+									$status = "Invalid";
 								}
 							
 								

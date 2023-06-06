@@ -370,35 +370,31 @@
 		</div>
 	</section>
 </div>
-
-<?php  echo $this->element('old_applications_elements/inforamtion_input_previous_renewals_dates'); ?>
-<?php
+<?php //below code updated on 05-10-2021 by Amol, call external js files
+	echo $this->element('old_applications_elements/inforamtion_input_previous_renewals_dates');
 	echo $this->Html->css('multiselect/jquery.multiselect');
 	echo $this->Html->script('multiselect/jquery.multiselect');
 	echo $this->Html->script('forms/add_firms');
-?>
-
-
-<input type="hidden" value="<?php echo $return_error_msg; ?>" id="return_error_msg"/>
-
-<?php //below code updated on 05-10-2021 by Amol, call external js files ?>
-
-<!-- Don't change the "Is Certificate Already Granted" radio button value on the return false of duplication certification no error. Done by pravin 14-07-2018-->
-<?php if (!empty($duplicate_certification_no_msg)) { ?>
-		<input type="hidden" value="<?php echo $duplicate_certification_no_msg; ?>" id="duplicate_certification_no_msg"/>
-		<?php echo $this->Html->script('forms/duplicate_certification_no_msg');
+ 
+ 	//Don't change the "Is Certificate Already Granted" radio button value on the return false of duplication certification no error.
+	//Done by pravin 14-07-2018-->
+	if (!empty($return_error_msg)) {
+		echo $this->Form->control('return_error_msg', array('type'=>'hidden', 'id'=>'return_error_msg', 'value'=>$return_error_msg));
+	}
+	
+	if (!empty($duplicate_certification_no_msg)) { 
+		echo $this->Form->control('duplicate_certification_no_msg', array('type'=>'hidden', 'id'=>'duplicate_certification_no_msg', 'value'=>$duplicate_certification_no_msg));
+		echo $this->Html->script('forms/duplicate_certification_no_msg');
 	}else{ 
 		echo $this->Html->script('forms/duplicate_certification_no_msg_else');
 	} 
-?>
 
-
-<?php if(isset($toastTheme)) { ?>
-		<input type="hidden" value="<?php echo $toastTheme; ?>" id="toastTheme"/>
-		<?php	echo $this->Html->script('forms/toastTheme');
+	if(isset($toastTheme)) { 
+		echo $this->Form->control('toastTheme', array('type'=>'hidden', 'id'=>'toastTheme', 'value'=>$toastTheme));
+		echo $this->Html->script('forms/toastTheme');
 	}else{ 
 		echo $this->Html->script('forms/toastTheme_else');
 	} 
-?>
-
-<?php echo $this->Html->script('forms/bsCustomFileInput'); ?>
+ 	
+	echo $this->Html->script('forms/bsCustomFileInput'); 
+ ?>

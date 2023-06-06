@@ -68,7 +68,7 @@
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="form-group">
-                                                <a class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/8">All Charges</a>
+                                                <a class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/8">Application Charges</a>
                                             </div>
                                         </div>
                                     </div>
@@ -85,12 +85,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <a class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/10">RO/SO/RAL Office</a>
+                                                <a class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/10">Offices</a>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/11">Message Template</a>
+                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/11">Message Templates</a>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -147,9 +147,10 @@
                                                 <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/19">Documents List</a>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                         <!-- For Routine Inspection added by shankhpal shende on 06/12/2022 -->
+                                         <div class="col-md-3"> 
                                             <div class="form-group">
-                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/20">Misgrading Categories</a>
+                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/20">Routine Inspection Period</a>
                                             </div>
                                         </div>
                                     </div>
@@ -159,14 +160,22 @@
                             <div class="form-horizontal">
                                 <div class="card-body">
                                     <div class="row">
+                                        <!-- For Management of Misgrading's Action's Module -> Akash [05-06-2023] -->
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <a class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/21">Misgrading Levels</a>
+                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/21">Misgrading Categories</a>
                                             </div>
                                         </div>
+                                        <!-- For Management of Misgrading's Action's Module -> Akash [05-06-2023] -->
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/22">Misgrading Actions</a>
+                                                <a class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/22">Misgrading Levels</a>
+                                            </div>
+                                        </div>
+                                        <!-- For Management of Misgrading's Action's Module -> Akash [05-06-2023] -->
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <a  class="btn btn-block btn-outline-secondary" href="<?php echo $this->getRequest()->getAttribute('webroot');?>masters/fetchAndRedirect/23">Misgrading Actions</a>
                                             </div>
                                         </div>
                                     </div>

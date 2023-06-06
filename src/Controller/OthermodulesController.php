@@ -59,24 +59,25 @@ class OthermodulesController extends AppController{
 
 
 		$username = $this->getRequest()->getSession()->read('username');
-		
 		if ($username == null){
+			
 			$this->customAlertPage("Sorry You are not authorized to view this page..");
+			
+		} elseif (preg_match("/^[0-9]+\/[0-9]+\/[A-Z]+\/[0-9]+$/", $username,$matches)==1) {
+			//this added intensionally to avoid the login when applicant is logged in - Akash [06-06-2023]
 		} else {
-			if (preg_match("/^[0-9]+\/[0-9]+\/[A-Z]+\/[0-9]+$/", $username, $matches) == 1) { 
 
-			} elseif (preg_match("/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/", $username,$matches)==1) {
-				
-				$this->loadModel('DmiUsers');
-				$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$this->Session->read('username'))))->first();
-				if (empty($check_user)) {
-					$this->customAlertPage("Sorry You are not authorized to view this page..");
-				}
+			$this->loadModel('DmiUsers');
+			//Check User
+			$check_user = $this->DmiUsers->find('all',array('conditions'=>array('email IS'=>$this->Session->read('username'))))->first();
+
+			if (empty($check_user)) {
+				$this->customAlertPage("Sorry You are not authorized to view this page..");
 			}
 		}
 	}
 
-	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
 																/***###| RE-ESIGN MODULE|###***/
 
@@ -199,20 +200,81 @@ class OthermodulesController extends AppController{
 		$grant_date = $grant_date[0];	   
 		$this->Session->write('re_esign_grant_date',$grant_date);
 
-		
 		//creating application type session
 		$applicationType = 1;
 		if ($grant_details['pdf_version'] > 1) {
 
 			$applicationType = 2;
-		} 
+		}
+
 		$this->Session->write('application_type',$applicationType);
 
 		exit;
 	}
 
 
-	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|[ RE-ESIGN ]|
+	//To Create Grant Certificate PDFs to ReESign
+	/*	public function createGrantCertificatePdfToReEsign() {
+
+		$customer_id = $this->Session->read('customer_id');
+		$split_customer_id = explode('/',$customer_id);
+
+		//$view = new View($this, false);
+		//$view->layout = null;
+		$all_data_pdf = $this->render($pdf_view_path);
+
+		if ($split_customer_id[1] == 1) {
+
+			$all_data_pdf = $view->render('/Applicationformspdfs/grant_ca_certificate_pdf');
+
+		} elseif ($split_customer_id[1] == 2) {
+
+			$all_data_pdf = $view->render('/Applicationformspdfs/grant_printing_certificate_pdf');
+
+		} elseif ($split_customer_id[1] == 3) {
+
+			$all_data_pdf = $view->render('/Applicationformspdfs/grant_laboratory_certificate_pdf');
+		}
+
+		//commented all mpdf code and used tcpdf functionality on 27-01-2020
+		/*	$this->Mpdf->init();
+			$stylesheet = file_get_contents('css/forms-style.css');
+			//$this->Mpdf->WriteHTML($stylesheet,1);
+
+			$this->Mpdf->ob_clean();
+			$this->Mpdf->SetDisplayMode('fullpage');
+			$this->Mpdf->WriteHTML($all_data_pdf);
+		*/
+
+		/*		$rearranged_id = 'G-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+
+		//Check Applicant Last Record Version to Increment
+		$this->loadModel('DmiGrantCertificatesPdfs');
+
+		//updated logic as per new order on 01-04-2021, 5 years validity for PP and Laboratory
+		//as the module is to reesign renewal certificate only, So now need to re-esign the first grant also, if granted with 2 years of validity
+		//but not the old first grant record
+		//on 15-09-2021 by Amol
+
+		//$list_id = $this->DmiGrantCertificatesPdfs->find('list', array('fields'=>'id', 'conditions'=>array('customer_id'=>$customer_id)))->toArray();
+		//For Version 2 Only
+		//$current_pdf_version = 2;
+
+		$grant_details = $this->DmiGrantCertificatesPdfs->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'user_email_id !='=>'old_application'),'order'=>'id desc'))->first();
+		$current_pdf_version = $grant_details['pdf_version'];
+
+		//taking complete file name in session, which will be use in esign controller to esign the file.
+		$this->Session->write('pdf_file_name',$rearranged_id.'('.$current_pdf_version.')'.'.pdf');
+
+		$applicationPdf = new ApplicationformspdfsController();
+		$applicationPdf->callTcpdf($all_data_pdf,'I',$customer_id,'re_esign');
+		$applicationPdf->callTcpdf($all_data_pdf,'F',$customer_id,'re_esign');//on 27-01-2020 with save mode
+
+
+	}*/
+
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
 
 																/***###| WORK TRANSFER MODULE|###***/
@@ -527,7 +589,7 @@ class OthermodulesController extends AppController{
 			'appl_type'=>$appl_type,
 			'created'=>date('Y-m-d H:i:s'),
 			'modified'=>date('Y-m-d H:i:s'),
-	));
+		));
 
 
 		if ($this->DmiWorkTransferLogs->save($DmiWorkTranferLogEntity)) {
@@ -866,7 +928,7 @@ class OthermodulesController extends AppController{
 	}
 
 
-	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
 																/***###| UPDATE FIRM DETAILS MODULE|###***/
 
@@ -1200,6 +1262,8 @@ class OthermodulesController extends AppController{
 							}
 
 							$this->set('return_message',null);
+							//return null;
+
 						}
 					}
 
@@ -1213,7 +1277,7 @@ class OthermodulesController extends AppController{
 	}
 
 
-	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
 																/***###| APPLICANT DETAILS MODULE|###***/
 
@@ -1269,7 +1333,7 @@ class OthermodulesController extends AppController{
 
 	}
 
-	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
 																/***###| MY TEAM MODULE|###***/
 
@@ -1430,6 +1494,287 @@ class OthermodulesController extends AppController{
 
 
 
+
+	// getScenarios
+	// Author : Shankhpal Shende
+	// Description : This function is created to show scenarios view
+	// Date : 08-02-2023
+	public function getScenarios(){
+
+		$this->loadModel('DmiRoOffices');
+		$username = $this->getRequest()->getSession()->read('username');
+		$this->set('username',$username);
+		// Find out the officer present in RO/SO office, 
+		$officerPresentInOff = $this->Customfunctions->findOfficerCountInoffice($username);
+		$this->set('officerPresentInOff',$officerPresentInOff);
+
+		$office = $this->DmiRoOffices->getOfficeDetails($username);
+		$office_type = $office[1];	
+
+		$this->set('office_type',$office_type);
+
+		// SO  office where SO In-charge has power(role) to grant (more than one officer posted)
+		$so_power_to_grant_appl = $this->soAuthorisedToGrantApp($username);
+
+		$this->set('so_power_to_grant_appl',$so_power_to_grant_appl);
+	}
+		
+
+
+	// checked if SO have power to grant the CA Non Bevo or printing application
+	// added by shankhpal shende on 02/02/2023
+	public function soAuthorisedToGrantApp($username){
+
+		$this->loadModel("DmiUserRoles");
+		$this->loadModel("DmiApplWithRoMappings");
+		$nodalOfficerId = $username;
+		$soPowerToGrantApp = 'no';
+		
+		$soGrantPP = $this->DmiUserRoles->find('all',array('conditions'=>array('so_grant_pp'=>'yes','user_email_id IS'=>$nodalOfficerId)))->first();
+	
+		if(!empty($soGrantPP))
+		{
+			$soPowerToGrantApp = 'yes';
+		}
+		
+		return $soPowerToGrantApp;
+	}		
+
+
+
+	//added method to check if the lab application is NABL accreditated
+	//on 03-02-2023 by Shankhpal Shende
+	public function checkIfLabNablAccreditated($username){
+	
+		//check if the applicant for laboratory selected the NABL accreditation
+		$this->loadModel("DmiLaboratoryOtherDetails");
+		
+		$checkNabl = $this->DmiLaboratoryOtherDetails->find('all',['conditions'=>['user_email_id'=>$username],'order'=>'id desc'])->first();
+
+		if(!empty($checkNabl) && $checkNabl['is_accreditated']=='yes'){
+
+			return true;
+		}else{
+			return null;
+		}
+		
+	}
+
+
+
+	// Author : Shankhpal Shende
+	// Description : This function is created for display list of records whose status approved and matched
+	// Date : 08-02-2023
+	// Note : For Routine Inspection (RTI)
+
+	public function routineInspectionList(){
+
+		$this->viewBuilder()->setLayout('admin_dashboard');
+		$userName = $this->Session->read('username');
+		$this->loadModel('DmiRtiAllocations');
+		$this->loadModel('DmiRtiFinalReports');
+		$this->loadModel('DmiRoutineInspectionPeriod');
+		$this->loadModel('DmiFirms');
+		$this->loadModel('DmiFlowWiseTablesLists');
+		
+		
+
+		$conn = ConnectionManager::get('default');
+
+		// $users = "SELECT
+		// tbl.customer_id, dff.firm_name,dff.sub_commodity,tbl.tbl_name
+		// FROM dmi_firms AS df
+		// INNER JOIN dmi_ca_pp_lab_mapings AS map ON map.pp_id=df.id::varchar
+		// INNER JOIN dmi_firms AS dff ON dff.customer_id = map.customer_id
+		// INNER JOIN dmi_all_tbls_details AS tbl ON tbl.customer_id = map.customer_id
+		// WHERE df.customer_id = '$customer_id'";
+
+		$this->Session->write('application_type',10);
+		
+		$application_type = $this->Session->read('application_type');
+
+		$customer_id = $this->Session->read('customer_id');
+		
+		$get_period = $conn->execute("SELECT pp.* FROM dmi_routine_inspection_period AS pp")->fetchAll('assoc');
+
+		$period_ca = $get_period[0]['period'];
+			
+		$period_lab = $get_period[1]['period'];
+			
+		$period_pp = $get_period[2]['period'];
+
+		//dates between to fetch records
+		$from_date_ca = date("Y-m-d H:i:s",strtotime("-$period_ca month"));
+
+		$from_date_pp = date("Y-m-d H:i:s",strtotime("-$period_pp month"));
+			
+		$from_date_lab = date("Y-m-d H:i:s",strtotime("-$period_lab month"));
+
+		$to_date = date('Y-m-d H:i:s');
+
+		// to get array list for allocated ca application 
+		$list_array_ca = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/1/'.'%', array('date(created) >=' => $from_date_ca, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+		
+		// to get array list for allocated pp application 
+		$list_array_pp = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/2/'.'%',array('date(created) >=' => $from_date_pp, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+	
+		// to get array list for allocated lab application 
+		$list_array_lab = $this->DmiRtiAllocations->find('list',array('keyField'=>'id','valueField'=>'customer_id','conditions'=>array('customer_id like'=>'%'.'/3/'.'%',array('date(created) >=' => $from_date_lab, 'date(created) <=' =>$to_date)),'order'=>'id desc'))->toArray();
+		//added by shankhpal for approved list of ca 16/05/2023
+		$get_rti_approved_list_for_ca = [];
+		if(!empty($list_array_ca)){
+					$get_rti_approved_list_for_ca = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_ca,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
+		}
+		//added by shankhpal for approved list of pp 16/05/2023
+		$get_rti_approved_list_for_pp = [];
+		if(!empty($list_array_pp)){
+			$get_rti_approved_list_for_pp = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_pp,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
+		}
+		//added by shankhpal for approved list of lab 16/05/2023
+		$get_rti_approved_list_for_lab = [];
+		if(!empty($list_array_lab)){
+			$get_rti_approved_list_for_lab = $this->DmiRtiFinalReports->find('all',array('conditions'=>array('customer_id IN'=>$list_array_lab,'status IN'=>'approved','current_level'=>'level_3'),'order'=>'id desc'))->toArray();
+		}
+
+			$flow_wise_table = $this->DmiFlowWiseTablesLists->find('all',array('conditions'=>array('application_type IS'=>$application_type)))->first();
+
+		$report_pdf_table = $flow_wise_table['DmiRtiReportPdfRecords'];
+		$this->loadModel('DmiRtiReportPdfRecords');
+
+	
+		$appl_array_ca = array();
+		$i=0;
+		foreach($get_rti_approved_list_for_ca as $each){	
+			
+			$customer_id = $each['customer_id'];
+		
+				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+			
+				$report_pdf_field = 'pdf_file';
+				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+				
+					
+					$report_pdf = '';
+					$pdf_version_ca = '';
+				if(!empty($get_report_pdf)){
+					$report_pdf = $get_report_pdf[$report_pdf_field];
+					$pdf_version_ca = $get_report_pdf['pdf_version'];
+				}
+
+				
+
+				//get firm details
+				$firm_details = $this->DmiFirms->firmDetails($customer_id);
+				$firm_name = $firm_details['firm_name'];					
+				$firm_table_id = $firm_details['id'];
+
+				$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
+			
+				$appl_array_ca[$i]['customer_id'] = $customer_id.'-'.$form_type;
+				$appl_array_ca[$i]['firm_name'] = $firm_name;
+				$appl_array_ca[$i]['on_date'] = $each['created'];
+				$appl_array_ca[$i]['report_pdf'] = $report_pdf;
+				$appl_array_ca[$i]['report_link'] = $report_link;
+				$appl_array_ca[$i]['pdf_version'] = $pdf_version_ca;
+				
+				$i=$i+1;
+			//}
+		}
+
+		$appl_array_pp = array();
+		$i=0;
+			
+		foreach($get_rti_approved_list_for_pp as $each){	
+			
+			$customer_id = $each['customer_id'];
+		
+				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+			
+				$report_pdf_field = 'pdf_file';
+				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+				
+				$pdf_version_pp = '';
+				$report_pdf = '';
+				if(!empty($get_report_pdf)){
+					$report_pdf = $get_report_pdf[$report_pdf_field];
+						$pdf_version_pp = $get_report_pdf['pdf_version'];
+						
+				}
+
+				//get firm details
+				$firm_details = $this->DmiFirms->firmDetails($customer_id);
+				$firm_name = $firm_details['firm_name'];					
+				$firm_table_id = $firm_details['id'];
+
+				$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
+
+				$appl_array_pp[$i]['customer_id'] = $customer_id.'-'.$form_type;
+				$appl_array_pp[$i]['firm_name'] = $firm_name;
+				$appl_array_pp[$i]['on_date'] = $each['created'];
+				$appl_array_pp[$i]['report_pdf'] = $report_pdf;
+				$appl_array_pp[$i]['report_link'] = $report_link;
+				$appl_array_pp[$i]['pdf_version'] = $pdf_version_pp;
+				
+				$i=$i+1;
+			//}
+		}
+
+		$appl_array_lab = array();
+		$i=0;
+		foreach($get_rti_approved_list_for_lab as $each){	
+			
+			$customer_id = $each['customer_id'];
+		
+				$form_type = $this->Customfunctions->checkApplicantFormType($customer_id);
+
+				$report_pdf_field = 'pdf_file';
+				$get_report_pdf = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id'=>$customer_id),'order'=>'id desc'))->first();
+				
+				$report_pdf = '';
+				$pdf_version_lab = '';
+				if(!empty($get_report_pdf)){
+					$report_pdf = $get_report_pdf[$report_pdf_field];
+					$pdf_version_lab= $get_report_pdf['pdf_version'];
+				}
+			
+				//get firm details
+				$firm_details = $this->DmiFirms->firmDetails($customer_id);
+				$firm_name = $firm_details['firm_name'];					
+				$firm_table_id = $firm_details['id'];
+
+				$report_link = '../inspections/routine_inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
+
+
+				$appl_array_lab[$i]['customer_id'] = $customer_id.'-'.$form_type;
+				$appl_array_lab[$i]['firm_name'] = $firm_name;
+				$appl_array_lab[$i]['on_date'] = $each['created'];
+				$appl_array_lab[$i]['report_pdf'] = $report_pdf;
+				$appl_array_lab[$i]['report_link'] = $report_link;
+				$appl_array_lab[$i]['pdf_version'] = $pdf_version_lab;
+				
+				$i=$i+1;
+			//}
+		}
+
+
+	
+
+		// $report_pdf_path = $this->DmiRtiReportPdfRecords->find('all',array('conditions'=>array('customer_id IS'=>$customer_id),'order'=>'id DESC'))->first();
+		// $report_link = '/inspections/inspection_report_fetch_id/'.$firm_details['id'].'/view/'.$application_type.'/yes';
+		// $this->redirect($report_link);
+
+		$this->set('appl_array_ca',$appl_array_ca);
+		$this->set('appl_array_pp',$appl_array_pp);
+		$this->set('appl_array_lab',$appl_array_lab);
+	
+	}
+
+
+
+
+
+
+	
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
 											/***###|Action on Misgrading / Suspension / Cancellation / Management of Misgrading Reports|###***/

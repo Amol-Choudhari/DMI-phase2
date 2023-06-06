@@ -590,6 +590,7 @@ class BeforepageloadComponent extends Component {
 						
 		}
 
+
 		$this->Controller->set(compact('InprocessMsg','InprocessApplId'));
 		$this->Controller->set('IsApproved',$IsApproved);
 		$this->Controller->set('show_renewal_btn',$show_renewal_btn);

@@ -102,7 +102,7 @@
 										<div class="form-group row">
 											<label for="inputEmail3" class="col-sm-3 col-form-label">Undertaking doc: <span class="cRed">*</span>
 												<?php if(!empty($section_form_details[0]['required_document'])){?>
-													<a id="required_document_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['required_document']); ?>">Preview</a>
+													<a id="required_document_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['required_document']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['required_document'])), -1))[0],23);?></a>
 												<?php } ?>
 											</label>
 											<div class="custom-file col-sm-9">
@@ -150,7 +150,7 @@
 									<div class="form-group row" id="noc_for_lab_docs_block">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
 											<?php if(!empty($section_form_details[0]['noc_for_lab_docs'])){?>
-												<a id="noc_for_lab_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['noc_for_lab_docs']); ?>">Preview</a>
+												<a id="noc_for_lab_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['noc_for_lab_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['noc_for_lab_docs'])), -1))[0],23);?></a>
 											<?php } ?>
 										</label>
 										
@@ -192,7 +192,7 @@
 									<div class="form-group row" id="is_lab_packers_conveyed_docs_block">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
 											<?php if(!empty($section_form_details[0]['is_lab_packers_conveyed_docs'])){?>
-												<a id="is_lab_packers_conveyed_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_lab_packers_conveyed_docs']); ?>">Preview</a>
+												<a id="is_lab_packers_conveyed_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_lab_packers_conveyed_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['is_lab_packers_conveyed_docs'])), -1))[0],23);?></a>
 											<?php } ?>
 										</label>
 										<div class="custom-file col-sm-9">

@@ -1,7 +1,7 @@
 <thead>
 	<tr>
 		<th>SR.No</th>
-		<th>SMS Message</th>
+		<th>Template Text</th>
 		<th>Created By</th>
 		<th>For</th>
 		<th>Status</th>

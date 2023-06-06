@@ -240,8 +240,18 @@ class MastersController extends AppController {
 			$this->masterEditTitle = 'Edit Documents Type';
 			$this->fieldNameForCheck = 'document_type';
 		
-		//[ 20 For the Misgrade Categories Master ] -> Akash [12-12-2022]
+		//[ 20 For routin Inspections Master ] -> Shankhpal [06-12-2022]
 		} elseif ($masterId=='20') {
+
+			$this->masterTable = 'DmiRoutineInspectionPeriod';
+			$this->masterListTitle = 'Routine Inspection Period (Month)';
+			$this->masterListHeader = 'Routine Inspection';
+			$this->masterAddTitle = 'Add Month';
+			$this->masterEditTitle = 'Edit Month';
+			$this->fieldNameForCheck = 'routin_month';
+
+		//[ 21 For the Misgrade Categories Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='21') {
 
 			$this->masterTable = 'DmiMmrCategories';
 			$this->masterListTitle = 'List of All Misgrade Categories';
@@ -250,8 +260,8 @@ class MastersController extends AppController {
 			$this->masterEditTitle = 'Edit Misgrade Category';
 			$this->fieldNameForCheck = 'misgrade_category';
 		
-		//[ 21 For the Misgrade Levels Master ] -> Akash [12-12-2022]
-		} elseif ($masterId=='21') {
+		//[ 22 For the Misgrade Levels Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='22') {
 
 			$this->masterTable = 'DmiMmrLevels';
 			$this->masterListTitle = 'List of All Misgrade Levels';
@@ -260,8 +270,8 @@ class MastersController extends AppController {
 			$this->masterEditTitle = 'Edit Misgrade Levels';
 			$this->fieldNameForCheck = 'misgrade_levels';
 
-		//[ 22 For the Misgrade Actions Master ] -> Akash [12-12-2022]
-		} elseif ($masterId=='22') {
+		//[ 23 For the Misgrade Actions Master ] -> Akash [12-12-2022]
+		} elseif ($masterId=='23') {
 
 			$this->masterTable = 'DmiMmrActions';
 			$this->masterListTitle = 'List of All Misgrade Actions';
@@ -435,6 +445,7 @@ class MastersController extends AppController {
 		$this->loadModel('DmiUserRoles');
 		$this->loadModel('DmiStates');
 		$this->loadModel('DmiDistricts');
+		$this->loadModel('DmiRoutineInspectionPeriod');
 		$form_id = '';
 
 		if (!empty($masterTable)) {
@@ -478,7 +489,9 @@ class MastersController extends AppController {
 			$all_so_list = $this->DmiUserRoles->find('list',array('keyField'=>'user_email_id','valueField'=>'user_email_id','conditions'=>array('so_inspection'=>'yes')))->toArray();
 			//to fetch ro offices list
 			$ro_office_list = $this->DmiRoOffices->find('list',array('keyField'=>'id','valueField'=>'ro_office','conditions'=>array('office_type'=>'RO','delete_status IS NULL'),'order'=>'ro_office ASC'))->toArray();
-
+			//fetch and print the 15 digit
+			$fdcode = $this->DmiRoOffices->find('list',array('keyField'=>'ro_office','valueField'=>'replica_code','conditions'=>array('delete_status IS NULL','office_type IN'=>array('RO','SO')),'order'=>'ro_office ASC'))->toArray();
+			
 			//added below loop //for email encoding
 			$newArray = array();
 			foreach ($all_ro_list as $key => $emailId) {
@@ -504,7 +517,7 @@ class MastersController extends AppController {
 			$all_so_list = $newArray;
 			//till here
 
-			$this->set(compact('all_ro_list','all_ral_list','all_so_list','ro_office_list','masterListHeader'));
+			$this->set(compact('all_ro_list','all_ral_list','all_so_list','ro_office_list','masterListHeader','fdcode'));
 
 		//For PAO/DDO
 		} elseif ($masterId=='11') {
@@ -568,7 +581,13 @@ class MastersController extends AppController {
 			$unit = $this->DmiReplicaUnitDetails->find('list',array('keyField'=>'id','valueField'=>'sub_unit','conditions'=>array('delete_status IS NULL')))->toArray();
 			//Set the All Varibles
 			$this->set(compact('commodity_categories','unit'));
-		}
+	
+		}elseif($masterId == '20'){
+			  
+			$this->loadModel('DmiCertificateTypes');
+        		$certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
+		    	$this->set('certificate_type',$certificate_type);
+		} 
 
 
 		//when POST data sent from Form
@@ -785,8 +804,10 @@ class MastersController extends AppController {
 			
 			//to fetch ro offices list
 			$ro_office_list = $this->DmiRoOffices->find('list',array('keyField'=>'id','valueField'=>'ro_office','conditions'=>array('office_type'=>'RO','delete_status IS NULL'),'order'=>'ro_office ASC'))->toArray();
-
-			$this->set(compact('ro_incharge_name','ro_incharge_mobile_no','ro_incharge_name_list','all_ral_list','ro_office_list','masterEditTitle','masterListHeader'));
+			//fetch and print the 15 digit
+			$fdcode = $this->DmiRoOffices->find('list',array('keyField'=>'ro_office','valueField'=>'replica_code','conditions'=>array('delete_status IS NULL','office_type IN'=>array('RO','SO')),'order'=>'ro_office ASC'))->toArray();
+			
+			$this->set(compact('ro_incharge_name','ro_incharge_mobile_no','ro_incharge_name_list','all_ral_list','ro_office_list','masterEditTitle','masterListHeader','fdcode'));
 
 
 		// For SMS/Email Templates
@@ -861,6 +882,25 @@ class MastersController extends AppController {
 
 			//Set the All Varibles
 			$this->set(compact('commodity_categories','entered_commodity','entered_charge','entered_qty','selected_unit','replica_code','masterEditTitle','masterListHeader'));
+	
+	
+		// For Routine Inspection -> Shankhpal Shende [06/12/2022]
+		}elseif($masterId == '20'){
+
+			$this->loadModel('DmiRoutineInspectionPeriod');
+			$form_id = 'edit_period';
+			$period_id = $this->Session->read('record_id');
+			//period added for master of routine inspection -> shankhpal 16/05/2023
+			// updated period of master by shankhpal shende on 17/05/2023
+			$period_rti = array('0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12');
+			$this->set('period_rti',$period_rti);
+				
+			$this->loadModel('DmiCertificateTypes');
+			$certificate_type = $this->DmiCertificateTypes->find('list',array('valueField'=>'certificate_type','conditions'=>array()))->toArray();
+			$this->set('certificate_type',$certificate_type);
+					
+			$period_details = $this->DmiRoutineInspectionPeriod->find('all',array('conditions'=>array('id IS'=>$period_id)))->first();
+			$this->set(compact('period_details'));
 		}
 
 
@@ -1301,8 +1341,19 @@ class MastersController extends AppController {
 				$this->message_theme = 'success';
 			}
 		
-		// For Misgrade Categories -> Akash [12-12-2022]
+		// For Routine Inspection -> Shankhpal Shende [06/12/2022]
 		} elseif ($masterId=='20') {
+			 
+			 if ($this->Mastertablecontent->addEditPeriodMaster($postData,$record_id)) {
+
+				///Added this call to save the user action log on 21-02-2022 by Akash
+				$this->Customfunctions->saveActionPoint('Routine Inspection Period Master '."($forActionLog)", 'Success');
+				$this->message = 'You have '.$action_var.' Period Successfully.';
+				$this->message_theme = 'success';
+			}
+
+		// For Misgrade Categories -> Akash [12-12-2022]
+		} elseif ($masterId=='21') {
 
 			if ($this->Mastertablecontent->addEditMisgradeCategories($postData,$record_id)) {
 
@@ -1313,7 +1364,7 @@ class MastersController extends AppController {
 			}
 		
 		// For Misgrade Levels -> Akash [12-12-2022]
-		} elseif ($masterId=='21') {
+		} elseif ($masterId=='22') {
 
 			if ($this->Mastertablecontent->addEditMisgradeLevels($postData,$record_id)) {
 
@@ -1324,7 +1375,7 @@ class MastersController extends AppController {
 			}
 		
 		// For Misgrade Action -> Akash [12-12-2022]
-		} elseif ($masterId=='22') {
+		} elseif ($masterId=='23') {
 
 			if ($this->Mastertablecontent->addEditMisgradeActions($postData,$record_id)) {
 

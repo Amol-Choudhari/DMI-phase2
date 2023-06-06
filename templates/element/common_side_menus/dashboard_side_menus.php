@@ -248,6 +248,13 @@
 
 								<ul class="nav nav-treeview">
 									<li class="nav-item has-treeview">
+										<!-- added new Li to show menu for Old applications, with two parameters, on 29-05-2023 by Amol -->
+										<li class="nav-item">
+											<a href="<?php echo $this->request->getAttribute("webroot");?>hoinspections/redirectGrantedApplications/1/old" class="bg-cyan nav-link">
+												<i class="far fa-dot-circle nav-icon"></i>
+												<p class="nav-icon-p"><b>Old Application</b></p>
+											</a>
+										</li>
 										<li class="nav-item">
 											<a href="<?php echo $this->request->getAttribute("webroot");?>hoinspections/redirectGrantedApplications/1" class="bg-cyan nav-link">
 												<i class="far fa-dot-circle nav-icon"></i>
@@ -374,7 +381,8 @@
 								</ul>
 							</li>
 						</li>
-
+						
+						<!-- This Whole block is For the Management of Misgrading Module (MMR) / Actions / Suspensions / Cancellations -->
 						<li class="nav-item">
 							<li class="nav-item has-treeview">
 								<a href="#" class="nav-link">
@@ -412,7 +420,7 @@
 								</ul>
 							</li>
 						</li>
-
+						<!-- End of Block -->
 									
 
 					<?php } if ($current_user_roles['old_appln_data_entry'] == 'yes') { ?>

@@ -3,14 +3,14 @@
 	h4 {
 		padding: 5px;
 		font-family: times;
-		font-size: 13pt;					
+		font-size: 13pt;
 	}
 	table{
 		padding: 5px;
 		font-size: 12pt;
 		font-family: times;
 	}
-				
+
 	.cRed{
 		color: red;
 	}
@@ -116,16 +116,16 @@
 		
 		<!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
 			#This field is not required as UAT Suggestion by DMI - Akash [12-05-2023]
-		<tr>
-			<td style="padding:10px; vertical-align:top;">3.Is Packer Submitted CA Book?</td>
+			<tr>
+				<td style="padding:10px; vertical-align:top;">3.Is Packer Submitted CA Book?</td>
 				<td style="padding:10px; vertical-align:top;"><?php // echo $surrenderData[0]['is_cabook_submitted']; ?> <br></td>
-		</tr>
-		<tr>
-			<td style="padding:10px; vertical-align:top;">3(a). Related Document: </td>
+			</tr>
+			<tr>
+				<td style="padding:10px; vertical-align:top;">3(a). Related Document: </td>
 				<td style="padding:10px; vertical-align:top;"><?php // if(!empty($surrenderData[0]['is_cabook_submitted_docs'])){ $split_file_path = explode("/",$surrenderData[0]['is_cabook_submitted_docs']);
 														//	$file_name = $split_file_path[count($split_file_path) - 1];?>
 														<a href="<?php //echo $surrenderData[0]['is_cabook_submitted_docs']; ?>"><?php // echo substr($file_name, 23); ?></a><?php // }else{ echo 'NA'; }  ?></td>
-		</tr>
+			</tr>
 		----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
 

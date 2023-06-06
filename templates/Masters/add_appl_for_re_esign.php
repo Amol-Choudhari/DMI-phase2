@@ -27,9 +27,8 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group row">
-												<label class="col-md-6">Enter Application Id</label>
+												<label class="col-md-6 col-form-label">Enter Application Id <span class="cRed">*</span></label>
 												<?php echo $this->Form->control('customer_id', array('type'=>'text', 'id'=>'customer_id', 'class'=>'form-control', 'label'=>false, 'placeholder'=>'Enter Application Id', 'required'=>true)); ?>
-												<div id="error_machine_type"></div>
 											</div>
 										</div>
 										<div class="col-md-2">
@@ -54,7 +53,6 @@
 									<tbody>
 										<?php
 											$sr_no = 1;
-
 											foreach($added_appl as $each){ ?>
 											<tr>
 												<td><?php echo $sr_no; ?></td>
@@ -81,4 +79,4 @@
 		</div>
 	</section>
 </div>
-		<?php echo $this->Html->script('Masters/add_appl_for_re_esign'); ?>
+<?php echo $this->Html->script('Masters/add_appl_for_re_esign'); ?>

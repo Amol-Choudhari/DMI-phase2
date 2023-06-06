@@ -1,7 +1,7 @@
 <thead>
 	<tr>
 		<th>SR.No</th>
-		<th>State Name</th>
+		<th>Document Name</th>
 		<th>Action</th>
 	</tr>
 </thead>

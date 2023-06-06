@@ -450,3 +450,4 @@ class SampleInwardTable extends Table
 		return $details;
     }
 }
+?>

@@ -14,17 +14,20 @@ $menu_firm = '';
 $menu_password = '';
 $menu_log = '';
 $menu_action_log = '';
+$menu_manual = '';
 
 if ($current_menu == 'menu_profile') {
   $menu_profile = 'active';
 } elseif ($current_menu == 'menu_firm') {	
   $menu_firm = 'active';
-} elseif ($current_menu == 'menu_password') {
+} elseif ($current_menu == 'change_password') {
   $menu_password = 'active';
-} elseif ($current_menu == 'menu_log') {
+} elseif ($current_menu == 'current_user_logs') {
   $menu_log = 'active';
-} elseif ($current_menu == 'menu_action_log') { 
+} elseif ($current_menu == 'user_action_history') { 
   $menu_action_log = 'active';
+} elseif ($current_menu == 'menu_manual'){
+	$menu_manual = 'active';
 } else {
   $menu_dashboard = 'active';
 }
@@ -55,7 +58,7 @@ if ($current_menu == 'menu_profile') {
 					<?php echo $this->Html->link('<i class="nav-icon fas fa-book"></i><p class="nav-icon-p">Action History</p>', array('controller'=>'common', 'action'=>'user_action_history'), array('escape'=>false, 'class'=>'nav-link '.$menu_action_log)); ?>
 				</li>
 				<li class="nav-item">
-					<?php echo $this->Html->link('<i class="nav-icon fas fa-address-book"></i><p class="nav-icon-p">User Manuals</p>', array('controller'=>'common', 'action'=>'all_manuals'), array('escape'=>false, 'class'=>'nav-link '.$menu_action_log)); ?>
+					<?php echo $this->Html->link('<i class="nav-icon fas fa-address-book"></i><p class="nav-icon-p">User Manuals</p>', array('controller'=>'common', 'action'=>'all_manuals'), array('escape'=>false, 'class'=>'nav-link '.$menu_manual)); ?>
 				</li>
 				<li class="nav-item">
 					<?php echo $this->Html->link('<i class="nav-icon fas fa-power-off"></i><p class="nav-icon-p">Logout</p>', array('controller'=>'common', 'action'=>'logout'), array('escape'=>false, 'class'=>'nav-link')); ?>

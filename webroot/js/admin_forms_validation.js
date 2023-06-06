@@ -794,7 +794,7 @@
 
             if(application_type_id == ''){
 
-                $("#error_application_type_id").show().text("Please enter application type id");
+                $("#error_application_type_id").show().text("Please Select the Application Type");
                 $("#application_type_id").addClass("is-invalid");
                 $("#application_type_id").click(function(){$("#error_application_type_id").hide().text;$("#application_type_id").removeClass("is-invalid");});
                 value_return = 'false';
@@ -802,7 +802,7 @@
 
             if(firm_type == ''){
 
-                $("#error_firm_type").show().text("Please enter firm type");
+                $("#error_firm_type").show().text("Please Select Firm Type");
                 $("#firm_type").addClass("is-invalid");
                 $("#firm_type").click(function(){$("#error_firm_type").hide().text;$("#firm_type").removeClass("is-invalid");});
                 value_return = 'false';
@@ -1132,8 +1132,8 @@
 		}
 
 
-		//For Misgrading Category
-		if (masterId == '20') {
+		//For Misgrading Category- Akash [05-06-2023]
+		if (masterId == '21') {
 
 			var misgrade_category_name = $('#misgrade_category_name').val();
 			var misgrade_category_dscp = $('#misgrade_category_dscp').val();
@@ -1156,8 +1156,8 @@
 		}
 
 
-		//For Misgrading Levels
-		if (masterId == '21') {
+		//For Misgrading Levels - Akash [05-06-2023]
+		if (masterId == '22') {
 
 			var misgrade_level_name = $('#misgrade_level_name').val();
 			var misgrade_level_dscp = $('#misgrade_level_dscp').val();
@@ -1180,8 +1180,8 @@
 		}
 
 
-		//For Misgrading Actions
-		if (masterId == '22') {
+		//For Misgrading Actions- Akash [05-06-2023]
+		if (masterId == '23') {
 
 			var misgrade_action_name = $('#misgrade_action_name').val();
 			var misgrade_action_dscp = $('#misgrade_action_dscp').val();

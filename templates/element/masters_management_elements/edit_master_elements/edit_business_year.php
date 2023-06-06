@@ -12,15 +12,15 @@
 
 <div class="col-md-6">
 	<div class="form-group">
-		<label>Enter value Here <span class="cRed">*</span></label>
+		<label class="col-form-label">Business Years <span class="cRed">*</span></label>
 		<?php echo $this->Form->control('business_years', array('type'=>'text', 'id'=>'business_years','label'=>false, 'value'=>$record_details[$business_years],'class'=>'form-control')); ?>
 		<span id="error_business_year" class="error invalid-feedback"></span>
 	</div>
 </div>
 
 <div class="col-md-6">
-	<label>Select Business Years for:</label>
-	<?php echo $this->Form->control('business_years_for', array('type'=>'select', 'id'=>'business_years_for','label'=>false, 'options'=>$options, 'value'=>$years_for,'class'=>'form-control','readonly'=>true)); ?>
+	<label class="col-form-label">Select Business Years for:</label>
+	<?php echo $this->Form->control('business_years_for', array('type'=>'select', 'id'=>'business_years_for','label'=>false, 'options'=>$options, 'value'=>$years_for,'class'=>'form-control rOnly','readonly'=>true)); ?>
 	<span id="error_business_years_for" class="error invalid-feedback"></span>
 </div>
 

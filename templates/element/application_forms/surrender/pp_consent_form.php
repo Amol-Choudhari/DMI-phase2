@@ -96,7 +96,7 @@
 										<div class="form-group row">
 											<label for="inputEmail3" class="col-sm-3 col-form-label">Undertaking doc: <span class="cRed">*</span>
 												<?php if(!empty($section_form_details[0]['required_document'])){?>
-													<a id="required_document_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['required_document']); ?>">Preview</a>
+													<a id="required_document_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['required_document']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['required_document'])), -1))[0],23);?></a>
 												<?php } ?>
 											</label>
 											<div class="custom-file col-sm-9">
@@ -144,7 +144,7 @@
 									<div class="form-group row" id="is_balance_printing_submitted_docs_block">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
 											<?php if(!empty($section_form_details[0]['is_balance_printing_submitted_docs'])){?>
-												<a id="is_balance_printing_submitted_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_balance_printing_submitted_docs']); ?>">Preview</a>
+												<a id="is_balance_printing_submitted_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_balance_printing_submitted_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['is_balance_printing_submitted_docs'])), -1))[0],23);?></a>
 											<?php } ?>
 										</label>
 										
@@ -186,7 +186,7 @@
 									<div class="form-group row" id="printing_declaration_docs_block">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
 											<?php if(!empty($section_form_details[0]['printing_declaration_docs'])){?>
-												<a id="printing_declaration_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['printing_declaration_docs']); ?>">Preview</a>
+												<a id="printing_declaration_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['printing_declaration_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['printing_declaration_docs'])), -1))[0],23);?></a>
 											<?php } ?>
 										</label>
 										<div class="custom-file col-sm-9">
@@ -227,7 +227,7 @@
 									<div class="form-group row" id="is_packers_conveyed_docs_block">
 										<label for="inputEmail3" class="col-sm-3 col-form-label">Related Document: <span class="cRed">*</span>
 											<?php if(!empty($section_form_details[0]['is_packers_conveyed_docs'])){?>
-												<a id="is_packers_conveyed_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_packers_conveyed_docs']); ?>">Preview</a>
+												<a id="is_packers_conveyed_docs_value" target="blank" href="<?php echo str_replace("D:/xampp/htdocs","",$section_form_details[0]['is_packers_conveyed_docs']); ?>"><?=$str2 = substr(array_values(array_slice((explode("/",$section_form_details[0]['is_packers_conveyed_docs'])), -1))[0],23);?></a>
 											<?php } ?>
 										</label>
 										<div class="custom-file col-sm-9">

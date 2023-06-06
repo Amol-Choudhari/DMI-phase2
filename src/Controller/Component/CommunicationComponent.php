@@ -35,18 +35,18 @@ class CommunicationComponent extends Component {
 		}
 
 		$list_record_with_delete_null = $tablename->find('list', array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,
-							'delete_mo_comment IS NULL', 'delete_ro_referred_back  IS NULL', 'ro_current_comment_to'=>'mo', 'modified IS'=>$latest_modified_date)))->toArray();
+						  'delete_mo_comment IS NULL', 'delete_ro_referred_back  IS NULL', 'ro_current_comment_to'=>'mo', 'modified IS'=>$latest_modified_date)))->toArray();
 
 
 		if($list_record_with_delete_null)
 		{
-			$last_record_with_delete_null = $tablename->find('all', array('conditions'=>array('id'=>max($list_record_with_delete_null))))->first();
+		  $last_record_with_delete_null = $tablename->find('all', array('conditions'=>array('id'=>max($list_record_with_delete_null))))->first();
 		}
 		else{
 
 			$list_record_with_delete_null = $tablename->find('list', array('conditions'=>array('customer_id IS'=>$customer_id,$grantDateCondition,
-							'OR'=>array('ro_reply_comment_date IS NOT NULL','mo_comment_date IS NOT NULL'),
-							'delete_mo_comment IS NULL', 'delete_ro_referred_back IS NULL')))->toArray();
+						  'OR'=>array('ro_reply_comment_date IS NOT NULL','mo_comment_date IS NOT NULL'),
+						  'delete_mo_comment IS NULL', 'delete_ro_referred_back IS NULL')))->toArray();
 
 			if(!empty($list_record_with_delete_null))
 			{
@@ -239,17 +239,17 @@ class CommunicationComponent extends Component {
 	{
 		$section_id = $this->Session->read('section_id');
 		$username = $this->Session->read('username');
-		
+			
 		$application_dashboard = $this->Session->read('application_dashboard');
 
 		// Pravin bhakare 03-10-2021
 		$Dmi_chemist_comment = TableRegistry::getTableLocator()->get('DmiChemistComments');
-		
+			
 		if($application_dashboard == 'chemist'){
 
 			$chemist_reply_history = $Dmi_chemist_comment->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'section_id IS'=>$section_id)))->toArray();
 			$this->Controller->set('chemist_referredback_history',$chemist_reply_history);
-			
+				
 			$referredbacksection = $Dmi_chemist_comment->find('all',array('conditions'=>array('customer_id IS'=>$customer_id,'section_id IS'=>$section_id,'is_latest'=>1)))->first();
 			$this->Controller->set('referredbacksection',$referredbacksection);
 
@@ -265,28 +265,28 @@ class CommunicationComponent extends Component {
 
 	//Saved referredback comments in chemist flow, Done Aakash Thakare 30-09-2021
 	public function singleWindowReferredback($data,$allSectionDetails){
-	
 		
+			
 		$comment_to = $this->Session->read('customer_id');
 		$comment_by = $this->Session->read('username');
 		$section_id = $this->Session->read('section_id');
 		$commentid= '';	
-		
+			
 		$Dmi_chemist_comment = TableRegistry::getTableLocator()->get('DmiChemistComments');
 
 		$commentDetails = $Dmi_chemist_comment->find('all',array('conditions'=>array('customer_id' => $comment_to,'comment_by'=>$comment_by,'section_id'=>"$section_id",'is_latest'=>'1')))->first();
-		
+			
 		if(!empty($commentDetails)){
 
 			$commentid = $commentDetails['id'];
-			
+				
 			if($data['reffered_back_id'] == ''){
 				$comment = $commentDetails['comments'].' '.htmlentities($data['reffered_back_comment'], ENT_QUOTES);
 			}else{
 				$comment = htmlentities($data['reffered_back_comment'], ENT_QUOTES);
 			}
-			
-			
+				
+				
 			if(!empty($commentDetails['reply_comment'])&& !empty($commentDetails['reply_dt'])){			
 				$commentid= '';			
 				$Dmi_chemist_comment->updateAll(
@@ -302,7 +302,7 @@ class CommunicationComponent extends Component {
 		}else{
 			$comment = htmlentities($data['reffered_back_comment'], ENT_QUOTES);
 		}
-		
+			
 		$newEntity = $Dmi_chemist_comment->newEntity(array(
 
 			'id'=>$commentid,
@@ -315,7 +315,7 @@ class CommunicationComponent extends Component {
 			'is_latest'=>1			   
 		));
 		if($Dmi_chemist_comment->save($newEntity)){
-			
+				
 			$section_id = $section_id - 1;
 			$section_model = $allSectionDetails[$section_id]['section_model'];
 			$formtable = TableRegistry::getTableLocator()->get($section_model);
@@ -323,12 +323,12 @@ class CommunicationComponent extends Component {
 				array('form_status' => "referred_back",'ro_current_comment_to'=>'applicant'),
 				array('customer_id'=>$comment_to,'is_latest'=>'1')
 			);
-			
+				
 			return 1;
 		}else{
 			return 2;
 		}
-		
+			
 	}
 
 
@@ -478,7 +478,7 @@ class CommunicationComponent extends Component {
 
 
 			if($comment_reply['id']==$reply_max_id &&
-					$section_form_details[0]['id']==$reply_max_id &&
+				 $section_form_details[0]['id']==$reply_max_id &&
 					$show_io_edit_delete == 'yes'){
 						$show_sent_to_btn = 'yes';
 					}
@@ -493,11 +493,6 @@ class CommunicationComponent extends Component {
 		$this->Controller->set('show_sent_to_btn',$show_sent_to_btn);
 		$this->Controller->set('show_referred_back_btn',$show_referred_back_btn);
 	}
-
-
-
-
-	
 
 }
 

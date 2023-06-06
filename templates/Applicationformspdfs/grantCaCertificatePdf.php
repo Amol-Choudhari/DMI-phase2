@@ -16,48 +16,53 @@
 	
 </style>
 
-	<?php if ($isSurrender== 'yes') { ?>
-		<table width="100%" border="1">
-			<tr>
-				<td>
-					<h4 class="cRed">
-						This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
-						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
-						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
-					</h4>
-				</td>
-			</tr>
-		</table>
-	<?php } elseif ($isForSuspension != null && $isForSuspension == 'Yes') { ?>
 
-		<table width="100%" border="1">
-			<tr>
-				<td>
-					<h4 class="cRed">
-						This Certificate of Authorisation is Suspended by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
-						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
-						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
-					</h4>
-				</td>
-			</tr>
-		</table>
+	<!--  This Below Blocks Are used for the Surrender , Suspension and Cancellation of Certificate - Akash [05-06-2023] -->
+		<?php if ($isSurrender== 'yes') { ?>
+			<table width="100%" border="1">
+				<tr>
+					<td>
+						<h4 class="cRed">
+							This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+							Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+							If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+						</h4>
+					</td>
+				</tr>
+			</table>
+		<?php } elseif ($isForSuspension != null && $isForSuspension == 'Yes') { ?>
 
- 	<?php } elseif ($isForCancellation !=null && $isForCancellation == 'Yes') { ?>
+			<table width="100%" border="1">
+				<tr>
+					<td>
+						<h4 class="cRed">
+							This Certificate of Authorisation is Suspended by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+							Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+							If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+						</h4>
+					</td>
+				</tr>
+			</table>
 
-		<table width="100%" border="1">
-			<tr>
-				<td>
-					<h4 class="cRed">
-						This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
-						Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
-						If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
-					</h4>
-				</td>
-			</tr>
-		</table>
+	 	<?php } elseif ($isForCancellation !=null && $isForCancellation == 'Yes') { ?>
 
-	<?php } ?>
+			<table width="100%" border="1">
+				<tr>
+					<td>
+						<h4 class="cRed">
+							This Certificate of Authorisation is cancelled by the competent authority dated <b> <?php echo date('d-m-Y'); ?> </b> 
+							Applicant do not grade and mark "<?php echo $commodityNames ?>" commodity/ies under AGMARK.
+							If, violation is observed than action shall be taken as per APGM Act and GGM Rule.
+						</h4>
+					</td>
+				</tr>
+			</table>
 
+		<?php } ?>
+	<!--- End of Block -->
+	
+	
+	
 	<table width="100%" border="1">
 		<tr>				
 			<td width="12%" align="center">
@@ -504,7 +509,14 @@
 				
 							
 				<!-- element call to show change updates added on 02-01-2023-->
-				<?php // echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate'); ?>
+				<?php
+					//condition added on 26-05-2023, to get changed details only when appl. is for change or already changed earlier 
+					if($_SESSION['application_type']==3 || !empty($getNoOfAppl)){
+						echo $this->element('application_forms/change/elementChangeUpdatesOnCertificate');
+					}
+				 ?>
+						
+		
 		</table>
 		
 		

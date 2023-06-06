@@ -872,10 +872,10 @@ class ApplicationController extends AppController{
 							
 							if (!empty($getId)) {
 								
-							$renRecordId = $getId['id'];
-							$renewalSubmissionLogEntity = $this->DmiRenewalSubmissionLogs->newEntity(array(
+								$renRecordId = $getId['id'];
+								$renewalSubmissionLogEntity = $this->DmiRenewalSubmissionLogs->newEntity(array(
 
-								'id'=>$renRecordId,
+									'id'=>$renRecordId,
 									//'remark'=>$this->request->getData('late_remark'),									
 									'remark' =>$remark,//commented above and added new by laxmi B. on 30-1-23
 									'modified'=>date('Y-m-d H:i:s'),
@@ -892,9 +892,9 @@ class ApplicationController extends AppController{
 									//'remark'=>$this->request->getData('late_remark'),
 									'remark' =>$remark,//commented above and added new by laxmi B. on 30-1-23
 									'created'=>date('Y-m-d H:i:s'),
-								'modified'=>date('Y-m-d H:i:s'),
-								'status'=>'submitted'
-							));
+									'modified'=>date('Y-m-d H:i:s'),
+									'status'=>'submitted'
+								));
 							}
 							
 
@@ -1042,7 +1042,7 @@ class ApplicationController extends AppController{
 			if ($application_type == 9) {
 				$message = "Application of Surrender for ".$firm_type_text.' - Final submitted successfully ';
 			}else{
-			$message = $firm_type_text.' - Final submitted successfully ';
+				$message = $firm_type_text.' - Final submitted successfully ';
 			}
 
 			$message_theme = 'success';

@@ -1709,11 +1709,11 @@ class AjaxFunctionsController extends AppController{
 						<td>".$resultArray['firm_data']['district']."</td>
 						<td>".$resultArray['current_position']."</td>
 						<td>".$resultArray['process']."</td>
-							<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td> ";
-							//added by laxmi on 13-12-23
-							if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
-								echo "<td>Rejected</td>";
-							}
+						<td>".$resultArray['currentPositionUser']." <br>( ".$resultArray['getEmailCurrent']." )"."</td> ";
+						//added by laxmi on 13-12-23
+						if(!empty($rejectedData['customer_id']) && $rejectedData['customer_id'] == $customer_id){
+							echo "<td>Rejected</td>";
+						}
 
 				echo "</tr>
 				</tbody>

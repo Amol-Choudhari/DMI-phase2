@@ -45,7 +45,7 @@
 			$linecolor = imagecolorallocate($im, 255,255,255);
 			for($i=0;$i<5;$i++){
 				
-				imageline($im,0,rand()%50,200,rand()%50,$linecolor);
+				imageline($im,0,rand()%80,200,rand()%80,$linecolor);
 			}
 			
 			//adding random dots in image 05-05-2021 by Amol

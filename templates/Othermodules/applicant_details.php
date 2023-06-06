@@ -37,7 +37,7 @@
 								</thead>
 								<tbody>
 									<?php $sr_no=1; foreach($datalist as $eachdata){ ?>
-										<?php foreach($eachdata as $data){	
+									<?php foreach($eachdata as $data){
 											//$email = AppController::get_email_masked($data['fp']['email']);
 											//$femail = AppController::get_email_masked($data['Dmi_firm']['email']);
 											$email = base64_decode($data['email']);//for email encoding

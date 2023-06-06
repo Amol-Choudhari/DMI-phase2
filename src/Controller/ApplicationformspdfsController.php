@@ -497,15 +497,15 @@ class ApplicationformspdfsController extends AppController{
 		
 		$all_data_pdf = $this->render($pdf_view_path);		
 		
-		//Below Block Is added to Change the PDF prefix if the Firm is Suspended or Cancelled- Akash [02-06-2023]
+		//Below Block Is added to Change the PDF prefix if the Firm is Suspended or Cancelled and the Orignal Condition is Now in else block -> Akash [02-06-2023]
 		if ($this->Session->check('for_module')) {
 
 			$for_module = $this->Session->read('for_module');
 			
 			if ($for_module === 'Suspension') {
-				$rearranged_id = 'G-SPN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+				$rearranged_id = 'SPN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 			} elseif ($for_module === 'Cancellation') {
-				$rearranged_id = 'G-CAN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
+				$rearranged_id = 'CAN-'.$split_customer_id[0].'-'.$split_customer_id[1].'-'.$split_customer_id[2].'-'.$split_customer_id[3];
 			} 
 
 		} else {
@@ -1757,12 +1757,17 @@ class ApplicationformspdfsController extends AppController{
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 			
 			
-			if ($_SESSION['application_type'] == '9') {	 		//For Suspension [Application Type = 9] - (SOC) -> Akash [02-05-2023]
+			if ($_SESSION['application_type'] == '9') {	 		//For Surrender [Application Type = 9] - (SOC) -> Akash [02-05-2023]
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
-			} elseif ($_SESSION['application_type'] == 13) { 	//For Suspension [tempprary Application Type = 13] - (SPN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN');
-			} elseif ($_SESSION['application_type'] == 14) {	//For Suspension [tempprary Application Type = 13] - (CAN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN');
+
+			} elseif ($this->Session->check('for_module')) {
+
+				if($this->Session->read('for_module') == 'Suspension') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN'); //For Suspension [Application Type = 9] - (SPN) -> Akash [06-06-2023]
+				} elseif ($this->Session->read('for_module') == 'Cancellation') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN'); //For Suspension [Application Type = 9] - (CAN) -> Akash [06-06-2023]
+				}
+			
 			} else {
 				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
@@ -1832,16 +1837,20 @@ class ApplicationformspdfsController extends AppController{
 			$firm_name_forqr = $customer_firm_data['firm_name'];//updated on 25-04-2023, to get updated details, if changed appl in process
 			$data = [$customer_id,$pdf_date,$certificate_valid_upto,$firm_name_forqr];
 
-			if ($_SESSION['application_type'] == '9') {	 		//For Suspension [Application Type = 9] - (SOC) -> Akash [02-05-2023]
+			if ($_SESSION['application_type'] == '9') {	 		//For Surrender [Application Type = 9] - (SOC) -> Akash [02-05-2023]
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
-			} elseif ($_SESSION['application_type'] == 13) { 	//For Suspension [tempprary Application Type = 13] - (SPN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN');
-			} elseif ($_SESSION['application_type'] == 14) {	//For Suspension [tempprary Application Type = 13] - (CAN) -> Akash [02-05-2023]
-				$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN');
+
+			} elseif ($this->Session->check('for_module')) {
+
+				if($this->Session->read('for_module') == 'Suspension') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'SPN'); //For Suspension [Application Type = 9] - (SPN) -> Akash [06-06-2023]
+				} elseif ($this->Session->read('for_module') == 'Cancellation') {
+					$result_for_qr = $this->Customfunctions->getQrCode($data,'CAN'); //For Suspension [Application Type = 9] - (CAN) -> Akash [06-06-2023]
+				}
+			
 			} else {
 				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
-			
 			
 			$this->set('result_for_qr',$result_for_qr);
 			
@@ -2059,7 +2068,7 @@ class ApplicationformspdfsController extends AppController{
 			if ($_SESSION['application_type'] == '9') {
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
 			} else {
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
 
 			$this->set('result_for_qr',$result_for_qr);				
@@ -2096,7 +2105,7 @@ class ApplicationformspdfsController extends AppController{
 			if ($_SESSION['application_type'] == '9') {
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
 			} else {
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
 
 			$this->set('result_for_qr',$result_for_qr);				
@@ -2316,7 +2325,7 @@ class ApplicationformspdfsController extends AppController{
 			if ($_SESSION['application_type'] == '9') {
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
 			} else {
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
 
 			$this->set('result_for_qr',$result_for_qr);
@@ -2352,10 +2361,10 @@ class ApplicationformspdfsController extends AppController{
 			if ($_SESSION['application_type'] == '9') {
 				$result_for_qr = $this->Customfunctions->getQrCode($data,'SOC');
 			} else {
-			$result_for_qr = $this->Customfunctions->getQrCode($data);
+				$result_for_qr = $this->Customfunctions->getQrCode($data);
 			}
 
-			$this->set('result_for_qr',$result_for_qr);				
+			$this->set('result_for_qr',$result_for_qr);
 			
 			$this->generateGrantCerticatePdf('/Applicationformspdfs/grantLaboratoryCertificatePdf'); 
 		}
@@ -2496,12 +2505,13 @@ class ApplicationformspdfsController extends AppController{
 		//generatin pdf starts here
 		//create new pdf using tcpdf including signature apprearence to generate its hash below
 		require_once(ROOT . DS .'vendor' . DS . 'tcpdf' . DS . 'tcpdf.php');
-		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php'); //This is added for the watermarks on PDF - Akash [05-06-2023]
+		//below line is added on 23-05-2023 by Amol, to print water mark on pdf
+		require_once(ROOT . DS . 'vendor' . DS . 'tcpdf' . DS . 'tcpdf_text.php');
 
 		
 
 		//This below condition is updated for the Surrender (SOC) Application PDFs watermarks - Akash [12-05-2023]
-		if (($appl_type == 9 && $current_level != 'applicant')) { 
+		if ($appl_type == 9 && $current_level != 'applicant') { 
 
 			$this->Session->write('for_module','Surrender');
 			$pdf = new PDF_Rotate(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -3464,5 +3474,7 @@ class ApplicationformspdfsController extends AppController{
 
 	}
 
+	
+	
 }	
 ?>
